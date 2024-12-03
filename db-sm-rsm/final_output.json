@@ -1,0 +1,72 @@
+{
+    "PO": [
+        {
+            "email": "umangagarwal@gmail.com",
+            "passwordHash": "$2a$10$LuB8fjrNSv1VLyBCO6Hbk.Pney7Dy.ZNt65DS7BbYw95Z//6d4ytK"
+        }
+    ],
+    "voter": [
+        {
+            "name": "Michael",
+            "voter_id": "2023ME70710",
+            "vote": false,
+            "ballot_id": ""
+        },
+        {
+            "name": "Angel",
+            "voter_id": "2022ME70710",
+            "vote": false,
+            "ballot_id": ""
+        },
+        {
+            "name": "Charlie",
+            "voter_id": "2024ME70710",
+            "vote": false,
+            "ballot_id": ""
+        },
+        {
+            "name": "Carlos",
+            "voter_id": "2023ME90710",
+            "vote": false,
+            "ballot_id": ""
+        },
+        {
+            "name": "Nam",
+            "voter_id": "2023ME79710",
+            "vote": false,
+            "ballot_id": ""
+        }
+    ],
+    "receipt": [
+        {
+            "commitment_identifier": "",
+            "ballot_id": "d2eae80fa6569bc2253b3322bdf222a86e223de6b7d72839a4edc6c32c086e38",
+            "voter_id": "",
+            "accessed": false
+        },
+        {
+            "commitment_identifier": "",
+            "ballot_id": "129ebde77ce274ea02d3ab78948046763de123d54ddf0179d7c42e2daca9416b",
+            "voter_id": "",
+            "accessed": false
+        },
+        {
+            "commitment_identifier": "",
+            "ballot_id": "6af348620771ab38b257de0d4fc6afa1e269f510b2aba8e6bad439af491bf799",
+            "voter_id": "",
+            "accessed": false
+        },
+        {
+            "commitment_identifier": "",
+            "ballot_id": "bbed85f7c5cef2ebe2d3b5697dbf6cb9ebe89f458042d0783a875b55979b9b54",
+            "voter_id": "",
+            "accessed": false
+        },
+        {
+            "commitment_identifier": "",
+            "ballot_id": "a7b3ee5bc72d3bcd4fa3a839f287d49d0cac76d2118e83263d4bd93c79b7f02e",
+            "voter_id": "",
+            "accessed": false
+        }
+    ]
+}
