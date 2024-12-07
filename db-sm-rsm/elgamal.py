@@ -1,15 +1,19 @@
 from charm.toolbox.pairinggroup import ZR
-from globals import group, g1
+from globals import group
 from secretsharing import share
+from db import load,store
+from misc import serialize_wrapper,deserialize_wrapper
 
 def elgamal_th_keygen(alpha):
     sk = group.random(ZR)
     sklist = share(sk, alpha)
+    g1,h1 = load("setup",["g1","h1"]).values()
     pk = (g1 ** sk, [g1 ** sklist[a] for a in range(len(sklist))]) 
     return sklist, pk
 
 def elgamal_encrypt(pk, m, randIn=None, randOut=False):
     _pk, _ = pk
+    g1,h1 = load("setup",["g1","h1"]).values()
     if randIn is None:
         r  = group.random(ZR)
     else:
@@ -28,6 +32,7 @@ def elgamal_share_decrypt(pk, c, _skshare):
     return c1 ** _skshare
 
 def elgamal_combine_decshares(pk, cs, decshares):
+    g1,h1 = load("setup",["g1","h1"]).values()
     decfactors = [g1 ** 0] * len(cs)
     for a in range(len(decshares)):
         decfactors = [decfactors[i] * decshares[a][i] for i in range(len(cs))]
@@ -36,6 +41,7 @@ def elgamal_combine_decshares(pk, cs, decshares):
     return ms
 
 def elgamal_th_decrypt(sklist, c):
+    g1,h1 = load("setup",["g1","h1"]).values()
     c1, c2 = c 
     c1term = g1 ** 0
     for k in range(len(sklist)):
@@ -52,6 +58,7 @@ def elgamal_exp(c1, a):
     return (c1[0] ** a, c1[1] ** a)
 
 def elgamal_reencrypt(pk, c, randIn=None, randOut=False):
+    g1,h1 = load("setup",["g1","h1"]).values()
     if randOut:
         c_iden, r = elgamal_encrypt(pk, g1 ** 0, randIn=randIn, randOut=True)
         return elgamal_mult(c, c_iden), r
@@ -76,7 +83,7 @@ def elgamal_share_decryption_batchpf(pk, decshares, cs, deltavec, k, _sklist):
         PK{(d_k): hk^{delta}c1k^{delta1}...cNk^{deltaN} = (g_1^{delta}c10^{delta1}...cN0^{deltaN})^{sk_k}},
     which is a proof of the form PK{(d): a=b^d}. This is efficient because the deltas are small!
     """
-
+    g1,h1 = load("setup",["g1","h1"]).values()
     _pk, pklist = pk
     lhs = pklist[k] ** deltavec[0]
     for i in range(1, len(deltavec)):
@@ -99,6 +106,7 @@ def elgamal_share_decryption_batchpf(pk, decshares, cs, deltavec, k, _sklist):
     return chal, z_skshare
 
 def elgamal_share_decryption_batchverif(pk, decshares, cs, deltavec, k, pf):
+    g1,h1 = load("setup",["g1","h1"]).values()
     _pk, pklist = pk
     lhs = pklist[k] ** deltavec[0]
     for i in range(1, len(deltavec)):

@@ -1,3 +1,4 @@
+import os
 import concurrent.futures
 import random
 from reportlab.lib.pagesizes import A4
@@ -17,7 +18,7 @@ import gmpy2
 from gmpy2 import mpz
 import pymongo
 from misc import serialize_wrapper, deserialize_wrapper
-#test
+
 def init():
     client = pymongo.MongoClient('mongodb+srv://raagineedturki:pxfkFNcAnkinDFnk@cluster0.8i60tuh.mongodb.net/')
     db = client["test"]
@@ -78,9 +79,9 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     # Call the functions to add content to both halves
     gamma_booth = G2_part1()
     print(gamma_booth)
-    eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid = G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m)
+    eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls = G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m)
     print(eps_v_w_ls)
-    c_w_all,ov_hash = G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m, bid)
+    c_w_all,ov_hash = G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m)
     print(ov_hash)
     for i in range(len(candidates)):
         collection.insert_one({
@@ -91,7 +92,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
             'enc_msg_share': serialize_wrapper(evr_kw_ls[i]),
             'enc_rand_share': serialize_wrapper(evr_rw_ls[i]),
             'pfcomm': None,
-            'enc_rand': None,
+            'enc_rand': serialize_wrapper(eps_r_w_ls),
             'pf_encmsg': None,
             'pf_encrand': None,
             'pfs_enc_msg_share': None,
@@ -200,14 +201,14 @@ def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, 
 
     c.line(left_x, left_y - 60*(k+2) - 10, left_x + 150 + 100, left_y - 60*(k+2) - 10)
     
-    return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid
+    return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls
     
 def G2_part1():
     r_booth = group.random(ZR)
     gamma_booth = (g**j)*(h**r_booth)
     return gamma_booth   
 
-def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m, bid):
+def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m):
     # Set the font and size for the right half
     c.setFont("Helvetica", 16)
     
@@ -280,15 +281,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, ca
     ov_hash = sha256_of_array(c_w_all)
     commitment_identifier = str(uuid.uuid4())
     
-    c_w_all_updated = []
-
-    for i, candidate in enumerate(candidates):
-        v_w_bar = bid + i
-        y = int(v_w_bar) % len(candidates)
-        c_w_all_i = c_w_all[y]
-        c_w_all_updated.append(c_w_all_i)
-
-    qr_data = c_w_all_updated
+    qr_data = c_w_all
     print(qr_data)
     qr_filename2 = "qr_code2.png"
     generate_qr_code(qr_data, qr_filename2)
@@ -325,8 +318,8 @@ def load():
         result[params2[i]] = deserialize_wrapper(document[params[i]])
     return result
 
-def main():
-    num_ballots = int(input("Enter the number of ballots to generate: "))
+def ballot_draft(num):
+    num_ballots = num
 
     db=init()
     collect=db['candidates']
@@ -340,13 +333,25 @@ def main():
     # Connect to MongoDB
     m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load().values()
     
+    #print("a")
+    #print(m)
+    #print("b")
+    #print(pai_pk)
+    #print("c")
+    #print(pai_sk)
     #m = 2
     #print(m)
     #print(pai_sklist)
     collection = connect_to_mongodb()
 
     for i in range(num_ballots):
+        print(f"Creating PDF for ballot {i+1}...")
         create_pdf(m, collection, f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
+        print(f"PDF ballot_{i+1}.pdf created successfully!")
+        if os.path.exists(f"ballot_{i+1}.pdf"): 
+            print(f"ballot_{i+1}.pdf saved successfully.")
+        else:
+            print(f"Failed to save ballot_{i+1}.pdf!")
 
     # Prepare arguments for threading
     #args_list = [(i, m, collection, f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk) for i in range(num_ballots)]
@@ -355,5 +360,3 @@ def main():
     #with concurrent.futures.ThreadPoolExecutor() as executor:
     #    executor.map(create_pdf_worker, args_list)
 
-if __name__ == "__main__":
-    main()

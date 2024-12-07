@@ -2,24 +2,34 @@ import random
 
 from charm.toolbox.pairinggroup import ZR, pair
 
-from globals import group, g1, h1, f1, f2, ef1f2
-
+from globals import group
+from db import load,store
 def bbspluskeygen():
     _sk = group.random(ZR)
+    g1,f2 = load("setup",["g1","f2"]).values()
+    print(type(f2),type(_sk))
     pk = f2 ** _sk
     return _sk, pk
 
 def bbsplussign(m, _sk):
     c, r = group.random(ZR, 2)
+    f1,g1,h1=load("setup",["f1","g1","h1"]).values()
     S = (f1 * (g1 ** m) * (h1 ** r)) ** (1 / (c + _sk))
     return (S, c, r)
 
 def bbsplusverify(sigma, m, pk):
     S, c, r = sigma
+    f2,g1,h1,f1 = load("setup",["f2","g1","h1","f1"]).values()
     return pair(S, pk * (f2 ** c)) == pair(f1 * (g1 ** m) * (h1 ** r), f2)
 
 def bbsplusquasisign_commitment(C, _sk):
     c, rhat = group.random(ZR, 2)
+    f1,h1 = load("setup",["f1","h1"]).values()
+    print(type(c),"type of c")
+    print(type(rhat),"type of rhat")
+    print(type(f1),"type of f1")
+    print(type(C),"type of C")
+    print(type(_sk),"type of sk")
     S = (f1 * (h1 ** rhat) * C) ** (1 / (c + _sk))
     return (S, c, rhat)
 
@@ -36,7 +46,7 @@ def bbsplusquasibatchverify(sigmas, comms, pk):
     #    e(prod_i S_i ** delta_i, pk) * e(prod_i ((S_i ** c_i)( C_i ** (-1))(h1 ** (-r_i))) ** delta_i, f2) = ef1f2 ** (sum_i delta_i)
     #
     # Ref: Anna Lisa Ferrara, Matthew Green, Susan Hohenberger, ``Practical Short Signature Batch Verification'', https://eprint.iacr.org/2008/015.pdf
-
+    g1,f1,f2,h1,ef1f2 = load("setup",["g1","f1","f2","h1","ef1f2"]).values()
     deltas = [random.getrandbits(80) for _ in range(len(sigmas))]
 
     S_delta_prod = g1 ** 0

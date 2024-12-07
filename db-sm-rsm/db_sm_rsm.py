@@ -163,12 +163,14 @@ def check_verfsigs(msgs_out, sigs, verfpk, enc_sigs, enc_sigs_rands, elgpk, alph
     status_checkverfsigs = True
     for a in range(alpha):
         with timer("mixer %d: checking verifier's signatures and encryptions" % a):
-            print(sigs,"in check_verfsigs")
+            #print(sigs,"in check_verfsigs")
             status_checkverfsigs = status_checkverfsigs and bbbatchverify(sigs, msgs_out, verfpk)
-            print(status_checkverfsigs,"check for bbatchverify")
+            #print(bbbatchverify(sigs, msgs_out, verfpk),"check for bbatchverify")
             enc_sigs_dash = tuple([elgamal_encrypt(elgpk, sigs[i], randIn=enc_sigs_rands[i]) for i in range(len(sigs))])
+            #print(enc_sigs_dash,"enc_sigs_dash")
+            #print(enc_sigs,"enc_sigs")
             status_checkverfsigs = status_checkverfsigs and (enc_sigs_dash == enc_sigs)
-            print(enc_sigs_dash ,"enc_sigs_dash")
+            #print(enc_sigs_dash ,"enc_sigs_dash")
     return status_checkverfsigs
 
 def get_blsigs(enc_sigs, ck, permcomm, alpha, elgpk, _svecperm, _pi, _re_pi, _elgsklist):

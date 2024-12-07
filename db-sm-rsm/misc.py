@@ -4,6 +4,7 @@ from collections.abc import Iterable
 import gmpy2
 
 from globals import CALLDEPTH, group
+from charm.toolbox.pairinggroup import PairingGroup
 
 
 def sz(base64_input):
@@ -86,6 +87,13 @@ def serialize_wrapper(item):
         return (fn, bytes(item, 'utf-8'))
     elif isinstance(item, Iterable) and not isinstance(item, (str, bytes)):
         return (fn, [serialize_wrapper(iitem) for iitem in item])
+    elif hasattr(item, "serialize"):  # Check if the item has a serialize method
+        # Assume the item is a group element and serialize it
+        serialized = item.serialize()
+        return (fn, base64.b64encode(serialized).decode('utf-8'))
+    elif isinstance(item, PairingGroup):
+        # Serialize the PairingGroup by extracting relevant parameters
+        return ("charm.toolbox.pairinggroup.PairingGroup", item.param_id)
     else:
         return (fn, item)
 
@@ -97,17 +105,27 @@ def deserialize_wrapper(sitem):
         item = pai_group.deserialize(_sitem)
     elif fn == "pairing.Element":
         item = group.deserialize(_sitem)
+    elif fn == "charm.toolbox.pairinggroup.PairingGroup":
+        # Recreate the PairingGroup using the stored parameter ID
+        item = PairingGroup(_sitem)
     elif fn == "builtins.str":
         item = str(_sitem, 'utf-8')
-    elif fn == "gmpy2.mpz":
-        item = gmpy2.mpz(_sitem)  # Convert string back to mpz
-    elif fn=="builtins.mpz":
-        item=gmpy2.mpz(_sitem)
-    elif isinstance(_sitem, Iterable) and not isinstance(_sitem, (str, bytes)):
+    elif fn =="gmpy2.mpz":
+        item = gmpy2.mpz(_sitem)
+    elif fn =="builtins.mpz":
+        item = gmpy2.mpz(_sitem)
+    elif fn =="builtins.tuple":
+        item = tuple(deserialize_wrapper(siitem) for siitem in _sitem)
+    elif isinstance(_sitem, Iterable):
         item = [deserialize_wrapper(siitem) for siitem in _sitem]
+    elif fn == "PairingGroupElement":
+        # Decode from base64 and deserialize
+        serialized_bytes = base64.b64decode(_sitem)
+        item = group.deserialize(serialized_bytes)
     else:
         item = _sitem
     return item
+
 
 
 

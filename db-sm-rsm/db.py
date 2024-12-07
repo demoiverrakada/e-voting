@@ -34,7 +34,18 @@ def store(funcs,params):
             "_pi":(serialize_wrapper(params[9])),
             "_re_pi":(serialize_wrapper(params[10])),
             "_svecperm":(serialize_wrapper(params[11])),
-            "permcomm":(serialize_wrapper(params[12]))
+            "permcomm":(serialize_wrapper(params[12])),
+            "g1":(serialize_wrapper(params[13])),
+            "f2":(serialize_wrapper(params[14])),
+            "eg1f2":(serialize_wrapper(params[15])),
+            "ef1f2":(serialize_wrapper(params[16])),
+            "f1":(serialize_wrapper(params[17])),
+            "h1":(serialize_wrapper(params[18])),
+            "eh1f2":(serialize_wrapper(params[19])),
+            "idenT":(serialize_wrapper(params[20])),
+            "inveh1f2":(serialize_wrapper(params[21])),
+            "inveg1f2":(serialize_wrapper(params[22])),
+            "fT":(serialize_wrapper(params[23]))
         })
     elif(function_map[funcs]=='decs'):
         collection.insert_one({
@@ -85,16 +96,16 @@ def load(funcs,params):
             res.append(document["name"])
         return res
     elif function_map[funcs] == 'receipts':
-        res = []
+        res = {}
         param_value = params[0]
         document = collection.find_one({"enc_hash": param_value})
         del params[0]
         if document:
             for key in params:
-                if(key!="enc_hash"):
-                    deserialized_item = deserialize_wrapper(document[key])
-                    result[key].append(deserialized_item)
-            res.append({"enc_hash":param_value})
+                #if(key!="enc_hash"):
+                deserialized_item = deserialize_wrapper(document[key])
+                res[key] = deserialized_item
+            res["enc_hash"] = param_value
             return res
     elif function_map[funcs] =="verfps":
         res=[]
