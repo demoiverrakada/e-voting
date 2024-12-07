@@ -1,0 +1,35 @@
+services:
+  ea-server:
+    build: .
+    working_dir: /app/evoting_localstorage/project_evoting
+    command: /root/.nvm/versions/node/v22.3.0/bin/node index
+    ports:
+      - "5000:5000"
+    links:
+      - ea-db
+    volumes:
+    - ./output:/output
+  
+  ea-db:
+    image: mongo:latest
+    hostname: eadb
+    environment:
+      - MONGO_INITDB_DATABASE=EA_DB
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    ports:
+      - 27017:27017
+  
+  # verif-server:
+  #   build: .
+  #   command: python verif_server.py
+  #   ports:
+  #     - "5001:5001"
+  #   volumes:
+  #   - ./output:/output
+  
+  # interactive:
+  #   build: .
+  #   command: /bin/bash -c "cd core; python rename.py &> /output/rename.log"
+  #   volumes:
+  #   - ./output:/output
