@@ -10,7 +10,7 @@ import optpaillier
 import optthpaillier
 import secretsharing
 import qrcode
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from reportlab.lib.utils import ImageReader
 import hashlib
 import uuid
@@ -18,6 +18,10 @@ import gmpy2
 from gmpy2 import mpz
 import pymongo
 from misc import serialize_wrapper, deserialize_wrapper
+import sys
+#import pyqrcode
+#from pyzbar.pyzbar import decode
+
 
 def init():
     client = pymongo.MongoClient('mongodb+srv://raagineedturki:pxfkFNcAnkinDFnk@cluster0.8i60tuh.mongodb.net/')
@@ -66,22 +70,14 @@ def generate_qr_code(data, filename):
     img = qr.make_image(fill='black', back_color='white')
     img.save(filename)
 
+
 def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk):
-    # A4 dimensions in points (1 point = 1/72 inch)
-    width, height = A4
-    
-    # Create a new canvas object for the PDF
-    c = canvas.Canvas(filename, pagesize=A4)
-    
-    # Draw a line to divide the page vertically into two halves
-    c.line(width / 2, 0, width / 2, height)
-    
     # Call the functions to add content to both halves
     gamma_booth = G2_part1()
     print(gamma_booth)
-    eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls = G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m)
+    eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid = G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m)
     print(eps_v_w_ls)
-    c_w_all,ov_hash = G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m)
+    c_w_all,ov_hash = G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid)
     print(ov_hash)
     for i in range(len(candidates)):
         collection.insert_one({
@@ -99,10 +95,105 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
             'pfs_enc_rand_share': None
         })
     
-    # Save the PDF
-    c.save()
+    # Constants for A5 size in pixels (300 DPI)
+    bw = 2480
+    bh = 1748
+    
+    # Fonts
+    font = ImageFont.truetype('DejaVuSans.ttf', 40)
+    smallfont = ImageFont.truetype('DejaVuSans.ttf', 30)
+    boldfont = ImageFont.truetype('DejaVuSans-Bold.ttf', 40)
+    titlefont = ImageFont.truetype('DejaVuSans-Bold.ttf', 80)
+    subtitlefont = ImageFont.truetype('DejaVuSans.ttf', 40)
 
-def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m):
+    # Create a blank white image with A5 dimensions
+    image = Image.new('RGB', (bw, bh), color='white')
+    draw = ImageDraw.Draw(image)
+
+    # Vertical line at the center
+    center_x = bw // 2
+    draw.line((center_x, 0, center_x, bh), fill='gray', width=10)
+
+    # Headings
+    draw.text((int(0.2 * bh), 0.07 * bh), "VVPAT side", font=titlefont, fill='black')
+    draw.text((int(0.2 * bh), 0.07 * bh + 100), "(Drop into the ballot box)", font=subtitlefont, fill='black')
+    draw.text((center_x + int(0.2 * bh), 0.07 * bh), "Receipt side", font=titlefont, fill='black')
+    draw.text((center_x + int(0.2 * bh), 0.07 * bh + 100), "(Bring back for scanning)", font=subtitlefont, fill='black')
+
+    # QR code containing encrypted votes
+    qr_code2 = "qr_code.png"
+    qr_encvotes = Image.open(qr_code2)
+    qr_encvotes = qr_encvotes.resize((600, 600))  # Resize if necessary
+    encvotes_x = center_x + (bw // 4) - (qr_encvotes.width // 2) 
+    encvotes_y = (bh - qr_encvotes.height) // 2
+    draw.text((encvotes_x + 130, encvotes_y - 80), "Encrypted candidate IDs", font=boldfont, fill='black')
+    draw.text((encvotes_x + 130, encvotes_y - 40), "(In the same order as the VVPAT side)", font=smallfont, fill='black')
+    image.paste(qr_encvotes, (encvotes_x + 100, encvotes_y))
+
+    # Candidate names
+    text_x = int(0.3 * (bw // 2))  
+    text_y = int(0.25 * bh) 
+    candname_top = text_y
+    box_startx = center_x - (encvotes_x - center_x)
+    box_endx = encvotes_x - 50
+    draw.text((text_x - 50, text_y - 100), "Candidates", font=boldfont, fill='black')
+    draw.text((box_startx + 20, text_y - 100), "Your choice", font=boldfont, fill='black')
+    draw.text((center_x + 20, text_y - 100), "Your choice", font=boldfont, fill='black')
+    draw.text((center_x - (center_x - box_startx) // 2, text_y - 50), "(Mark across the line)", font=smallfont, fill='black')
+    n = 0
+    for i, candname in enumerate(candidates):
+        n += 1
+    
+    for i, candname in enumerate(candidates):
+        draw.line((0, text_y, box_endx + 100, text_y), fill='gray', width=5)
+        text_y = text_y + int(0.06 * bh *(4/n))
+        draw.text((text_x, text_y - 0.008*bh), "%s. %s" % (i, candname), font=font, fill='black')
+        draw.text((box_endx + 40, text_y - 0.008*bh), "%s." % i, font=font, fill='black')
+        text_y = text_y + int(0.06 * bh *(4/n))
+    draw.line((0, text_y, box_endx + 100, text_y), fill='gray', width=5)
+    candname_bot = text_y
+    draw.line((box_startx, candname_top, box_startx, candname_bot), fill='gray', width=5)
+    #draw.line((box_endx, candname_top, box_endx, candname_bot), fill='gray', width=5)
+    draw.line((box_endx + 100, candname_top, box_endx + 100, candname_bot), fill='gray', width=5)
+    draw.text((box_startx + 30, candname_bot + 20), "(Separate along the line after marking)", font=smallfont, fill='black')
+
+    # QR code containing the bid
+    qr_code = "qr_code.png"
+    qr_bid = Image.open(qr_code)
+    qr_bid = qr_bid.resize((300, 300))  # Resize if necessary
+    bid_x = text_x
+    bid_y = text_y + 150
+    draw.text((bid_x + 60, bid_y - 50), "Ballot ID", font=boldfont, fill='black')
+    image.paste(qr_bid, (bid_x, bid_y))
+
+    # QR code containing the booth num
+    qr_code3 = "qr_code3.png"
+    qr_ballot_num = Image.open(qr_code3)
+    qr_ballot_num = qr_ballot_num.resize((300, 300))  # Resize if necessary
+    ballot_num_x = center_x + (bw // 4) - (qr_encvotes.width // 2) + 280 
+    ballot_num_y = text_y + 150
+    draw.text((ballot_num_x + 60, ballot_num_y - 50), "Booth Num", font=boldfont, fill='black')
+    image.paste(qr_ballot_num, (ballot_num_x, ballot_num_y))
+
+    # Save the image
+    image.save(filename)
+
+    
+    # A4 dimensions in points (1 point = 1/72 inch)
+    #width, height = A4
+    
+    # Create a new canvas object for the PDF
+    #c = canvas.Canvas(filename, pagesize=A4)
+    
+    # Draw a line to divide the page vertically into two halves
+    #c.line(width / 2, 0, width / 2, height)
+    
+    
+    
+    # Save the PDF
+    #c.save()
+
+def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m):
     # bid
     bid = group.random(ZR)
     
@@ -119,20 +210,23 @@ def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, 
     generate_qr_code(qr_data, qr_filename)
     
     # Set the font and size for the left half
-    c.setFont("Helvetica", 16)
+    #c.setFont("Helvetica", 16)
     
     # Set the starting position for the left half
-    left_x = 20
-    left_y = height - 40
+    #left_x = 20
+    #left_y = height - 160
     
     # Titles for the left half
-    c.drawString(left_x + 40, left_y - 10, "w")
+    #c.drawString(left_x + 40, left_y - 10, "w")
     
-    c.drawString(left_x + 150, left_y - 10, "Candidate")
-    c.line(left_x, left_y - 8 - 10, left_x + 150 + 100, left_y - 8 - 10)  # Underline 'Candidate'
+    #c.drawString(left_x + 150, left_y - 10, "Candidate")
+    #c.drawString(left_x + 390, left_y - 60, "Scan Commitments")
+    #c.drawString(left_x + 110, left_y - 10 - 400, "Scan bid")
+    #c.drawString(left_x + 400, left_y - 10 - 400, "Scan booth num")
+    #c.line(left_x, left_y - 8 - 10, left_x + 150 + 100, left_y - 8 - 10)  # Underline 'Candidate'
     
     # Calculate center position for candidate names
-    candidate_x_center = left_x + 180
+    #candidate_x_center = left_x + 180
     
     # Print each candidate's number and name on the left half
     k = 0
@@ -142,6 +236,11 @@ def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, 
     evr_kw_ls = []
     eps_r_w_ls = []
     evr_rw_ls=[]
+
+    n = 0
+    for i, candidate in enumerate(candidates):
+        n += 1
+
     for i, candidate in enumerate(candidates):
         # v_w_bar
         v_w_bar = bid + i
@@ -180,50 +279,51 @@ def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, 
         evr_kw_ls.append(evr_kw_ls_sub2)
         evr_rw_ls.append(evr_rw_ls_sub2)        
         k = i
-        c.drawString(left_x + 40, left_y - 60 * (i + 1) - 10, f"{i}")
+        step = 300/n
+        #c.drawString(left_x + 40, left_y - step * (i + 1) - 10, f"{i}")
         
         # Calculate the width of the candidate name
-        candidate_width = c.stringWidth(candidate, "Helvetica", 14)
+        #candidate_width = c.stringWidth(candidate, "Helvetica", 14)
         
         # Calculate the position to start drawing the candidate name
-        candidate_x = candidate_x_center - candidate_width / 2
+        #candidate_x = candidate_x_center - candidate_width / 2
         
         # candidate's index
         y = int(v_w_bar) % len(candidates)  # Convert v_w_bar to int before using modulus
         candidate = candidates[y]
         
-        c.drawString(candidate_x, left_y - 60 * (i + 1) - 10, f"{candidate}")
+        #c.drawString(candidate_x, left_y - 60 * (i + 1) - 10, f"{candidate}")
 
-    qr_image = ImageReader(qr_filename)
-    qr_x = width / 2 - 100  # Adjust the position as needed
-    qr_y = left_y - 60 * (k + 4)
-    c.drawImage(qr_image, left_x + 40, left_y - 60*(k+6) - 10, width=200, height=200)
+    #qr_image = ImageReader(qr_filename)
+    #qr_x = width / 2 - 100  # Adjust the position as needed
+    #qr_y = left_y - 60 * (k + 4)
+    #c.drawImage(qr_image, left_x + 40, left_y - 60*(k+6) - 10, width=200, height=200)
 
-    c.line(left_x, left_y - 60*(k+2) - 10, left_x + 150 + 100, left_y - 60*(k+2) - 10)
+    #c.line(left_x, left_y - 60*(k+2) - 10, left_x + 150 + 100, left_y - 60*(k+2) - 10)
     
-    return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls
+    return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid
     
 def G2_part1():
     r_booth = group.random(ZR)
     gamma_booth = (g**j)*(h**r_booth)
     return gamma_booth   
 
-def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, m):
+def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid):
     # Set the font and size for the right half
-    c.setFont("Helvetica", 16)
+    #c.setFont("Helvetica", 16)
     
     # Set the starting position for the right half
-    right_x = width / 2 + 20
-    right_y = height - 40
+    #right_x = width / 2 + 20
+    #right_y = height - 160
     
     # Titles for the right half
-    c.drawString(right_x + 40, right_y - 10, "w")
+    #c.drawString(right_x + 40, right_y - 10, "w")
     
-    c.drawString(right_x + 150, right_y - 10, "Candidate")
-    c.line(right_x + 40, right_y - 8 - 10, right_x + 150 + 100, right_y - 8 - 10)  # Underline 'Candidate'
+    #c.drawString(right_x + 150, right_y - 10, "Candidate")
+    #c.line(right_x + 40, right_y - 8 - 10, right_x + 150 + 100, right_y - 8 - 10)  # Underline 'Candidate'
     
     # Calculate center position for candidate names
-    candidate_x_center = right_x + 180
+    #candidate_x_center = right_x + 180
     
     # Print each candidate's number and name on the right half
     k = 0
@@ -269,24 +369,30 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, ca
         c_w_all.append(c_w_h)
         
         k = i
-        c.drawString(right_x + 40, right_y - 60 * (i + 1) - 10, f"{i}")
+        #c.drawString(right_x + 40, right_y - 60 * (i + 1) - 10, f"{i}")
         
         # Calculate the width of the candidate name
-        candidate_width = c.stringWidth(candidate, "Helvetica", 14)
+        #candidate_width = c.stringWidth(candidate, "Helvetica", 14)
         
         # Calculate the position to start drawing the candidate name
-        candidate_x = candidate_x_center - candidate_width / 2
+        #candidate_x = candidate_x_center - candidate_width / 2
         
     _sk = group.random(ZR)
     ov_hash = sha256_of_array(c_w_all)
     commitment_identifier = str(uuid.uuid4())
     
-    qr_data = c_w_all
+    c_w_all_updated = []
+    for i, candidate in enumerate(candidates):
+        v_w_bar = bid + i
+        y = int(v_w_bar) % len(candidates)
+        c_w_all_i = c_w_all[y]
+        c_w_all_updated.append(c_w_all_i)
+    qr_data = c_w_all_updated
     print(qr_data)
     qr_filename2 = "qr_code2.png"
     generate_qr_code(qr_data, qr_filename2)
-    qr_image2 = ImageReader(qr_filename2)
-    c.drawImage(qr_image2, right_x + 60, right_y - 270, width=200, height=200)
+    #qr_image2 = ImageReader(qr_filename2)
+    #c.drawImage(qr_image2, right_x + 60, right_y - 270, width=200, height=200)
     
     has = group.hash(c_w_hash, type=ZR)
     sigma_c = bbsig.bbsign(has, _sk)
@@ -296,10 +402,10 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, ca
     qr_filename3 = "qr_code3.png"
     generate_qr_code(qr_data3, qr_filename3)
     qr_image3 = ImageReader(qr_filename3)
-    c.drawImage(qr_image3, right_x + 60, right_y - 60*(k+6) - 10, width=200, height=200)
+    #c.drawImage(qr_image3, right_x + 60, right_y - 60*(k+6) - 10, width=200, height=200)
 
-    c.line(right_x + 40, right_y - 60*(k+2) - 10, right_x + 150 + 100, right_y - 60*(k+2) - 10)
-    c.line(width/2, right_y - 60*(k+7) - 10, width, right_y - 60*(k+7) - 10)
+    #c.line(right_x + 40, right_y - 60*(k+2) - 10, right_x + 150 + 100, right_y - 60*(k+2) - 10)
+    #c.line(width/2, right_y - 60*(k+7) - 10, width, right_y - 60*(k+7) - 10)
     
     return c_w_all,ov_hash
 
@@ -346,7 +452,7 @@ def ballot_draft(num):
 
     for i in range(num_ballots):
         print(f"Creating PDF for ballot {i+1}...")
-        create_pdf(m, collection, "/output/" + f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
+        create_pdf(m, collection, f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
         print(f"PDF ballot_{i+1}.pdf created successfully!")
         if os.path.exists(f"ballot_{i+1}.pdf"): 
             print(f"ballot_{i+1}.pdf saved successfully.")
