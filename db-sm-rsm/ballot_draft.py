@@ -122,15 +122,12 @@ def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, 
     
     # Set the starting position for the left half
     left_x = 20
-    left_y = height - 160
+    left_y = height - 40
     
     # Titles for the left half
     c.drawString(left_x + 40, left_y - 10, "w")
     
     c.drawString(left_x + 150, left_y - 10, "Candidate")
-    c.drawString(left_x + 390, left_y - 60, "Scan Commitments")
-    c.drawString(left_x + 110, left_y - 10 - 400, "Scan bid")
-    c.drawString(left_x + 400, left_y - 10 - 400, "Scan booth num")
     c.line(left_x, left_y - 8 - 10, left_x + 150 + 100, left_y - 8 - 10)  # Underline 'Candidate'
     
     # Calculate center position for candidate names
@@ -144,10 +141,6 @@ def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, 
     evr_kw_ls = []
     eps_r_w_ls = []
     evr_rw_ls=[]
-    n = 0
-    for i, candidate in enumerate(candidates):
-        n += 1
-
     for i, candidate in enumerate(candidates):
         # v_w_bar
         v_w_bar = bid + i
@@ -186,8 +179,7 @@ def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, 
         evr_kw_ls.append(evr_kw_ls_sub2)
         evr_rw_ls.append(evr_rw_ls_sub2)        
         k = i
-        step = 300/n
-        c.drawString(left_x + 40, left_y - step * (i + 1) - 10, f"{i}")
+        c.drawString(left_x + 40, left_y - 60 * (i + 1) - 10, f"{i}")
         
         # Calculate the width of the candidate name
         candidate_width = c.stringWidth(candidate, "Helvetica", 14)
@@ -204,7 +196,6 @@ def G1(gamma_booth, c, width, height, candidates, pai_pk_optthpaillier, pai_pk, 
     qr_image = ImageReader(qr_filename)
     qr_x = width / 2 - 100  # Adjust the position as needed
     qr_y = left_y - 60 * (k + 4)
-    c.drawString(left_x + 140, left_y - 60*(k+6) - 10, "bid")
     c.drawImage(qr_image, left_x + 40, left_y - 60*(k+6) - 10, width=200, height=200)
 
     c.line(left_x, left_y - 60*(k+2) - 10, left_x + 150 + 100, left_y - 60*(k+2) - 10)
@@ -222,12 +213,12 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, ca
     
     # Set the starting position for the right half
     right_x = width / 2 + 20
-    right_y = height - 160
+    right_y = height - 40
     
     # Titles for the right half
-    #c.drawString(right_x + 40, right_y - 10, "w")
+    c.drawString(right_x + 40, right_y - 10, "w")
     
-    #c.drawString(right_x + 150, right_y - 10, "Candidate")
+    c.drawString(right_x + 150, right_y - 10, "Candidate")
     c.line(right_x + 40, right_y - 8 - 10, right_x + 150 + 100, right_y - 8 - 10)  # Underline 'Candidate'
     
     # Calculate center position for candidate names
@@ -277,7 +268,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, c, width, height, ca
         c_w_all.append(c_w_h)
         
         k = i
-        #c.drawString(right_x + 40, right_y - 60 * (i + 1) - 10, f"{i}")
+        c.drawString(right_x + 40, right_y - 60 * (i + 1) - 10, f"{i}")
         
         # Calculate the width of the candidate name
         candidate_width = c.stringWidth(candidate, "Helvetica", 14)

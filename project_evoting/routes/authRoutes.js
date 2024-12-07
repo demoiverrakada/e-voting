@@ -45,7 +45,7 @@ function callPythonFunction(functionName, ...params) {
 }
 
 // endpoint for generating the keys for the election
-router.post('/setup', async (req, res) => {
+router.post('/setup',requireAuth, async (req, res) => {
     const { alpha, n } = req.body;
     const alp = Number(JSON.parse(alpha));
     const nu = Number(JSON.parse(n));
@@ -62,7 +62,7 @@ router.post('/setup', async (req, res) => {
     }
 });
 
-router.post('/generate', async (req, res) => {
+router.post('/generate',requireAuth, async (req, res) => {
     const { n } = req.body;
     const num = Number(JSON.parse(n));
     const outputDirectory = path.join(__dirname, '../');
@@ -114,12 +114,14 @@ router.get('/pk', async (req, res) => {
         if (!existingKey) {
             return res.status(422).send({ error: "Setup has not been done yet." });
         }
+        console.log("here")
         // Sending the response in correct JSON format
         res.send({
             pai_pk: existingKey.pai_pk,
             pai_pklist_single: existingKey.pai_pklist_single,
             elg_pk: existingKey.elg_pk
         });
+        console.log(res.data());
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -550,6 +552,7 @@ router.post('/signin/Admin', async (req, res) => {
     try {
         await newAdmin.comparePassword(password);
         const token = jwt.sign({ userId: newAdmin._id }, jwtkey);
+        console.log(token)
         res.send({ token });
     } catch (err) {
         return res.status(422).send(err.message);

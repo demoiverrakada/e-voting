@@ -9,26 +9,18 @@ module.exports = async (req, res, next) => {
     }
 
     const token = authorization.replace("Bearer ", "");
-
+    console.log(token);
     jwt.verify(token, jwtkey, async (err, payload) => {
         if (err) {
             return res.status(401).send({ error: "You must be logged in!" });
         }
 
         const { userId } = payload;
-
+        console.log(userId,"userId")
         try {
-            // Check if the user is a Polling Officer
-            const newPO = await PO.findById(userId);
-
-            if (newPO) {
-                req.user = newPO;
-                return next();
-            }
-
             // If not a PO, check if the user is an Admin
             const newAdmin = await Admin.findById(userId);
-
+            console.log(newAdmin,"admin name")
             if (!newAdmin) {
                 return res.status(401).send({ error: "User not found or unauthorized" });
             }
