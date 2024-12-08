@@ -32,7 +32,14 @@ function App() {
       const my_Email = values.Email;
       const my_Password = values.Password;
       axios
-        .post(`http://localhost:5000/signin/admin`, { email: my_Email, password: my_Password })
+        .post(`https://3c75-35-247-153-222.ngrok-free.app/signin/admin`, 
+          { email: my_Email, password: my_Password },
+          {
+            headers: {
+              "Content-Type": "application/json"
+            },
+          }
+        )
         .then((res) => {
           const access_token = res.data.token;
           ReactSession.set('access_token', access_token);
