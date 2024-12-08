@@ -24,9 +24,30 @@ services:
   #   build: .
   #   command: python verif_server.py
   #   ports:
-  #     - "5001:5001"
+  #     - "7000:7000"
   #   volumes:
   #   - ./output:/output
+  #
+
+  # bulletin:
+  #     build: .
+  #     command:
+  #     ports:
+  #       - "5001:5001"
+
+  # admin-webpage:
+  #     build: .
+  #     command:
+  #     ports:
+  #       - "3000:3000"
+
+  # verification-webpage:
+  #     build: .
+  #     command: 
+  #     ports:
+  #       - "7001:7001" 
+  # 
+
   
   # interactive:
   #   build: .
