@@ -5,8 +5,6 @@ import { ReactSession } from 'react-client-session';
 import './App.css';
 
 function Upload() {
-    const [file, setFile] = useState(null);
-    const [message, setMessage] = useState('');
 
     const navigate = useNavigate();
 
@@ -17,170 +15,67 @@ function Upload() {
             navigate('/', { replace: true });
         }
     }, [navigate]);
+    
+    
 
-    const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0];
-        if (selectedFile && selectedFile.type === 'application/json') {
-            setFile(selectedFile);
+    const [file, setFile] = useState(null);
+    const [message, setMessage] = useState('');
+    // const navigate = useNavigate();
+
+    const handleFileChange = (event) => {
+        const uploadedFile = event.target.files[0];
+        if (uploadedFile && uploadedFile.type === 'application/json') {
+        setFile(uploadedFile);
+        setMessage('File selected: ' + uploadedFile.name);
         } else {
-            setMessage('Please select a valid JSON file.');
-            setFile(null);
+        setMessage('Please upload a valid JSON file.');
+        setFile(null);
         }
     };
 
-    const handleUpload = async () => {
+
+    const uploadFile = async (endpoint) => {
         if (!file) {
-            setMessage('Please select a file first.');
+            setMessage('No file selected.');
             return;
         }
     
-        //console.log("check 1");
-    
         const reader = new FileReader();
-        reader.onload = async (event) => {
-            try {
-                const fileContent = event.target.result; // File content as text
-                const jsonData = JSON.parse(fileContent); // Parse the JSON content
     
+        reader.onload = async (e) => {
+            try {
+                // Parse the JSON file content
+                const jsonData = JSON.parse(e.target.result);
+    
+                // Retrieve the access token from session storage
                 const token = ReactSession.get('access_token');
-                const response = await axios.post(
-                    'http://localhost:5000/upload',
-                    jsonData,  // Send parsed JSON data directly
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'  // Important for sending JSON
-                        },
-                    }
-                );
-                
-                console.log('Protected data:', response.data);
-                setMessage('File uploaded successfully!');
+    
+                // Send the parsed JSON data to the server
+                const response = await axios.post(endpoint, jsonData, {
+                    headers: {
+                        authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+    
+                setMessage(`Upload successful: ${response.data.message || 'Success'}`);
             } catch (error) {
-                console.error('Upload error:', error);
-                setMessage('Failed to upload the file.');
+                setMessage(
+                    `Upload failed: ${
+                        error.response?.data?.message || error.message || 'Invalid JSON format or unknown error.'
+                    }`
+                );
             }
         };
     
-        // Read the file content
-        reader.readAsText(file);  // Assumes 'file' is a valid file object
+        // Read the file content as text
+        reader.readAsText(file);
     };
 
-    const handleUploadCandidate = async () => {
-        if (!file) {
-            setMessage('Please select a file first.');
-            return;
-        }
-    
-        //console.log("check 1");
-    
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            try {
-                const fileContent = event.target.result; // File content as text
-                const jsonData = JSON.parse(fileContent); // Parse the JSON content
-    
-                const token = ReactSession.get('access_token');
-                const response = await axios.post(
-                    'http://localhost:5000/upload_candidate',
-                    jsonData,  // Send parsed JSON data directly
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'  // Important for sending JSON
-                        },
-                    }
-                );
-                
-                console.log('Protected data:', response.data);
-                setMessage('File uploaded successfully!');
-            } catch (error) {
-                console.error('Upload error:', error);
-                setMessage('Failed to upload the file.');
-            }
-        };
-    
-        // Read the file content
-        reader.readAsText(file);  // Assumes 'file' is a valid file object
-    };
-
-    const handleUploadPO = async () => {
-        if (!file) {
-            setMessage('Please select a file first.');
-            return;
-        }
-    
-        //console.log("check 1");
-    
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            try {
-                const fileContent = event.target.result; // File content as text
-                const jsonData = JSON.parse(fileContent); // Parse the JSON content
-    
-                const token = ReactSession.get('access_token');
-                const response = await axios.post(
-                    'http://localhost:5000/upload_PO',
-                    jsonData,  // Send parsed JSON data directly
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'  // Important for sending JSON
-                        },
-                    }
-                );
-                
-                console.log('Protected data:', response.data);
-                setMessage('File uploaded successfully!');
-            } catch (error) {
-                console.error('Upload error:', error);
-                setMessage('Failed to upload the file.');
-            }
-        };
-    
-        // Read the file content
-        reader.readAsText(file);  // Assumes 'file' is a valid file object
-    };
-
-    const handleUploadVoters = async () => {
-        if (!file) {
-            setMessage('Please select a file first.');
-            return;
-        }
-    
-        //console.log("check 1");
-    
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            try {
-                const fileContent = event.target.result; // File content as text
-                const jsonData = JSON.parse(fileContent); // Parse the JSON content
-    
-                const token = ReactSession.get('access_token');
-                const response = await axios.post(
-                    'http://localhost:5000/upload_voters',
-                    jsonData,  // Send parsed JSON data directly
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'  // Important for sending JSON
-                        },
-                    }
-                );
-                
-                console.log('Protected data:', response.data);
-                setMessage('File uploaded successfully!');
-            } catch (error) {
-                console.error('Upload error:', error);
-                setMessage('Failed to upload the file.');
-            }
-        };
-    
-        // Read the file content
-        reader.readAsText(file);  // Assumes 'file' is a valid file object
-    };
-
-
+    const handleUpload = () => uploadFile('https://3c75-35-247-153-222.ngrok-free.app/upload'); // Default upload
+    const handleUploadCandidate = () => uploadFile('https://3c75-35-247-153-222.ngrok-free.app/upload_candidate');
+    const handleUploadPO = () => uploadFile('https://3c75-35-247-153-222.ngrok-free.app/upload_PO');
+    const handleUploadVoters = () => uploadFile('https://3c75-35-247-153-222.ngrok-free.app/upload_voters');
 
     const GoBack = async () => {
         navigate('/opts', { replace: true });
