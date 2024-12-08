@@ -23,7 +23,8 @@ services:
   
   # verif-server:
   #   build: .
-  #   command: python verif_server.py
+  #   working_dir: /app/evoting_localstorage/verification_server
+  #   command: /root/.nvm/versions/node/v22.3.0/bin/node index
   #   ports:
   #     - "7000:7000"
   #   volumes:
@@ -32,19 +33,22 @@ services:
 
   # bulletin:
   #     build: .
-  #     command:
+  #     working_dir: /app/evoting_localstorage/bulletin
+  #     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
   #     ports:
   #       - "5001:3000"
 
   # admin-webpage:
   #     build: .
-  #     command:
+  #     working_dir: /app/evoting_localstorage/admin-webpage
+  #     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
   #     ports:
   #       - "3000:3000"
 
   # verification-webpage:
   #     build: .
-  #     command: 
+  #     working_dir: /app/evoting_localstorage/verification-webpage
+  #     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
   #     ports:
   #       - "7001:3000" 
   # 
