@@ -9,6 +9,7 @@ services:
       - ea-db
     volumes:
     - ./output:/output
+    - /app/evoting_localstorage/project_evoting/node_modules
   
   ea-db:
     image: mongo:latest
