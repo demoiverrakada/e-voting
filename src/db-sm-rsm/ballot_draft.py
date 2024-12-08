@@ -4,7 +4,7 @@ import random
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from charm.toolbox.pairinggroup import PairingGroup, ZR, pair
-from globals import group, g1, f2, eg1f2
+from globals import group
 import bbsig
 import optpaillier
 import optthpaillier
@@ -19,6 +19,7 @@ from gmpy2 import mpz
 import pymongo
 from misc import serialize_wrapper, deserialize_wrapper
 import sys
+from db import load,store
 #import pyqrcode
 #from pyzbar.pyzbar import decode
 
@@ -53,8 +54,7 @@ def sha256_of_array(array):
 #group = PairingGroup('SS512')
 
 # Define g and h using the pairing group
-g = group.init(ZR, 5564993445756101503206304700110936918638328897597942591925129910965597995003)
-h = group.init(ZR, 12653160894039224234691306368807880269056474991426613178779481321437840969124)
+
 j = 1
 #m = 2
 
@@ -196,7 +196,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
 def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m):
     # bid
     bid = group.random(ZR)
-    
+    g1,h1=load("setup",["g1","h1"]).values()
     # sigma_bid generation
     _sk = group.random(ZR)
     sigma_bid = g1**(1/(bid+_sk))
@@ -249,7 +249,7 @@ def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m):
         r_w = group.random(ZR)
         
         # gamma_w
-        gamma_w = (g**v_w_bar)*(h**r_w)
+        gamma_w = (g1**v_w_bar)*(h1**r_w)
         gamma_w_ls.append(gamma_w)
         
         # Step 7
@@ -304,8 +304,9 @@ def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m):
     return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid
     
 def G2_part1():
+    g1,h1=load("setup",["g1","h1"]).values()
     r_booth = group.random(ZR)
-    gamma_booth = (g**j)*(h**r_booth)
+    gamma_booth = (g1**j)*(h1**r_booth)
     return gamma_booth   
 
 def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid):
@@ -326,6 +327,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
     #candidate_x_center = right_x + 180
     
     # Print each candidate's number and name on the right half
+    g1,h1=load("setup",["g1","h1"])
     k = 0
     c_w_hash = []
     c_w_all = []
@@ -333,7 +335,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
     for i, candidate in enumerate(candidates):
         # Step 14
         r_w_dash = group.random(ZR)
-        gamma_w_dash = gamma_w_ls[i] * (h**r_w_dash)
+        gamma_w_dash = gamma_w_ls[i] * (h1**r_w_dash)
         
         # Step 15
         alpha = len(candidates)
