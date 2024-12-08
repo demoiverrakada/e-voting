@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-project_dir = "/app/evoting2/e-voting/BallotAudit/android"
+project_dir = "/app/evoting2/e-voting/VoterVerification/android"
 
 os.chdir(project_dir)
 

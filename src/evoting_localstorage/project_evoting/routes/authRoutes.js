@@ -124,6 +124,45 @@ function callPythonFunction4(functionName, ...params) {
     }
 }
 
+function callPythonFunction5(functionName, ...params) {
+    // Use the correct relative path
+    const scriptPath = join(__dirname, '../../VoterVerification/android/automation.py'); // Adjust as needed
+    const pythonExecutable = 'python3';
+
+    console.log("Resolved script path:", scriptPath);
+
+    const formattedParams = params.map(param => 
+        typeof param === 'string' ? `'${param}'` : param
+    ).join(', ');
+
+    const command = `${pythonExecutable} ${scriptPath}`;
+    console.log(`Running: ${command}`);
+
+    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
+        env: { ...process.env, precomputing: '0' },
+    });
+
+    if (pythonProcess.error) {
+        console.error('Python process error:', pythonProcess.error);
+        throw pythonProcess.error;
+    }
+
+    const stdout = pythonProcess.stdout.toString().trim();
+    const stderr = pythonProcess.stderr.toString().trim();
+
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+
+    try {
+        console.log('Python stdout:', stdout);
+        return stdout || stderr;
+    } catch (error) {
+        console.error('Error reading or parsing result:', error);
+        throw error;
+    }
+}
+
 // endpoint for generating the keys for the election
 router.post('/setup',requireAuth, async (req, res) => {
     const { alpha, n } = req.body;
@@ -709,6 +748,41 @@ router.post('/runBuild2', async (req, res) => {
     }
 });
 
+
+router.post('/runBuild3', async (req, res) => {
+    try {
+        // Call the Python function to start the build process
+        console.log('Calling Python function to start the build process');
+        const result = await callPythonFunction5("runBuild3");
+
+        // Log the result
+        console.log('Build process result:', result);
+
+        // Path to the generated app (adjust to match your build script's output location)
+        const appPath = path.join(__dirname, '../../VoterVerification/android/app/build/outputs/apk/release/app-release.apk');
+
+        // Check if the file exists
+        if (!fs.existsSync(appPath)) {
+            return res.status(404).json({
+                success: false,
+                message: 'Build process completed, but the app file was not found.'
+            });
+        }
+
+        // Send the app file as a download
+        console.log('Sending the generated app file to the client');
+        res.download(appPath, 'app-release.apk', (err) => {
+            if (err) {
+                console.error('Error sending the app file:', err);
+                res.status(500).json({ error: 'Failed to send the app file.' });
+            }
+        });
+    } catch (err) {
+        // Handle any errors that occur
+        console.error('Error during build process:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
 module.exports = router;
 
   
