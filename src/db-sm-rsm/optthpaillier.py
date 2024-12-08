@@ -153,7 +153,9 @@ def pai_combine_decshares(pai_pk, pai_cshares, embedded_q=None):
 
 def pai_add(pai_pk, cipher1, cipher2):
     n, n2, inv4, h, hn, kappa, v, vs, precomputing = pai_pk
-    return (cipher1 * cipher2) % n2
+    cipher3 = (cipher1 * cipher2)
+    print(cipher3)
+    return (cipher3) % n2
 
 def pai_reencrypt(pai_pk, cipher, randIn=None, randOut=False, embedded_q=None):
     c, r = pai_encrypt(pai_pk, 0, randIn=randIn, randOut=True, embedded_q=embedded_q)

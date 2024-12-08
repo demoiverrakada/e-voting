@@ -40,7 +40,7 @@ def pf_zksm_proof(verfpk, sigs, enc_sigs, enc_sigs_rands,dpk_bbsig_pfs,blsigs):
         blsigs=deserialize_wrapper(ast.literal_eval(blsigs))
         dict=load("mix",["msgs_out"])
         alpha,ck,permcomm,elg_pk,=load("setup",["alpha","ck","permcomm","elg_pk"]).values()
-        comms=list(load("enc",["comm"]).values())[0]
+        comms=list(load("enc",["comm"]).values())
      
         status_verfsigs = check_verfsigs(dict['msgs_out'], sigs, verfpk, enc_sigs, enc_sigs_rands, elg_pk,alpha)
 
@@ -50,7 +50,7 @@ def pf_zksm_proof(verfpk, sigs, enc_sigs, enc_sigs_rands,dpk_bbsig_pfs,blsigs):
     status_fwd = status_verfsigs and status_dpk_bbsig
     print("status_forward_set_membership:", status_fwd)
 
-def pf_zkrsm_proof(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplussig_pfs,blsigs_rev,pfcomms):
+def pf_zkrsm_proof(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplussig_pfs,blsigs_rev):
     """ Get the list of proofs (dummy or real) for plaintext votes identified by index set J, proving or 
     disproving (in zero-knowledge) whether they are encrypted by some ciphertext identified by index set I.
     The additional parameters verfpk and verfsigs are because of the way our scheme works - it requires the 
@@ -60,7 +60,6 @@ def pf_zkrsm_proof(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplu
     
     The verifier code should take the output of this function --- the proofs --- and verify them.
     """
-    pfcomms = deserialize_wrapper(ast.literal_eval(pfcomms))
     verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
     sigs_rev= deserialize_wrapper(ast.literal_eval(sigs_rev))
     enc_sigs_rev= deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
@@ -68,11 +67,11 @@ def pf_zkrsm_proof(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplu
     dpk_bbsplussig_pfs=deserialize_wrapper(ast.literal_eval(dpk_bbsplussig_pfs))
     blsigs_rev= deserialize_wrapper(ast.literal_eval(blsigs_rev))
     msgs_out,_rand_shares=load("mix",["msgs_out","_rand_shares"]).values()
-    alpha, pai_pk, _pai_sklist,elg_pk, _elg_sklist,ck, ck_fo, _pi, _svecperm, permcomm=load("setup",['alpha','pai_pk','_pai_sklist','elg_pk','_elg_sklist','ck','ck_fo','_pi','_svecperm','permcomm']).values()
+    alpha, pai_pk,elg_pk,ck, ck_fo, permcomm=load("setup",['alpha','pai_pk','elg_pk','ck','ck_fo','permcomm']).values()
     comms=comms=list(load("enc",["comm"]).values())[0]
     enc_rands=list(load("enc",["enc_rand"]).values())[0]
 
-    status_pkcomms = pkcommverifs(comms, pfcomms)
+    #status_pkcomms = pkcommverifs(comms, pfcomms)
     #print("status_pkcomms", status_pkcomms)
     # Check verifier signatures
     status_verfsigs_rev = check_verfsigs_rev(sigs_rev, comms, verfpk, enc_sigs_rev, enc_sigs_rev_rands, elg_pk, pai_pk,alpha)

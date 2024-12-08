@@ -492,11 +492,7 @@ router.post('/proof', async (req, res) => {
 
 router.post('/revproof',async(req,res) =>{
     try{
-    const{pfcomms} = req.body;
-    if(!pfcomms){
-       return res.status(422).send({error:"must provide all arguements"});
-    }
-    const result = await callPythonFunction('genrevproofs',pfcomms);
+    const result = await callPythonFunction('genrevproofs');
     if(!result){
         return res.status(422).send({error:"error during reverse_proof process"})
     }

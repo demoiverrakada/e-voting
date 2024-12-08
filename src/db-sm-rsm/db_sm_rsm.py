@@ -260,7 +260,7 @@ def get_blsigs(enc_sigs, ck, permcomm, alpha, elgpk, _svecperm, _pi, _re_pi, _el
 
     return blsigs, _blshares
 
-def get_verfsigs_rev(comms, pfcomms, elgpk, paipk):
+def get_verfsigs_rev(comms, elgpk, paipk):
     """ Get verifier quasi-signatures on the committed messages by using only the commitments. """
     with timer("verifier: creating BBS+ signatures and encryptions"):
         _verfsk, verfpk = bbspluskeygen()

@@ -10,7 +10,7 @@ from db import load,store
 
 def pkcomm(C, _m, _r, base=None):
     """ PoK of the opening of the commitment, i.e., PK{(m, r): C = g^m h^r}. """
-    g1,h1 = load("setup",["g1","h1"]).values()
+    g1,h1 = load("generators",["g1","h1"]).values()
     if base is None:
         base = (g1, h1)
     stmt = (base[0], base[1], C)
@@ -29,7 +29,7 @@ def pkcomm(C, _m, _r, base=None):
     return c, zm, zr
 
 def pkcommverif(C, pf, base=None):
-    g1,h1 = load("setup",["g1","h1"]).values()
+    g1,h1 = load("generators",["g1","h1"]).values()
     if base is None:
         base = (g1, h1)
     stmt = (base[0], base[1], C)
@@ -56,7 +56,7 @@ def pkcommverifs(comms, pfs):
 
 def pk_enc_bl(elg_pk, ctilde, c, _r, _b):
     """ PoK of the encrypted blinding factors during the DB-SM protocol. """
-    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("setup",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
+    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     _elg_pk, _elgpklist = elg_pk
 
     # Commit
@@ -74,7 +74,7 @@ def pk_enc_bl(elg_pk, ctilde, c, _r, _b):
     return chal, zr, zb
 
 def pk_enc_bl_verif(elg_pk, ctilde, c, pf):
-    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("setup",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
+    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     _elg_pk, _elgpklist = elg_pk
     chal, zr, zb = pf
     verif1 = (ctilde[0] ** chal) * (g1 ** zr) * (c[0] ** zb)
@@ -88,7 +88,7 @@ def pk_enc_bl_verif(elg_pk, ctilde, c, pf):
 
 def pk_enc_blrev_S(elg_pk, c, _r, _b):
     """ PoK of the encrypted blinding factors for the S component during the DB-RSM protocol. """
-    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("setup",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
+    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     _elg_pk, _elgpklist = elg_pk
 
     # Commit
@@ -106,7 +106,7 @@ def pk_enc_blrev_S(elg_pk, c, _r, _b):
     return chal, zr, zb
 
 def pk_enc_blrev_S_verif(elg_pk, c, pf):
-    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("setup",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
+    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     _elg_pk, _elgpklist = elg_pk
     chal, zr, zb = pf
     verif1 = (c[0] ** chal) * (g1 ** zr)
@@ -119,7 +119,7 @@ def pk_enc_blrev_S_verif(elg_pk, c, pf):
 def dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha, _msg_shares, _rand_shares, _blshares):
     """ PoKs of Boneh-Boyen signatures on committed messages, i.e.:
      PK{(v_k, r_k, bl_k): comm[i] = g^(sum_{k=1}^{m} v_k) h^(sum_{k=1}^{m} r_k) and BBVer(blsigs[i]^{1/((sum_{k=1}^{m} bl_k))}, v, verfpk)} """
-    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("setup",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
+    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     myn = len(comms)
     one_T= eg1f2 ** 0
     one_G1=g1 ** 0
@@ -149,7 +149,7 @@ def dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha, _msg_shares, _rand_shares
 
 def dpk_bbsig_nizkverifs(comms, blsigs, verfpk, pfs):
     zero_Zq = group.init(ZR, 0)
-    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("setup",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
+    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     with timer("verifier: verifying dpk_bbsig proof"):
         chals, zvs, zrs, zbls = pfs
         alpha = len(zvs)
@@ -180,7 +180,7 @@ def dpk_bbsig_nizkverifs(comms, blsigs, verfpk, pfs):
 def dpk_bbsplussig_nizkproofs(msgs, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha, _blshares_S, _blshares_c, _blshares_r):
     """ PoKs of BBS+ signatures on the given messages. """
     myn = len(msgs)
-    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("setup",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
+    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     z1 = [eg1f2 ** 0] * myn
     C1 = [eg1f2 ** 0] * myn
     C2 = [eg1f2 ** 0] * myn
@@ -251,7 +251,7 @@ def dpk_bbsplussig_nizkproofs(msgs, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha,
 
 def dpk_bbsplussig_nizkverifs(msgs, blsigs_S, blsigs_c, blsigs_r, verfpk, pfs):
     zero_Zq = group.init(ZR, 0)
-    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("setup",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
+    g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     with timer("verifier: verifying dpk_bbsplussig proofs"):
         myn = len(msgs)
         z1, chals, zbSs, zbcs, zbrs, zdelta0s, zdelta1s, zdelta2s = pfs

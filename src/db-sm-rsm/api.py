@@ -7,7 +7,7 @@ import random
 from globals import g1, group, pai_group, beta, q, kappa_e,f2, eg1f2,f1,ef1f2,h1,eh1f2,idenT,inveh1f2,inveg1f2,fT
 from charm.toolbox.pairinggroup import ZR
 from db_sm_rsm import check_encs, mix, check_verfsigs, get_blsigs, dpk_bbsig_nizkproofs,check_verfsigs_rev,get_blsigs_rev,genperms,get_verfsigs,get_verfsigs_rev
-from pok import dpk_bbsplussig_nizkproofs
+from pok import dpk_bbsplussig_nizkproofs,dpk_bbsig_nizkverifs,dpk_bbsplussig_nizkverifs
 import sys
 import json
 from db import store,load,init
@@ -120,14 +120,15 @@ def generate_proofs():
     #print(bbbatchverify(sigs,msgs_out['msgs_out'],verfpk),"checking bbbatch")
     print(({"verfpk":serialize_wrapper(verfpk),"sigs":serialize_wrapper(sigs),"enc_sigs":serialize_wrapper(enc_sigs),"enc_sigs_rands":serialize_wrapper(enc_sigs_rands)}))
     #print(type(verfpk),type(sigs),type(enc_sigs),type(enc_sigs_rands))
-def generate_reverse_proofs(pfcomms):
+def generate_reverse_proofs():
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
         elg_pk,pai_pk = load("setup",["elg_pk","pai_pk"]).values()
-        comms=list(load("enc",["comm"]).values())
-        pfcomms = deserialize_wrapper(ast.literal_eval(pfcomms))
+        comms=list(load("enc",["comm"]).values())[0]
+        """Important: pfcomms is a part of the function parameter of get_verfsigs_rev to be completed"""
+        #pfcomms = deserialize_wrapper(ast.literal_eval(pfcomms))
         print(comms,"comms")
-        verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands = get_verfsigs_rev(comms,pfcomms,elg_pk,pai_pk)
+        verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands = get_verfsigs_rev(comms,elg_pk,pai_pk)
     print(({"verfpk": serialize_wrapper(verfpk), "sigs_rev":serialize_wrapper(sigs_rev), "enc_sigs_rev":serialize_wrapper(enc_sigs_rev), "enc_sigs_rev_rands":serialize_wrapper(enc_sigs_rev_rands)}))
 
 def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
@@ -141,6 +142,7 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
     #print(type(verfpk),"type of verfpk")
     #print(type(sigs),"type of sigs")
     f = io.StringIO()
+    #if(True):
     with contextlib.redirect_stdout(f):
         verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
         sigs= deserialize_wrapper(ast.literal_eval(sigs))
@@ -152,8 +154,8 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
     #print(verfpk,"verfpk")
     #print(sigs,"sigs")
         alpha,ck,permcomm,elg_pk,_svecperm,_pi,_re_pi,_elg_sklist=load("setup",["alpha","ck","permcomm","elg_pk","_svecperm","_pi","_re_pi","_elg_sklist"]).values()
-        comms=list(load("enc",["comm"]).values())
-    #print(comms,"comms")
+        comms=list(load("enc",["comm"]).values())[0]
+        print(comms,"comms")
     #print(type(comms),"type of comms")
     # Check verifier signatures
         #from bbsig import bbbatchverify
@@ -167,9 +169,7 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
 
     # Proofs
         dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha,dict["_msg_shares"],dict["_rand_shares"], _blshares)
-
-    #store("pf_zksm",[dpk_bbsig_pfs])
-    #print(status_verfsigs)
+        
     print({"dpk_bbsig_pfs":serialize_wrapper(dpk_bbsig_pfs),"blsigs":serialize_wrapper(blsigs)})
 def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
     """ Get the list of proofs (dummy or real) for plaintext votes identified by index set J, proving or 
@@ -182,19 +182,20 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
     The verifier code should take the output of this function --- the proofs --- and verify them.
     """
     f = io.StringIO()
-    with contextlib.redirect_stdout(f):
+    if(True):
+    #with contextlib.redirect_stdout(f):
         verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
         sigs_rev= deserialize_wrapper(ast.literal_eval(sigs_rev))
         enc_sigs_rev= deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
         enc_sigs_rev_rands= deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
         msgs_out,_rand_shares=load("mix",["msgs_out","_rand_shares"]).values()
         alpha, pai_pk, _pai_sklist,elg_pk, _elg_sklist,ck, ck_fo, _pi, _svecperm, permcomm=load("setup",['alpha','pai_pk','_pai_sklist','elg_pk','_elg_sklist','ck','ck_fo','_pi','_svecperm','permcomm']).values()
-        comms=list(load("enc",["comm"]).values())
-        enc_rands=list(load("enc",["enc_rand"]).values())
+        comms=list(load("enc",["comm"]).values())[0]
+        enc_rands=list(load("enc",["enc_rand"]).values())[0]
 
     # Check verifier signatures
         status_verfsigs_rev = check_verfsigs_rev(sigs_rev, comms, verfpk, enc_sigs_rev, enc_sigs_rev_rands, elg_pk, pai_pk,alpha)
-
+        assert status_verfsigs_rev
     # Get blinded signatures against msg_outs
         blsigs_rev, _blshares_rev = get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, elg_pk, pai_pk, _svecperm, _rand_shares, _pi, _elg_sklist, _pai_sklist)
 
@@ -202,6 +203,8 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
         blsigs_S, blsigs_c, blsigs_r = blsigs_rev
         _blshares_S, _blshares_c, _blshares_r = _blshares_rev
         dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha, _blshares_S, _blshares_c, _blshares_r)
+        status_dpk_bbsplussig = dpk_bbsplussig_nizkverifs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, dpk_bbsplussig_pfs)
+    print(status_dpk_bbsplussig,"verification is true i.e. system is correct")
     print({"dpk_bbsplussig_pfs":serialize_wrapper(dpk_bbsplussig_pfs),"blsigs_rev":serialize_wrapper(blsigs_rev)})
 
 
