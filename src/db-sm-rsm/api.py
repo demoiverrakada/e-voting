@@ -21,8 +21,8 @@ from misc import serialize_wrapper, deserialize_wrapper
 from bbsig import bbbatchverify
 
 
-g = group.init(ZR, 5564993445756101503206304700110936918638328897597942591925129910965597995003)
-h = group.init(ZR, 12653160894039224234691306368807880269056474991426613178779481321437840969124)
+#g = group.init(ZR, 5564993445756101503206304700110936918638328897597942591925129910965597995003)
+#h = group.init(ZR, 12653160894039224234691306368807880269056474991426613178779481321437840969124)
 
 import io
 import contextlib
@@ -206,6 +206,7 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
 
 def audit(commitment,booth_num,bid):
     f = io.StringIO()
+    g1,h1=load("setup",["g1","h1"]).values()
     with contextlib.redirect_stdout(f):
         alpha,_pai_sklist_single,pai_pklist_single=load("setup",['alpha','_pai_sklist_single','pai_pklist_single']).values()
         mixers = lambda alpha: ["mixer %d" % a for a in range(alpha)]
@@ -244,7 +245,7 @@ def audit(commitment,booth_num,bid):
         #print(type(v_w))
         v_w_nbar =int(str(v_w))%len(candidates)
         name=candidates[v_w_nbar]
-        gamma_w = (g**v_w)*(h**r_w)
+        gamma_w = (g1**v_w)*(h1**r_w)
         #print(name,"name")
         #print(commitment[i])
         #print(commitment)
