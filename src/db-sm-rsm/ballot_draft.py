@@ -25,13 +25,13 @@ from db import load,store
 
 
 def init():
-    client = pymongo.MongoClient('mongodb+srv://raagineedturki:pxfkFNcAnkinDFnk@cluster0.8i60tuh.mongodb.net/')
+    client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
     db = client["test"]
     return db
 
 def connect_to_mongodb():
     # Connect to MongoDB
-    client = pymongo.MongoClient('mongodb+srv://raagineedturki:pxfkFNcAnkinDFnk@cluster0.8i60tuh.mongodb.net/')
+    client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
     # Create or use existing database
     db = client['test']
     # Create or use existing collection
@@ -415,7 +415,7 @@ def create_pdf_worker(args):
     index, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk = args
     create_pdf(collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
     
-def load():
+def load2():
     db = init()
     collection=db['keys']
     document=collection.find_one()
@@ -439,7 +439,7 @@ def ballot_draft(num):
     #pai_sklist, pai_pk_optthpaillier = optthpaillier.pai_th_keygen(len(candidates))
     #pai_sk, pai_pk = optpaillier.pai_keygen()
     # Connect to MongoDB
-    m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load().values()
+    m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2().values()
     
     #print("a")
     #print(m)

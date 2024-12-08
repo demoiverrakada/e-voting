@@ -3,7 +3,7 @@ import hashlib
 import json
 
 # Connect to MongoDB
-client = MongoClient('mongodb+srv://raagineedturki:pxfkFNcAnkinDFnk@cluster0.8i60tuh.mongodb.net/')
+client = MongoClient('mongodb://root:pass@eadb:27017')
 db = client['test']  # Replace with your database name
 candidates_collection = db['candidates']  # Replace with your candidates collection name
 receipts_collection = db['receipts']  # Replace with your receipts collection name

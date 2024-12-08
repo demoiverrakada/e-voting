@@ -2,7 +2,7 @@ from pymongo import MongoClient
 
 def process_bulletins():
     # Connect to MongoDB
-    client = MongoClient('mongodb+srv://raagineedturki:pxfkFNcAnkinDFnk@cluster0.8i60tuh.mongodb.net/')
+    client = MongoClient('mongodb://root:pass@eadb:27017')
     db = client['test']
 
     # Collections

@@ -8,7 +8,7 @@ def main(input_file):
         data = json.load(file)
 
     # Step 2: Connect to MongoDB
-    client = MongoClient('mongodb+srv://demoiverrakada:H*jwNx399A*4898@cluster0.morsxl9.mongodb.net/')  # Replace with your MongoDB connection string
+    client = MongoClient('mongodb://root:pass@eadb:27017')  # Replace with your MongoDB connection string
     db = client['test']  # Replace with your database name
     collection = db['voters']  # Replace with your collection name
 
