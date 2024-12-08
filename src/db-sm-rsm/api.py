@@ -37,6 +37,7 @@ def setup(n,alpha):
     """
     
     # Generate Paillier and ElGamal public/private keys
+    store("generators",[g1,f2,eg1f2,ef1f2,f1,h1,eh1f2,idenT,inveh1f2,inveg1f2,fT])
     _pai_sklist, pai_pk = pai_th_keygen(alpha)
     _pai_sklist_single, pai_pklist_single = [], []
     for a in range(alpha):
@@ -65,7 +66,7 @@ def setup(n,alpha):
      
     store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,
          # ...beaver triples (to add) ...
-         ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,g1,f2,eg1f2,ef1f2,f1,h1,eh1f2,idenT,inveh1f2,inveg1f2,fT])
+         ck, ck_fo, _pi, _re_pi, _svecperm, permcomm])
 
 def generate_ballots(num):
     ballot_draft(num)
@@ -123,7 +124,7 @@ def generate_reverse_proofs(pfcomms):
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
         elg_pk,pai_pk = load("setup",["elg_pk","pai_pk"]).values()
-        comms=list(load("enc",["comm"]).values())[0]
+        comms=list(load("enc",["comm"]).values())
         pfcomms = deserialize_wrapper(ast.literal_eval(pfcomms))
         print(comms,"comms")
         verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands = get_verfsigs_rev(comms,pfcomms,elg_pk,pai_pk)
@@ -151,7 +152,7 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
     #print(verfpk,"verfpk")
     #print(sigs,"sigs")
         alpha,ck,permcomm,elg_pk,_svecperm,_pi,_re_pi,_elg_sklist=load("setup",["alpha","ck","permcomm","elg_pk","_svecperm","_pi","_re_pi","_elg_sklist"]).values()
-        comms=list(load("enc",["comm"]).values())[0]
+        comms=list(load("enc",["comm"]).values())
     #print(comms,"comms")
     #print(type(comms),"type of comms")
     # Check verifier signatures
@@ -188,8 +189,8 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
         enc_sigs_rev_rands= deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
         msgs_out,_rand_shares=load("mix",["msgs_out","_rand_shares"]).values()
         alpha, pai_pk, _pai_sklist,elg_pk, _elg_sklist,ck, ck_fo, _pi, _svecperm, permcomm=load("setup",['alpha','pai_pk','_pai_sklist','elg_pk','_elg_sklist','ck','ck_fo','_pi','_svecperm','permcomm']).values()
-        comms=list(load("enc",["comm"]).values())[0]
-        enc_rands=list(load("enc",["enc_rand"]).values())[0]
+        comms=list(load("enc",["comm"]).values())
+        enc_rands=list(load("enc",["enc_rand"]).values())
 
     # Check verifier signatures
         status_verfsigs_rev = check_verfsigs_rev(sigs_rev, comms, verfpk, enc_sigs_rev, enc_sigs_rev_rands, elg_pk, pai_pk,alpha)
@@ -206,7 +207,7 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
 
 def audit(commitment,booth_num,bid):
     f = io.StringIO()
-    g1,h1=load("setup",["g1","h1"]).values()
+    g12,h12=load("generators",["g1","h1"]).values()
     with contextlib.redirect_stdout(f):
         alpha,_pai_sklist_single,pai_pklist_single=load("setup",['alpha','_pai_sklist_single','pai_pklist_single']).values()
         mixers = lambda alpha: ["mixer %d" % a for a in range(alpha)]
@@ -245,7 +246,7 @@ def audit(commitment,booth_num,bid):
         #print(type(v_w))
         v_w_nbar =int(str(v_w))%len(candidates)
         name=candidates[v_w_nbar]
-        gamma_w = (g1**v_w)*(h1**r_w)
+        gamma_w = (g12**v_w)*(h12**r_w)
         #print(name,"name")
         #print(commitment[i])
         #print(commitment)

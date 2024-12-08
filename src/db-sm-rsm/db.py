@@ -4,8 +4,7 @@ import ast
 function_map = {
         "setup": 'keys',
         "mix": 'decs',
-        "pf_zksm": 'verfps',
-        "pf_zkrsm": 'verves',
+        "generators":"generators",
         "enc":'votes',
         "load":'candidates',
         "receipt":'receipts',
@@ -20,7 +19,21 @@ def init():
 def store(funcs,params):
     db=init()
     collection=db[function_map[funcs]]
-    if(function_map[funcs]=='keys'):
+    if(function_map[funcs]=='generators'):
+        collection.insert_one({
+            "g1":(serialize_wrapper(params[0])),
+            "f2":(serialize_wrapper(params[1])),
+            "eg1f2":(serialize_wrapper(params[2])),
+            "ef1f2":(serialize_wrapper(params[3])),
+            "f1":(serialize_wrapper(params[4])),
+            "h1":(serialize_wrapper(params[5])),
+            "eh1f2":(serialize_wrapper(params[6])),
+            "idenT":(serialize_wrapper(params[7])),
+            "inveh1f2":(serialize_wrapper(params[8])),
+            "inveg1f2":(serialize_wrapper(params[9])),
+            "fT":(serialize_wrapper(params[10]))
+        })
+    elif(function_map[funcs]=='keys'):
         collection.insert_one({
             "alpha":(serialize_wrapper(params[0])),
             "pai_pk":(serialize_wrapper(params[1])),
@@ -34,18 +47,7 @@ def store(funcs,params):
             "_pi":(serialize_wrapper(params[9])),
             "_re_pi":(serialize_wrapper(params[10])),
             "_svecperm":(serialize_wrapper(params[11])),
-            "permcomm":(serialize_wrapper(params[12])),
-            "g1":(serialize_wrapper(params[13])),
-            "f2":(serialize_wrapper(params[14])),
-            "eg1f2":(serialize_wrapper(params[15])),
-            "ef1f2":(serialize_wrapper(params[16])),
-            "f1":(serialize_wrapper(params[17])),
-            "h1":(serialize_wrapper(params[18])),
-            "eh1f2":(serialize_wrapper(params[19])),
-            "idenT":(serialize_wrapper(params[20])),
-            "inveh1f2":(serialize_wrapper(params[21])),
-            "inveg1f2":(serialize_wrapper(params[22])),
-            "fT":(serialize_wrapper(params[23]))
+            "permcomm":(serialize_wrapper(params[12]))
         })
     elif(function_map[funcs]=='decs'):
         collection.insert_one({
@@ -54,14 +56,6 @@ def store(funcs,params):
             "_msg_shares":(serialize_wrapper(params[2])),
             "_rand_shares":(serialize_wrapper(params[3]))
         })
-    elif(function_map[funcs]=='verfps'):
-        collection.insert_one({
-            "pf_zksm":(serialize_wrapper(params[0]))
-        })
-    elif(function_map[funcs]=='verves'):
-        collection.insert_one({
-            "pf_zkrsm":(serialize_wrapper(params[0]))
-        })
 
 
 def load(funcs,params):
@@ -69,6 +63,11 @@ def load(funcs,params):
     collection=db[function_map[funcs]]
     result={}
     if(function_map[funcs]=='keys'):
+        document=collection.find_one()
+        for param in params:
+            result[param] = deserialize_wrapper(document[param])
+        return result
+    elif(function_map[funcs]=='generators'):
         document=collection.find_one()
         for param in params:
             result[param] = deserialize_wrapper(document[param])
@@ -107,9 +106,3 @@ def load(funcs,params):
                 res[key] = deserialized_item
             res["enc_hash"] = param_value
             return res
-    elif function_map[funcs] =="verfps":
-        res=[]
-        documents=collection.find()
-        for document in documents:
-            res.append(document["pfzksm"])
-        return res

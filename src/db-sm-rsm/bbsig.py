@@ -5,7 +5,7 @@ from db import store,load
 from misc import serialize_wrapper
 
 def bbkeygen():
-    g1,f2,eg1f2 = load("setup",["g1","f2","eg1f2"]).values()
+    g1,f2,eg1f2 = load("generators",["g1","f2","eg1f2"]).values()
     _sk = group.random(ZR)
     pk = f2 ** _sk
     return _sk, pk
@@ -13,13 +13,13 @@ def bbkeygen():
 def bbsign(m, _sk):
     print(type(m))
     print(type(_sk))
-    g1,f2,eg1f2 = load("setup",["g1","f2","eg1f2"]).values()
+    g1,f2,eg1f2 = load("generators",["g1","f2","eg1f2"]).values()
     sigma = g1 ** (1 / (m + _sk))
     print(type(m))
     return sigma
 
 def bbverify(sigma, m, pk):
-    g1,f2,eg1f2 = load("setup",["g1","f2","eg1f2"]).values()
+    g1,f2,eg1f2 = load("generators",["g1","f2","eg1f2"]).values()
     return pair(sigma, pk * (f2 ** m)) == eg1f2
 
 def bbbatchverify(sigmas, ms, pk):
@@ -33,7 +33,7 @@ def bbbatchverify(sigmas, ms, pk):
     #
     # Ref: Anna Lisa Ferrara, Matthew Green, Susan Hohenberger, ``Practical Short Signature Batch Verification'', https://eprint.iacr.org/2008/015.pdf
     #g1,group,f2,eg1f2 = load("setup",["g1","group","f2","eg1f2"]).values()
-    g1,f2,eg1f2 = load("setup",["g1","f2","eg1f2"]).values()
+    g1,f2,eg1f2 = load("generators",["g1","f2","eg1f2"]).values()
     print(sigmas)
     deltas = [random.getrandbits(80) for _ in range(len(sigmas))]
     #print(deltas)

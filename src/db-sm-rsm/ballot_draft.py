@@ -196,7 +196,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
 def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m):
     # bid
     bid = group.random(ZR)
-    g1,h1=load("setup",["g1","h1"]).values()
+    g1,h1=load("generators",["g1","h1"]).values()
     # sigma_bid generation
     _sk = group.random(ZR)
     sigma_bid = g1**(1/(bid+_sk))
@@ -304,7 +304,7 @@ def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m):
     return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid
     
 def G2_part1():
-    g1,h1=load("setup",["g1","h1"]).values()
+    g1,h1=load("generators",["g1","h1"]).values()
     r_booth = group.random(ZR)
     gamma_booth = (g1**j)*(h1**r_booth)
     return gamma_booth   
@@ -327,7 +327,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
     #candidate_x_center = right_x + 180
     
     # Print each candidate's number and name on the right half
-    g1,h1=load("setup",["g1","h1"])
+    g1,h1=load("generators",["g1","h1"]).values()
     k = 0
     c_w_hash = []
     c_w_all = []

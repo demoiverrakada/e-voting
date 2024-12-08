@@ -206,7 +206,10 @@ const keysSchema=new mongoose.Schema({
     _pi:{type:String,required:true},
     _re_pi:{type:String,required:true},
     _svecperm:{type:String,required:true},
-    permcomm:{type:String,required:true},
+    permcomm:{type:String,required:true}
+});
+
+const generatorSchema=new mongoose.Schema({
     g1:{type:String,required:true},
     f2:{type:String,required:true},
     eg1f2:{type:String,required:true},
@@ -238,18 +241,6 @@ const decSchema=new mongoose.Schema({
         required:true
     }
 })
-const VerfSchema=new mongoose.Schema({
-    pf_zksm:{
-        type:String,
-        required:true
-    }
-})
-const VerfpSchema=new mongoose.Schema({
-    pf_zkrsm:{
-        type:String,
-        required:true
-    }
-})
 // Create models for each schema
 const PO = dbConnection.model('PO', PollingSchema);
 const Votes = dbConnection.model('Votes', VotesSchema);
@@ -260,8 +251,7 @@ const Receipt = dbConnection.model('Receipt', ReceiptSchema);
 const Bulletin=dbConnection.model('Bulletin',BulletinSchema);
 const Keys=dbConnection.model('Keys',keysSchema);
 const Dec=dbConnection.model('Dec',decSchema);
-const Verf=dbConnection.model('Verf',VerfSchema);
-const VerfP=dbConnection.model('VerfP',VerfpSchema);
+const Generator=dbConnection.model('Generator',generatorSchema);
 module.exports = {
     PO,
     Votes,
@@ -272,6 +262,5 @@ module.exports = {
     Bulletin,
     Keys,
     Dec,
-    Verf,
-    VerfP
+    Generator
 };
