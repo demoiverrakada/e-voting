@@ -34,7 +34,7 @@ services:
   #     build: .
   #     command:
   #     ports:
-  #       - "5001:5001"
+  #       - "5001:3000"
 
   # admin-webpage:
   #     build: .
@@ -46,7 +46,7 @@ services:
   #     build: .
   #     command: 
   #     ports:
-  #       - "7001:7001" 
+  #       - "7001:3000" 
   # 
 
   
