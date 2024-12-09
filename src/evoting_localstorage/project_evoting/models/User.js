@@ -206,7 +206,10 @@ const keysSchema=new mongoose.Schema({
     _pi:{type:String,required:true},
     _re_pi:{type:String,required:true},
     _svecperm:{type:String,required:true},
-    permcomm:{type:String,required:true}
+    permcomm:{type:String,required:true},
+    beaver_a_shares:{type:String,required:true},
+    beaver_b_shares:{type:String,required:true},
+    beaver_c_shares:{type:String,required:true}
 });
 
 const generatorSchema=new mongoose.Schema({

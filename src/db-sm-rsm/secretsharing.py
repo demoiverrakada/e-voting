@@ -2,10 +2,8 @@ from charm.toolbox.pairinggroup import ZR
 
 from globals import group
 from misc import timed, timer, pprint
+from db import load,store
 
-beaver_a_shares = {}
-beaver_b_shares = {}
-beaver_c_shares = {}
 
 #### Simple alpha-out-of-alpha secret sharing scheme
 
@@ -36,7 +34,7 @@ def sharemults(shares1, shares2, alpha, purpose):
     """ Given shares1 = [(x11,...,xn1),...,(x1m,...,xnm)] and shares2 = [(y11,...,yn1),...,(y1m,...,ynm)] where n 
     denotes the number of items and m (=alpha) denotes the number of parties, compute [(z11,...,zn1),...,(z1m,...,znm)], 
     where zi1 + ... + zim = zi = xi * yi = (xi1 + ... + xim) * (yi1 + ... + yim). """
-
+    beaver_a_shares,beaver_b_shares,beaver_c_shares=load("setup",["beaver_a_shares","beaver_b_shares","beaver_c_shares"]).values()
     myn = len(shares1[0])
     dshares, eshares = [], []
     for a in range(alpha):
@@ -61,7 +59,9 @@ def gen_beaver_triples(myn, alpha):
     but rather only generating valid triples assuming a trusted setup. Since this is an input-independent preprocessing 
     step, we are not too concerned with the efficiency of the MPC protocol to generate these tuples. """
     
-    global beaver_a_shares, beaver_b_shares, beaver_c_shares
+    beaver_a_shares = {}
+    beaver_b_shares = {}
+    beaver_c_shares = {}
 
     # Note that Beaver's triples should not be repeated. We therefore create separate triples for the 
     # purpose of computing secret shares of delta1 (in DPK-RSM) and for the purpose of computing 
@@ -74,10 +74,13 @@ def gen_beaver_triples(myn, alpha):
         beaver_a_shares[purpose] = list(zip(*[share(beaver_a[i], alpha) for i in range(myn)]))
         beaver_b_shares[purpose] = list(zip(*[share(beaver_b[i], alpha) for i in range(myn)]))
         beaver_c_shares[purpose] = list(zip(*[share(beaver_c[i], alpha) for i in range(myn)]))
+    return beaver_a_shares,beaver_b_shares,beaver_c_shares
 
 if __name__ == "__main__":
     alpha = 2
-    
+    beaver_a_shares = {}
+    beaver_b_shares = {}
+    beaver_c_shares = {}
     beaver_a = [group.init(ZR, 10), group.init(ZR, 20)]
     beaver_b = [group.init(ZR, 100), group.init(ZR, 200)]
     beaver_c = [group.init(ZR, 1000), group.init(ZR, 4000)]

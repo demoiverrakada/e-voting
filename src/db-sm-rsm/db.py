@@ -47,7 +47,10 @@ def store(funcs,params):
             "_pi":(serialize_wrapper(params[9])),
             "_re_pi":(serialize_wrapper(params[10])),
             "_svecperm":(serialize_wrapper(params[11])),
-            "permcomm":(serialize_wrapper(params[12]))
+            "permcomm":(serialize_wrapper(params[12])),
+            "beaver_a_shares":(serialize_wrapper(params[13])),
+            "beaver_b_shares":(serialize_wrapper(params[14])),
+            "beaver_c_shares":(serialize_wrapper(params[15]))
         })
     elif(function_map[funcs]=='decs'):
         collection.insert_one({

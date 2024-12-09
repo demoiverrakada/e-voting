@@ -88,7 +88,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
             'enc_msg_share': serialize_wrapper(evr_kw_ls[i]),
             'enc_rand_share': serialize_wrapper(evr_rw_ls[i]),
             'pfcomm': None,
-            'enc_rand': serialize_wrapper(eps_r_w_ls),
+            'enc_rand': serialize_wrapper(eps_r_w_ls[i]),
             'pf_encmsg': None,
             'pf_encrand': None,
             'pfs_enc_msg_share': None,

@@ -300,6 +300,7 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
         # Homomorphically obtain the r component of the BBS+ signature
         for a in range(alpha):
             with timer("mixer %d: homomorphically obtain the r component of BBS+ sig" % a):
+                print(enc_rands[0],"enc_rands[i]")
                 enc_sigs_r = [pai_add(auth_paipk, enc_sigs_rhat[i], enc_rands[i]) for i in range(myn)]
 
         status_shuffle_blsigs_rev = True
@@ -336,8 +337,11 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
                     if adash == a: continue
                     else: 
                         status_shuffle_blsigs_rev = status_shuffle_blsigs_rev and shuffle_elgamal_nizkverif(ck, auth_elgpk, enc_sigs_S_1[adash], enc_sigs_S_2[adash], permcomm[adash], evec_S[adash], pf_S[adash])        
+                        print("status_shuffle_blsigs_rev after S (elgamal):", status_shuffle_blsigs_rev)
                         status_shuffle_blsigs_rev = status_shuffle_blsigs_rev and shuffle_paillier_nizkverif(ck, ck_fo, auth_paipk, enc_sigs_c_1[adash], enc_sigs_c_2[adash], permcomm[adash], evec_c[adash], pf_c[adash])                               
+                        print("status_shuffle_blsigs_rev after c (paillier):", status_shuffle_blsigs_rev)
                         status_shuffle_blsigs_rev = status_shuffle_blsigs_rev and shuffle_paillier_nizkverif(ck, ck_fo, auth_paipk, enc_sigs_r_1[adash], enc_sigs_r_2[adash], permcomm[adash], evec_r[adash], pf_r[adash])
+                        print("status_shuffle_blsigs_rev after r (paillier):", status_shuffle_blsigs_rev)
         pprint("status_shuffle_blsigs_rev:", status_shuffle_blsigs_rev)
 
     # Generate encrypted blinded signatures
@@ -395,8 +399,8 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
                 decshares_c.append(decshares_c_a)
                 decshares_r.append(decshares_r_a)
                 deltavec_S.append([group.init(ZR, int(gmpy2.mpz_urandomb(rs, kappa_e))) for i in range(myn)])
-                deltavec_c.append([gmpy2.mpz_urandomb(rs, kappa_e) for i in range(n)])
-                deltavec_r.append([gmpy2.mpz_urandomb(rs, kappa_e) for i in range(n)])
+                deltavec_c.append([gmpy2.mpz_urandomb(rs, kappa_e) for i in range(myn)])
+                deltavec_r.append([gmpy2.mpz_urandomb(rs, kappa_e) for i in range(myn)])
                 pf_S.append(elgamal_share_decryption_batchpf(auth_elgpk, decshares_S_a, enc_blsigs_S, deltavec_S[a], a, _auth_elgsklist))
                 pf_c.append(pai_share_decryption_batchpf(auth_paipk, decshares_c_a, enc_blsigs_c, deltavec_c[a], a, _auth_paisklist))
                 pf_r.append(pai_share_decryption_batchpf(auth_paipk, decshares_r_a, enc_blsigs_r, deltavec_r[a], a, _auth_paisklist))

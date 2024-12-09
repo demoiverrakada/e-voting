@@ -85,6 +85,9 @@ def serialize_wrapper(item):
         return (fn, str(item))  # Convert mpz to string
     elif isinstance(item, str):
         return (fn, bytes(item, 'utf-8'))
+    elif isinstance(item, dict):
+        # Serialize dictionaries key-value pairs
+        return (fn, {key: serialize_wrapper(value) for key, value in item.items()})
     elif isinstance(item, Iterable) and not isinstance(item, (str, bytes)):
         return (fn, [serialize_wrapper(iitem) for iitem in item])
     elif hasattr(item, "serialize"):  # Check if the item has a serialize method
@@ -116,6 +119,9 @@ def deserialize_wrapper(sitem):
         item = gmpy2.mpz(_sitem)
     elif fn =="builtins.tuple":
         item = tuple(deserialize_wrapper(siitem) for siitem in _sitem)
+    elif fn == "builtins.dict":
+        # Reconstruct the dictionary from serialized key-value pairs
+        item = {key: deserialize_wrapper(value) for key, value in _sitem.items()}
     elif isinstance(_sitem, Iterable):
         item = [deserialize_wrapper(siitem) for siitem in _sitem]
     elif fn == "PairingGroupElement":

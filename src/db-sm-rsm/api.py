@@ -49,8 +49,7 @@ def setup(n,alpha):
 
     # Generate beaver triples (offline preprocessing step for multiplicative 
     # secret sharing used in DPK2)
-    gen_beaver_triples(n, alpha)
-
+    beaver_a_shares,beaver_b_shares,beaver_c_shares = gen_beaver_triples(n, alpha)
     # Generate a commitment to the permutation and prove knowledge of its opening
     ck = commkey(n)
     ck_fo = commkey_fo(n, N=pai_pk[0])
@@ -66,7 +65,7 @@ def setup(n,alpha):
      
     store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,
          # ...beaver triples (to add) ...
-         ck, ck_fo, _pi, _re_pi, _svecperm, permcomm])
+         ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares])
 
 def generate_ballots(num):
     ballot_draft(num)
@@ -192,16 +191,29 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
         alpha, pai_pk, _pai_sklist,elg_pk, _elg_sklist,ck, ck_fo, _pi, _svecperm, permcomm=load("setup",['alpha','pai_pk','_pai_sklist','elg_pk','_elg_sklist','ck','ck_fo','_pi','_svecperm','permcomm']).values()
         comms=list(load("enc",["comm"]).values())[0]
         enc_rands=list(load("enc",["enc_rand"]).values())[0]
-
+        print(enc_rands,"enc_rands")
     # Check verifier signatures
         status_verfsigs_rev = check_verfsigs_rev(sigs_rev, comms, verfpk, enc_sigs_rev, enc_sigs_rev_rands, elg_pk, pai_pk,alpha)
         assert status_verfsigs_rev
+        print("status_verfsigs_rev: ", status_verfsigs_rev)
     # Get blinded signatures against msg_outs
         blsigs_rev, _blshares_rev = get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, elg_pk, pai_pk, _svecperm, _rand_shares, _pi, _elg_sklist, _pai_sklist)
 
     # Proofs
         blsigs_S, blsigs_c, blsigs_r = blsigs_rev
         _blshares_S, _blshares_c, _blshares_r = _blshares_rev
+        
+        from bbsplussig import bbsplusverify
+        _blshare_S = _blshares_S[0][0] + _blshares_S[1][0]
+        _blshare_c =  _blshares_c[0][0] + _blshares_c[1][0]
+        _blshare_r =  _blshares_r[0][0] + _blshares_r[1][0]
+        sig_S = blsigs_S[0] * (g1 ** (-_blshare_S))
+        sig_c = blsigs_c[0] - _blshare_c 
+        sig_r = blsigs_r[0] - _blshare_r
+        sigma = (sig_S, sig_c, sig_r)
+        tmp_status_verif = bbsplusverify(sigma, msgs_out[0], verfpk)
+        print("tmp_status_verif:", tmp_status_verif)
+
         dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha, _blshares_S, _blshares_c, _blshares_r)
         status_dpk_bbsplussig = dpk_bbsplussig_nizkverifs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, dpk_bbsplussig_pfs)
     print(status_dpk_bbsplussig,"verification is true i.e. system is correct")
