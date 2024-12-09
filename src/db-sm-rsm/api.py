@@ -141,8 +141,8 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
     #print(type(verfpk),"type of verfpk")
     #print(type(sigs),"type of sigs")
     f = io.StringIO()
-    #if(True):
-    with contextlib.redirect_stdout(f):
+    if(True):
+    #with contextlib.redirect_stdout(f):
         verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
         sigs= deserialize_wrapper(ast.literal_eval(sigs))
         enc_sigs= deserialize_wrapper(ast.literal_eval(enc_sigs))
@@ -168,7 +168,8 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
 
     # Proofs
         dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha,dict["_msg_shares"],dict["_rand_shares"], _blshares)
-        
+        status_dpk_bbsig = dpk_bbsig_nizkverifs(comms, blsigs, verfpk, dpk_bbsig_pfs)
+    print("status_dpk_bbsig:",status_dpk_bbsig)    
     print({"dpk_bbsig_pfs":serialize_wrapper(dpk_bbsig_pfs),"blsigs":serialize_wrapper(blsigs)})
 def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
     """ Get the list of proofs (dummy or real) for plaintext votes identified by index set J, proving or 

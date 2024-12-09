@@ -10,11 +10,11 @@ import random
 from charm.toolbox.pairinggroup import ZR, G1
 import gmpy2
 
-from globals import group, g1, h1, iden, logq, kappa_e, kappa_c, kappa_r, kappaby2
+from globals import group, iden, logq, kappa_e, kappa_c, kappa_r, kappaby2
 from numtheory import randcoprime
 from perm import gen_rand_perm
 from misc import timed, retval, hash_gmpy2, pprint
-
+from db import load,store
 kappaby2dash = kappaby2+kappa_e+20 # this is for \sum_{i=1}^{n} r_ie_i, where each r_i is kappaby2 bits long.
 
 # Random state for the gmpy2 random operations
@@ -26,6 +26,7 @@ def commkey(n):
     # Ensuring we generate at least two generators because the generating set of the Paillier 
     # ciphertext is of size 2. Protocol 15 of the first paper above (step 2) then requires that 
     # the commitment key must support at least two elements. 
+    g1,h1=load("generators",["g1","h1"]).values()
     return n, h1, [group.random(G1) for i in range(max(n,2))]
 
 def commit_vector(ck, vs, s):
@@ -112,6 +113,7 @@ def expprod(basevec, expvec, mod=None):
 
 def compute_perm_nizkproof(ck, evec, _pi, _svec):
     n, h1, gs = ck
+    g1,h12=load("generators",["g1","h1"]).values()
     t = sum(_svec)
     edashvec = applyperm(evec, _pi)
     sdashvec = [group.random(ZR) for i in range(n)]
@@ -125,6 +127,7 @@ def compute_perm_nizkproof(ck, evec, _pi, _svec):
     return B, t, k, edashvec, sdashvec, w
 
 def commitmsg_perm_nizkproof(ck, B):
+    g1,h12= load("generators",["g1","h1"]).values()
     n, h1, gs = ck
     rt = group.random(ZR)
     rk = group.random(ZR)
@@ -156,6 +159,7 @@ def respmsg_perm_nizkproof(ck, t, k, edashvec, sdashvec, w, rt, rk, redash, rsda
 
 def lhs_perm_nizkverif(ck, a, evec, B):
     n, h1, gs = ck
+    g1,h12=load("generators",["g1","h1"]).values()
     LC1 = group.init(G1, iden)
     A = group.init(G1, iden)
     GS = group.init(G1, iden)
@@ -176,6 +180,7 @@ def lhs_perm_nizkverif(ck, a, evec, B):
 
 def rhs_perm_nizkverif(ck, B, zt, zk, zedash, zsdash, zw):
     n, h1, gs = ck
+    g1,h12= load("generators",["g1","h1"]).values()
     ZC1 = h1 ** zt
     ZC2 = h1 ** zk
     for i in range(n):
@@ -289,6 +294,7 @@ def shuffle_elgamal_nizkproof(ck, elgpk, cinvec, coutvec, permcomm, evec, _pi, _
 
     # Compute
     n, h1, gs = ck
+    g1,h12= load("generators",["g1","h1"]).values()
     evec = [group.init(ZR, int(e)) for e in evec]
     B, t, k, edashvec, sdashvec, w = compute_perm_nizkproof(ck, evec, _pi, _svec)
     u = dot(_rvec, evec)
@@ -328,10 +334,10 @@ def shuffle_elgamal_nizkverif(ck, elgpk, cinvec, coutvec, permcomm, evec, pf):
     }
     """
     _elgpk, _elgpklist = elgpk
-
+    g1,h12= load("generators",["g1","h1"]).values()
     n, h1, gs = ck
     B, c, zt, zk, zedash, zsdash, zw, zu = pf
-
+    
     # LHS of the equation
     evec = [group.init(ZR, int(e)) for e in evec]
     LC1, LC2, LB, LW = lhs_perm_nizkverif(ck, permcomm, evec, B)
