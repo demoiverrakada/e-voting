@@ -144,6 +144,22 @@ def dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha, _msg_shares, _rand_shares
             zvs.append([(rv[a][i] - _msg_shares[a][i]*chals[i]) for i in range(myn)])
             zrs.append([(rr[a][i] - _rand_shares[a][i]*chals[i]) for i in range(myn)])
             zbls.append([(rbl[a][i] - _blshares[a][i]*chals[i]) for i in range(myn)]) 
+    print("chals in proof generation",chals)
+
+    myC2 = C2[0]
+    comm = comms[0]
+    chal = chals[0]
+    zr = zrs[0][0] + zrs[1][0]
+    zv = zvs[0][0] + zvs[1][0]
+    
+    print("expected C2:", myC2)
+    print("expected comm:", comm)
+    msg = sum([_msg_shares[a][0] for a in range(alpha)])
+    rand = sum([_rand_shares[a][0] for a in range(alpha)])
+    print("msg:", msg)
+    print("rand:", rand)
+    print("actual comm:", (g1 ** msg) * (h1 ** rand))
+    print("actual C2:", (comms[0] ** chal) * (h1 ** zr) * (g1 ** zv))
 
     return chals, zvs, zrs, zbls
 
@@ -153,8 +169,7 @@ def dpk_bbsig_nizkverifs(comms, blsigs, verfpk, pfs):
     with timer("verifier: verifying dpk_bbsig proof"):
         chals, zvs, zrs, zbls = pfs
         alpha = len(zvs)
-        print(pfs,"pfs")
-        print(alpha,"alpha")
+        print("chals in proof verification",chals)
         # Combine shares of the response messages received from all the provers
         zv, zr, zbl = [zero_Zq]*len(comms), [zero_Zq]*len(comms), [zero_Zq]*len(comms)
         for a in range(alpha):
@@ -168,7 +183,8 @@ def dpk_bbsig_nizkverifs(comms, blsigs, verfpk, pfs):
             verif = ((pair(blsigs[i], (verfpk**chals[i]) * (f2**(-zv[i]))) * (eg1f2 ** (zbl[i]))),
                     (comms[i] ** chals[i]) * (h1 ** zr[i]) * (g1 ** zv[i]))
             #print(verif,"verif")
-            print(chals[i]== group.hash((g1,h1,f2,comms[i],blsigs[i])+verif,type=ZR),"thing with status")
+            print("chals[i]",chals[i])
+            print("group.hash",group.hash((g1,h1,f2,comms[i],blsigs[i])+verif,type=ZR))
             status = status and (chals[i] == group.hash((g1, h1, f2, comms[i], blsigs[i]) + verif, type=ZR))
     return status
 

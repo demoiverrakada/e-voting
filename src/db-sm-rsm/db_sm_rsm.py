@@ -229,6 +229,7 @@ def get_blsigs(enc_sigs, ck, permcomm, alpha, elgpk, _svecperm, _pi, _re_pi, _el
                     else: 
                         for i in range(len(enc_sigs)):
                             status_pk_bl = status_pk_bl and pk_enc_bl_verif(elgpk, enc_bls[adash][i], enc_sigs[i], pf[adash][i])
+                            print("status_pk_bl:",status_pk_bl)
         pprint("status_pk_bl:", status_pk_bl)
 
         enc_blsigs = [elgamal_encrypt(elgpk, g1 ** 0, randIn=0)] * n
@@ -252,8 +253,9 @@ def get_blsigs(enc_sigs, ck, permcomm, alpha, elgpk, _svecperm, _pi, _re_pi, _el
             with timer("mixer %d: verifying others' decryption shares" % a):
                 for adash in range(alpha):
                     if adash == a: continue
-                    else: status_decshares_blsigs = status_decshares_blsigs and elgamal_share_decryption_batchverif(elgpk, decshares[adash], enc_blsigs, deltavec[adash], adash, pf[adash])
-
+                    else: 
+                        status_decshares_blsigs = status_decshares_blsigs and elgamal_share_decryption_batchverif(elgpk, decshares[adash], enc_blsigs, deltavec[adash], adash, pf[adash])
+                        print("status_decshares_blsigs:",status_decshares_blsigs)
         for a in range(alpha):
             with timer("mixer %d: combine decryption shares" % a):
                 blsigs = elgamal_combine_decshares(elgpk, enc_blsigs, decshares)
