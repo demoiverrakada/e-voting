@@ -316,6 +316,24 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
                 enc_sigs_c_new = permute(reenc_sigs_c, _pi[a])
                 enc_sigs_r_new = permute(reenc_sigs_r, _pi[a])
 
+            from db import load
+            _elg_sklist = load("setup", ["_elg_sklist"])
+            print("decryptions of original enc_sigs_S:")
+            sigs_S = []
+            for i, enc_sig_S in enumerate(enc_sigs_S):
+                decshares = elgamal_share_decrypt(auth_elgpk, enc_sig_S, _elg_sklist["_elg_sklist"][i])
+                sig_S = elgamal_combine_decshares(auth_elgpk, [enc_sig_S], [decshares])[0]
+                sigs_S.append(sig_S)
+                print("sig_S:", sig_S)
+
+            print("decryptions of enc_sigs_S after permutation:")
+            sigs_S_new = []
+            for i, enc_sig_S_new in enumerate(enc_sigs_S_new):
+                decshares = elgamal_share_decrypt(auth_elgpk, enc_sig_S_new, _elg_sklist[i])
+                sig_S_new = elgamal_combine_decshares(auth_elgpk, [enc_sig_S_new], [decshares])[0]
+                sigs_S_new.append(sig_S_new)
+                print("sig_S:", sig_S_new)
+
             with timer("mixer %d: creating proof of shuffle of encrypted BBS+ signatures" % a):
                 evec_S.append([group.init(ZR, random.getrandbits(kappa_e)) for i in range(myn)])
                 evec_c.append([gmpy2.mpz_urandomb(rs, kappa_e) for i in range(myn)])
