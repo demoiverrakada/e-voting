@@ -205,6 +205,7 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
         _blshares_S, _blshares_c, _blshares_r = _blshares_rev
         
         from bbsplussig import bbsplusverify
+        g1,h1=load("generators",["g1","h1"]).values()
         _blshare_S = _blshares_S[0][0] + _blshares_S[1][0]
         _blshare_c =  _blshares_c[0][0] + _blshares_c[1][0]
         _blshare_r =  _blshares_r[0][0] + _blshares_r[1][0]

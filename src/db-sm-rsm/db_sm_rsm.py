@@ -5,7 +5,7 @@ import gmpy2
 
 from charm.toolbox.pairinggroup import ZR
 
-from globals import g1, group, pai_group, beta, q, kappa_e
+from globals import group, pai_group, beta, q, kappa_e
 from pedersen import commit
 from bbsig import bbkeygen, bbsign, bbbatchverify
 from bbsplussig import bbspluskeygen, bbsplusquasisign_commitment, bbsplusquasibatchverify
@@ -17,7 +17,7 @@ from perm import permute, gen_rand_perm
 from shuffle import commkey, commkey_fo, commit_perm, perm_nizkproof, perm_nizkverif, shuffle_paillier_nizkproof, shuffle_paillier_nizkverif, shuffle_elgamal_nizkproof, shuffle_elgamal_nizkverif
 from pok import pkcomms, pkcommverifs, pk_enc_bl, pk_enc_bl_verif, pk_enc_blrev_S, pk_enc_blrev_S_verif, dpk_bbsig_nizkproofs, dpk_bbsig_nizkverifs, dpk_bbsplussig_nizkproofs, dpk_bbsplussig_nizkverifs
 from misc import timed, timer, sz, pprint
-
+from db import load
 random.seed()
 rs = gmpy2.random_state(random.randint(0,100000)) # random seed for gmpy2 operations
 
@@ -231,7 +231,7 @@ def get_blsigs(enc_sigs, ck, permcomm, alpha, elgpk, _svecperm, _pi, _re_pi, _el
                             status_pk_bl = status_pk_bl and pk_enc_bl_verif(elgpk, enc_bls[adash][i], enc_sigs[i], pf[adash][i])
                             print("status_pk_bl:",status_pk_bl)
         pprint("status_pk_bl:", status_pk_bl)
-
+        g1,h1=load("generators",["g1","h1"]).values()
         enc_blsigs = [elgamal_encrypt(elgpk, g1 ** 0, randIn=0)] * n
         for a in range(alpha):
             with timer("mixer %d: generate encrypted blinded BB signatures" % a):
@@ -360,7 +360,7 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
                         status_shuffle_blsigs_rev = status_shuffle_blsigs_rev and shuffle_paillier_nizkverif(ck, ck_fo, auth_paipk, enc_sigs_r_1[adash], enc_sigs_r_2[adash], permcomm[adash], evec_r[adash], pf_r[adash])
                         print("status_shuffle_blsigs_rev after r (paillier):", status_shuffle_blsigs_rev)
         pprint("status_shuffle_blsigs_rev:", status_shuffle_blsigs_rev)
-
+    g1,h1=load("generators",["g1","h1"]).values()
     # Generate encrypted blinded signatures
     with timer("generate encrypted blinded BBS+ signatures", report_subtimers=mixers(alpha)):
         _blshares_S, _blshares_c, _blshares_r, _blshares_cdash, _blshares_rdash = [], [], [], [], []
