@@ -3,15 +3,17 @@ import {useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ReactSession } from 'react-client-session';
 import './App.css';
-
+ReactSession.setStoreType('sessionStorage');
 function Options() {
   const navigate = useNavigate();
   const [showSetupForm, setShowSetupForm] = useState(false);
+  const [showGenerateForm, setShowGenerateForm] = useState(false);
   const [alpha, setAlpha] = useState(2);
   const [n, setN] = useState(5);
 
   useEffect(() => {
     const token = ReactSession.get('access_token');
+    //alert(token);
     if (!token) {
       navigate('/', { replace: true });
     }
@@ -22,9 +24,11 @@ function Options() {
   };
   const handleSetup = async () => {
     try {
+      //const alpha = 2;
+      //const n = 5;
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'https://3c75-35-247-153-222.ngrok-free.app/setup',
+        'http://localhost:5000/setup',
         { alpha: alpha, n: n }, // Replace with actual values if needed
         {
           headers: {
@@ -44,15 +48,23 @@ function Options() {
     try {
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'https://3c75-35-247-153-222.ngrok-free.app/setup',
+        'http://localhost:5000/runBuild1',
         { alpha: alpha, n: n }, // Replace with actual values if needed
         {
           headers: {
             authorization: `Bearer ${token}`
           },
+          responseType: 'blob', // Important to handle file as a blob
         }
       );
-      console.log('Protected data:', response.data);
+  
+      // Create a link element to trigger the download
+      const blob = new Blob([response.data], { type: 'application/octet-stream' }); // You can specify the MIME type depending on the file
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'app_file'; // Specify the file name to download
+      link.click();
+  
       alert('Setup was successful');
       setShowSetupForm(false); // Hide the form after successful setup
     } catch (err) {
@@ -64,7 +76,7 @@ function Options() {
     try {
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'https://3c75-35-247-153-222.ngrok-free.app/setup',
+        'http://localhost:5000/setup',
         { alpha: alpha, n: n }, // Replace with actual values if needed
         {
           headers: {
@@ -86,43 +98,53 @@ function Options() {
     try {
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'https://3c75-35-247-153-222.ngrok-free.app/generate',
-        { n: n }, // Replace with actual values if needed
+        'http://localhost:5000/generate',
+        { n: n },
         {
           headers: {
             authorization: `Bearer ${token}`,
           },
           timeout: 100000, // Increase timeout to 100 seconds
-          responseType: 'json', // Handle binary data (like a zip file)
+          responseType: 'blob', // Correctly handle binary data
         }
       );
   
-      // Convert JSON response to Blob and download it
-      const jsonBlob = new Blob([JSON.stringify(response.data)], { type: 'application/json' });
-      const url = URL.createObjectURL(jsonBlob);
-
-      // Create a temporary anchor element to trigger the download
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'generated.json'; // The name of the downloaded file
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      link.remove();
-      URL.revokeObjectURL(url);
-
-      alert('Ballot generation was successful and the file is being downloaded');
-      setShowSetupForm(false); // Hide the form after successful setup
+      // Check if the response status is 200
+      if (response.status === 200) {
+        alert('ballots.zip is being downloaded!');
+  
+        // Create a Blob from the response data
+        const zipBlob = new Blob([response.data], { type: 'application/zip' });
+        const url = URL.createObjectURL(zipBlob);
+  
+        // Create a temporary anchor element to trigger the download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'ballots.zip'; // Name of the downloaded file
+        document.body.appendChild(link);
+        link.click();
+  
+        // Cleanup
+        link.remove();
+        URL.revokeObjectURL(url);
+  
+        alert('Ballot generation was successful and the file has been downloaded');
+        setShowSetupForm(false); // Hide the form after successful setup
+      } else {
+        alert('Failed to generate ballots. Please try again.');
+      }
     } catch (err) {
+      console.error('Error during ballot generation:', err);
       alert(`Ballot generation failed: ${err.message}`);
     }
   };
   
+  
+  
 
   const handleGetPublicKeys = async () => {
     try {
-      const response = await axios.get('https://3c75-35-247-153-222.ngrok-free.app/pk');
+      const response = await axios.get('http://localhost:5000/pk');
       console.log(response.data);
       alert('Public keys fetched successfully');
     } catch (err) {
@@ -132,7 +154,7 @@ function Options() {
 
   const handleGetEncVotes = async () => {
     try {
-      const response = await axios.get('https://3c75-35-247-153-222.ngrok-free.app/encvotes');
+      const response = await axios.get('http://localhost:5000/encvotes');
       console.log(response.data);
 
       // Convert JSON response to Blob and download it
@@ -159,7 +181,7 @@ function Options() {
   const handleDecryptVotes = async () => {
     try {
       const token = ReactSession.get('access_token');
-      const response = await axios.get('https://3c75-35-247-153-222.ngrok-free.app/decvotes', {
+      const response = await axios.get('http://localhost:5000/decvotes', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -173,7 +195,7 @@ function Options() {
 
   const handleGetDcrpVotes = async () => {
     try {
-      const response = await axios.get('https://3c75-35-247-153-222.ngrok-free.app/getVotes');
+      const response = await axios.get('http://localhost:5000/getVotes');
       console.log(response.data);
       
       // Convert JSON response to Blob and download it
@@ -281,13 +303,37 @@ function Options() {
                 onChange={(e) => setN(Number(e.target.value))}
               />
             </label>
-            <button onClick={handleSetup}>Submit Setup</button>
+            <button type="button" onClick={handleSetup}>Submit Setup</button>
           </div>
-        )}
+          )}
 
           <button type="button" id="evoting_fron" onClick={handleEvoting_fron}>Evoting App</button>
           <button type="button" id="BallotAudit" onClick={handleBallot_audit}>Ballot Audit</button>
-          <button type="button" id="generate" onClick={handleGenerate}>Generate Ballot</button>
+          <button 
+            type="button" 
+            id="generate" 
+            onClick={() => setShowGenerateForm(!showGenerateForm)}
+          >
+            {showGenerateForm ? 'Cancel Generate' : 'Generate Ballot'}
+          </button>
+
+          {showGenerateForm && (
+            <div className="generate-form">
+              <h3>Generate Ballots</h3>
+              <label>
+                N (Number of Ballots):
+                <input
+                  type="number"
+                  value={n}
+                  onChange={(e) => setN(Number(e.target.value))}
+                />
+              </label>
+              <button type="button" onClick={handleGenerate}>
+                Submit Generate
+              </button>
+            </div>
+          )}
+
           <button type="button" id="get_pub_keys" onClick={handleGetPublicKeys}>Get public keys</button>
           <button type="button" id="get_enc_votes" onClick={handleGetEncVotes}>Get encrypted votes</button>
           <button type="button" id="decrypt_votes" onClick={handleDecryptVotes}>Decrypt votes</button>
