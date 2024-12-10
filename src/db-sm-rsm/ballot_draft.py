@@ -454,7 +454,7 @@ def ballot_draft(num):
 
     for i in range(num_ballots):
         print(f"Creating PDF for ballot {i+1}...")
-        create_pdf(m, collection, "/output"+f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
+        create_pdf(m, collection, "/output/"+f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
         print(f"PDF ballot_{i+1}.pdf created successfully!")
         if os.path.exists("/output"+f"ballot_{i+1}.pdf"): 
             print(f"ballot_{i+1}.pdf saved successfully.")
