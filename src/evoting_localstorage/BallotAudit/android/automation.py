@@ -4,15 +4,20 @@ import os
 def run_gradle_commands():
     project_dir = "/app/evoting_localstorage/BallotAudit/android"
     gradle_path = os.path.join(project_dir, "gradlew")
+    
+    # Copy the current environment variables
     env = os.environ.copy()
-    env["PATH"] = "/usr/local/bin:/usr/bin:/bin:" + env["PATH"]  # Ensure Node.js path is included
+
+    # Add the paths for Android SDK, Java, Node.js, and other necessary binaries
+    env["ANDROID_HOME"] = "/root/android-sdk"
+    env["PATH"] = "/root/android-sdk/platform-tools:/root/android-sdk/cmdline-tools/latest/bin:/usr/lib/jvm/java-17-openjdk-amd64/bin:/root/.nvm/versions/node/v22.3.0/bin:/opt/venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" + ":" + env["PATH"]
 
     try:
-        # Change to project directory
+        # Change to the project directory
         os.chdir(project_dir)
         print("Current working directory:", os.getcwd())
 
-        # Run 'sed' to remove carriage returns in 'gradlew'
+        # Run 'sed' to remove carriage returns in 'gradlew' (for compatibility)
         print("Removing carriage returns from 'gradlew'...")
         subprocess.run(["sed", "-i", "s/\r$//", "gradlew"], check=True)
 

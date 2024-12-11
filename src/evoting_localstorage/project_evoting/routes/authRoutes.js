@@ -85,41 +85,34 @@ function callPythonFunction3(functionName, ...params) {
 }
 
 //function for running BallotAudit app generation script
+
 function callPythonFunction4(functionName, ...params) {
-    // Resolve the correct path to the Python script
-    const scriptPath = join(__dirname, '../../BallotAudit/android/automation.py');
+    const scriptPath = '/app/evoting_localstorage/BallotAudit/android/automation.py';
     const pythonExecutable = 'python3';
 
     console.log("Resolved script path:", scriptPath);
 
-    // Ensure parameters are passed correctly
     const formattedParams = params.map(param =>
         typeof param === 'string' ? `'${param}'` : param
     ).join(' ');
+
     console.log(`Formatted params: ${formattedParams}`);
 
-    // Full command for reference (debugging purposes)
-    const command = `${pythonExecutable} ${scriptPath} ${functionName} ${formattedParams}`;
-    console.log(`Executing command: ${command}`);
-
-    // Set the correct environment variables and working directory
     const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
         env: {
             ...process.env,
-            PATH: process.env.PATH + ':/usr/local/bin:/usr/bin:/bin', // Ensure PATH includes all necessary paths
-            precomputing: '0', // Example custom environment variable
+            PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Explicitly add Node path
+            precomputing: '0'
         },
-        cwd: join(__dirname, '../../BallotAudit/android'), // Ensure the script runs in the correct directory
-        encoding: 'utf-8', // To properly handle output encoding
+        cwd: '/app/evoting_localstorage/BallotAudit/android/', // Make sure the working directory is correct
+        encoding: 'utf-8',
     });
 
-    // Handle errors during process spawn
     if (pythonProcess.error) {
         console.error('Error spawning Python process:', pythonProcess.error);
         throw pythonProcess.error;
     }
 
-    // Capture stdout and stderr
     const stdout = pythonProcess.stdout.trim();
     const stderr = pythonProcess.stderr.trim();
 
@@ -129,18 +122,11 @@ function callPythonFunction4(functionName, ...params) {
 
     console.log('Python stdout:', stdout);
 
-    // Handle potential errors in the Python script's execution
     if (pythonProcess.status !== 0) {
         throw new Error(`Python script failed with exit code ${pythonProcess.status}: ${stderr}`);
     }
 
-    // Return stdout (parsed or raw)
-    try {
-        return stdout || stderr;
-    } catch (error) {
-        console.error('Error reading or parsing result:', error);
-        throw error;
-    }
+    return stdout || stderr;
 }
 
 function callPythonFunction5(functionName, ...params) {
@@ -596,6 +582,7 @@ router.post('/runBuild1', async (req, res) => {
     }
 });
 
+// Your Express endpoint where the build process is triggered
 router.post('/runBuild2', async (req, res) => {
     try {
         // Call the Python function to start the build process
@@ -630,7 +617,6 @@ router.post('/runBuild2', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 
 router.post('/runBuild3', async (req, res) => {
     try {
