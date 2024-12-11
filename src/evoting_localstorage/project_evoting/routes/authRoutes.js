@@ -86,37 +86,56 @@ function callPythonFunction3(functionName, ...params) {
 
 //function for running BallotAudit app generation script
 function callPythonFunction4(functionName, ...params) {
-    // Use the correct relative path
-    const scriptPath = join(__dirname, '../../BallotAudit/android/automation.py'); // Adjust as needed
+    // Resolve the correct path to the Python script
+    const scriptPath = join(__dirname, '../../BallotAudit/android/automation.py');
     const pythonExecutable = 'python3';
 
     console.log("Resolved script path:", scriptPath);
 
-    const formattedParams = params.map(param => 
+    // Ensure parameters are passed correctly
+    const formattedParams = params.map(param =>
         typeof param === 'string' ? `'${param}'` : param
-    ).join(', ');
+    ).join(' ');
+    console.log(`Formatted params: ${formattedParams}`);
 
-    const command = `${pythonExecutable} ${scriptPath}`;
-    console.log(`Running: ${command}`);
+    // Full command for reference (debugging purposes)
+    const command = `${pythonExecutable} ${scriptPath} ${functionName} ${formattedParams}`;
+    console.log(`Executing command: ${command}`);
 
+    // Set the correct environment variables and working directory
     const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
-        env: { ...process.env, precomputing: '0' },
+        env: {
+            ...process.env,
+            PATH: process.env.PATH + ':/usr/local/bin:/usr/bin:/bin', // Ensure PATH includes all necessary paths
+            precomputing: '0', // Example custom environment variable
+        },
+        cwd: join(__dirname, '../../BallotAudit/android'), // Ensure the script runs in the correct directory
+        encoding: 'utf-8', // To properly handle output encoding
     });
 
+    // Handle errors during process spawn
     if (pythonProcess.error) {
-        console.error('Python process error:', pythonProcess.error);
+        console.error('Error spawning Python process:', pythonProcess.error);
         throw pythonProcess.error;
     }
 
-    const stdout = pythonProcess.stdout.toString().trim();
-    const stderr = pythonProcess.stderr.toString().trim();
+    // Capture stdout and stderr
+    const stdout = pythonProcess.stdout.trim();
+    const stderr = pythonProcess.stderr.trim();
 
     if (stderr) {
         console.error('Python stderr:', stderr);
     }
 
+    console.log('Python stdout:', stdout);
+
+    // Handle potential errors in the Python script's execution
+    if (pythonProcess.status !== 0) {
+        throw new Error(`Python script failed with exit code ${pythonProcess.status}: ${stderr}`);
+    }
+
+    // Return stdout (parsed or raw)
     try {
-        console.log('Python stdout:', stdout);
         return stdout || stderr;
     } catch (error) {
         console.error('Error reading or parsing result:', error);
