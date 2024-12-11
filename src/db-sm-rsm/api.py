@@ -70,8 +70,6 @@ def setup(n,alpha):
 def generate_ballots(num):
     ballot_draft(num)
 
-def upload():
-    process_bulletins()
 
 
 def mixer():
@@ -79,6 +77,7 @@ def mixer():
     
     Produces a permuted list of decrypted votes in the database.
     """
+    process_bulletins()
     alpha,pai_pk,pai_pklist_single,ck,ck_fo,permcomm,_pai_sklist,_pai_sklist_single,_pi,_svecperm=load("setup",["alpha","pai_pk","pai_pklist_single","ck","ck_fo","permcomm","_pai_sklist","_pai_sklist_single","_pi","_svecperm"]).values()
 
     enc_msgs, enc_msg_shares, enc_rand_shares=load("enc",["enc_msg", "enc_msg_share", "enc_rand_share"]).values()
@@ -103,32 +102,6 @@ def mixer():
  #   proofs=load("pf_zksm",[])
  #   print(proofs)
 
-def generate_proofs():
-    f = io.StringIO()
-    with contextlib.redirect_stdout(f):
-        elg_pk = load("setup",["elg_pk","alpha"])
-        msgs_out= load("mix",["msgs_out"])
-        verfpk,sigs,enc_sigs,enc_sigs_rands = get_verfsigs(msgs_out['msgs_out'], elg_pk['elg_pk'])
-    #print(type(sigs[0]),"type of sigs[0]")
-    #print(type(verfpk),"type of verfpk")
-    #print(msgs_out,"msgs_out")
-    #print(sigs,"sigs")
-    #print(verfpk,"verfpk")
-    #status_verfsigs = check_verfsigs(msgs_out['msgs_out'], sigs, verfpk, enc_sigs, enc_sigs_rands, elg_pk['elg_pk'],elg_pk['alpha'])
-    #assert status_verfsigs
-    #print(bbbatchverify(sigs,msgs_out['msgs_out'],verfpk),"checking bbbatch")
-    print(({"verfpk":serialize_wrapper(verfpk),"sigs":serialize_wrapper(sigs),"enc_sigs":serialize_wrapper(enc_sigs),"enc_sigs_rands":serialize_wrapper(enc_sigs_rands)}))
-    #print(type(verfpk),type(sigs),type(enc_sigs),type(enc_sigs_rands))
-def generate_reverse_proofs():
-    f = io.StringIO()
-    with contextlib.redirect_stdout(f):
-        elg_pk,pai_pk = load("setup",["elg_pk","pai_pk"]).values()
-        comms=list(load("enc",["comm"]).values())[0]
-        """Important: pfcomms is a part of the function parameter of get_verfsigs_rev to be completed"""
-        #pfcomms = deserialize_wrapper(ast.literal_eval(pfcomms))
-        print(comms,"comms")
-        verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands = get_verfsigs_rev(comms,elg_pk,pai_pk)
-    print(({"verfpk": serialize_wrapper(verfpk), "sigs_rev":serialize_wrapper(sigs_rev), "enc_sigs_rev":serialize_wrapper(enc_sigs_rev), "enc_sigs_rev_rands":serialize_wrapper(enc_sigs_rev_rands)}))
 
 def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
     """ Get the list of proofs (dummy or real) for encrypted votes identified by index set I, proving or 
@@ -141,8 +114,8 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
     #print(type(verfpk),"type of verfpk")
     #print(type(sigs),"type of sigs")
     f = io.StringIO()
-    if(True):
-    #with contextlib.redirect_stdout(f):
+    #if(True):
+    with contextlib.redirect_stdout(f):
         verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
         sigs= deserialize_wrapper(ast.literal_eval(sigs))
         enc_sigs= deserialize_wrapper(ast.literal_eval(enc_sigs))
@@ -168,8 +141,8 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
 
     # Proofs
         dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha,dict["_msg_shares"],dict["_rand_shares"], _blshares)
-        status_dpk_bbsig = dpk_bbsig_nizkverifs(comms, blsigs, verfpk, dpk_bbsig_pfs)
-    print("status_dpk_bbsig:",status_dpk_bbsig)    
+        #status_dpk_bbsig = dpk_bbsig_nizkverifs(comms, blsigs, verfpk, dpk_bbsig_pfs)
+    #print("status_dpk_bbsig:",status_dpk_bbsig)    
     print({"dpk_bbsig_pfs":serialize_wrapper(dpk_bbsig_pfs),"blsigs":serialize_wrapper(blsigs)})
 def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
     """ Get the list of proofs (dummy or real) for plaintext votes identified by index set J, proving or 
@@ -182,8 +155,8 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
     The verifier code should take the output of this function --- the proofs --- and verify them.
     """
     f = io.StringIO()
-    if(True):
-    #with contextlib.redirect_stdout(f):
+    #if(True):
+    with contextlib.redirect_stdout(f):
         verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
         sigs_rev= deserialize_wrapper(ast.literal_eval(sigs_rev))
         enc_sigs_rev= deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
@@ -204,21 +177,21 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
         blsigs_S, blsigs_c, blsigs_r = blsigs_rev
         _blshares_S, _blshares_c, _blshares_r = _blshares_rev
         
-        from bbsplussig import bbsplusverify
-        g1,h1=load("generators",["g1","h1"]).values()
-        _blshare_S = _blshares_S[0][0] + _blshares_S[1][0]
-        _blshare_c =  _blshares_c[0][0] + _blshares_c[1][0]
-        _blshare_r =  _blshares_r[0][0] + _blshares_r[1][0]
-        sig_S = blsigs_S[0] * (g1 ** (-_blshare_S))
-        sig_c = blsigs_c[0] - _blshare_c 
-        sig_r = blsigs_r[0] - _blshare_r
-        sigma = (sig_S, sig_c, sig_r)
-        tmp_status_verif = bbsplusverify(sigma, msgs_out[0], verfpk)
-        print("tmp_status_verif:", tmp_status_verif)
+        # from bbsplussig import bbsplusverify
+        # g1,h1=load("generators",["g1","h1"]).values()
+        # _blshare_S = _blshares_S[0][0] + _blshares_S[1][0]
+        # _blshare_c =  _blshares_c[0][0] + _blshares_c[1][0]
+        # _blshare_r =  _blshares_r[0][0] + _blshares_r[1][0]
+        # sig_S = blsigs_S[0] * (g1 ** (-_blshare_S))
+        # sig_c = blsigs_c[0] - _blshare_c 
+        # sig_r = blsigs_r[0] - _blshare_r
+        # sigma = (sig_S, sig_c, sig_r)
+        # tmp_status_verif = bbsplusverify(sigma, msgs_out[0], verfpk)
+        # print("tmp_status_verif:", tmp_status_verif)
 
         dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha, _blshares_S, _blshares_c, _blshares_r)
-        status_dpk_bbsplussig = dpk_bbsplussig_nizkverifs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, dpk_bbsplussig_pfs)
-    print(status_dpk_bbsplussig,"verification is true i.e. system is correct")
+        #status_dpk_bbsplussig = dpk_bbsplussig_nizkverifs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, dpk_bbsplussig_pfs)
+    #print(status_dpk_bbsplussig,"verification is true i.e. system is correct")
     print({"dpk_bbsplussig_pfs":serialize_wrapper(dpk_bbsplussig_pfs),"blsigs_rev":serialize_wrapper(blsigs_rev)})
 
 
@@ -286,11 +259,8 @@ if __name__ == "__main__":
         "mix": mixer,
         "pf_zksm": pf_zksm,
         "pf_zkrsm": pf_zkrsm,
-        "upload": upload,
         "generate":generate_ballots,
-        "audit":audit,
-        "genproof":generate_proofs,
-        "genrevproofs": generate_reverse_proofs
+        "audit":audit
     }
 
     func_name = sys.argv[1]
