@@ -8,7 +8,7 @@ COPY src/evoting_localstorage/bulletin/package.json /app/evoting_localstorage/bu
 COPY src/evoting_localstorage/evoting_fron/package.json /app/evoting_localstorage/evoting_fron/package.json
 COPY src/evoting_localstorage/VoterVerification/package.json /app/evoting_localstorage/VoterVerification/package.json
 COPY src/evoting_localstorage/admin_webpage/package.json /app/evoting_localstorage/admin_webpage/package.json
-
+COPY src/evoting_localstorage/verification-webpage/package.json /app/evoting_localstorage/verification-webpage/package.json
 WORKDIR /app/
 
 # Install node modules
@@ -19,6 +19,6 @@ RUN /bin/bash --login -c "cd evoting_localstorage/bulletin && npm install"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron && npm install --legacy-peer-deps"
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification && npm install"
 RUN /bin/bash --login -c "cd evoting_localstorage/admin_webpage && npm install --force"
-
+RUN /bin/bash --login -c "cd evoting_localstorage/verification-webpage && npm install --force"
 # Set working directory
 COPY src /app

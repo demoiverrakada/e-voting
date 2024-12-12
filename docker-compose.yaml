@@ -21,15 +21,15 @@ services:
     ports:
       - 27017:27017
   
-  # verif-server:
-  #   build: .
-  #   working_dir: /app/evoting_localstorage/verification_server
-  #   command: /root/.nvm/versions/node/v22.3.0/bin/node index
-  #   ports:
-  #     - "7000:7000"
-  #   volumes:
-  #   - ./output:/output
-  #
+  verif-server:
+    build: .
+    working_dir: /app/evoting_localstorage/verification_server
+    command: /root/.nvm/versions/node/v22.3.0/bin/node index
+    ports:
+      - "7000:7000"
+    volumes:
+    - ./output:/output
+  
 
   # bulletin:
   #     build: .
@@ -51,7 +51,7 @@ services:
   #     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
   #     ports:
   #       - "7001:3000" 
-  # 
+  
 
   
   # interactive:

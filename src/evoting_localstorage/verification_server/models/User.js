@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
 const { mongoUrl } = require('../keys');
-const keys = require('../keys');
+
 
 // Create a single connection to your MongoDB database
 const dbConnection = mongoose.createConnection(mongoUrl, {
@@ -16,131 +14,6 @@ dbConnection.on('connected', () => {
 
 dbConnection.on('error', (err) => {
     console.log('Error connecting to MongoDB', err);
-});
-
-// Schema for Polling officer and their methods
-const PollingSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    }
-});
-
-PollingSchema.pre('save', function (next) {
-    const user = this;
-    if (!user.isModified('password')) {
-        return next();
-    }
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) {
-            return next(err);
-        }
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err) {
-                return next(err);
-            }
-            user.password = hash;
-            next();
-        });
-    });
-});
-
-PollingSchema.methods.comparePassword = function (candidatePassword) {
-    const user = this;
-    return new Promise((resolve, reject) => {
-        bcrypt.compare(candidatePassword, user.password, (err, isMatch) => {
-            if (err) {
-                return reject(err); 
-            }
-            if (!isMatch) {
-                return reject(null); 
-            }
-            resolve(true); 
-        });
-    });
-};
-
-// Schema for Admin user and its methods
-const AdminSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    }
-});
-
-AdminSchema.pre('save', function (next) {
-    const user = this;
-    if (!user.isModified('password')) {
-        return next();
-    }
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) {
-            return next(err);
-        }
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err) {
-                return next(err);
-            }
-            user.password = hash;
-            next();
-        });
-    });
-});
-
-AdminSchema.methods.comparePassword = function (candidatePassword) {
-    const user = this;
-    return new Promise((resolve, reject) => {
-        bcrypt.compare(candidatePassword, user.password, (err, isMatch) => {
-            if (err) {
-                return reject(err);
-            }
-            if (!isMatch) {
-                return reject(null);
-            }
-            resolve(true); 
-        });
-    });
-};
-
-// Schema to store votes on server
-const VotesSchema = new mongoose.Schema({
-    voter_id: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    enc_msg:{type: String,required: true}, 
-    comm:{type: String,required: true}, 
-    enc_msg_share:{type: String,required: true}, 
-    enc_rand_share:{type: String,required: true}, 
-    pfcomm:{type: String,required: true}, 
-    enc_rand:{type: String,required: true}, 
-    pf_encmsg:{type: String,required: true}, 
-    pf_encrand:{type: String,required: true}, 
-    pfs_enc_msg_share:{type: String,required: true}, 
-    pfs_enc_rand_share:{type: String,required: true}
-});
-
-// Schema for candidate
-const CandidateSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true          
-    },
-    cand_id: {
-        type: String,
-        required: true
-    }    
 });
 
 // Schema for voters
@@ -160,21 +33,6 @@ const VoterSchema = new mongoose.Schema({
     }
 });
 
-// Schema for receipts
-const ReceiptSchema = new mongoose.Schema({
-    ov_hash:{type:String,required: true},
-    enc_hash: {type:String,required: true},
-    enc_msg:{type:String,required: true}, 
-    comm:{type: String,required: true}, 
-    enc_msg_shares:{type: String,required: true}, 
-    enc_rand_shares:{type: String,required: true}, 
-    pfcomm:{type:String,required: true}, 
-    enc_rand:{type: String,required: true}, 
-    pf_encmsg:{type: String,required: true}, 
-    pf_encrand:{type: String,required: true}, 
-    pf_enc_msg_shares:{type: String,required: true}, 
-    pf_enc_rand_shares:{type: String,required: true}
-});
 
 const BulletinSchema=new mongoose.Schema({
     voter_id:{
@@ -226,44 +84,15 @@ const generatorSchema=new mongoose.Schema({
     fT:{type:String,required:true}
 });
 
-const decSchema=new mongoose.Schema({
-    msgs_out_dec:{
-        type:String,
-        required:true
-    },
-    msgs_out:{
-        type:String,
-        required:true
-    }, 
-    _msg_shares:{
-        type:String,
-        required:true
-    }, 
-    _rand_shares:{
-        type:String,
-        required:true
-    }
-})
+
 // Create models for each schema
-const PO = dbConnection.model('PO', PollingSchema);
-const Votes = dbConnection.model('Votes', VotesSchema);
-const Admin = dbConnection.model('Admin', AdminSchema);
-const Candidate = dbConnection.model('Candidate', CandidateSchema);
 const Voter = dbConnection.model('Voter', VoterSchema);
-const Receipt = dbConnection.model('Receipt', ReceiptSchema);
 const Bulletin=dbConnection.model('Bulletin',BulletinSchema);
 const Keys=dbConnection.model('Keys',keysSchema);
-const Dec=dbConnection.model('Dec',decSchema);
 const Generator=dbConnection.model('Generator',generatorSchema);
 module.exports = {
-    PO,
-    Votes,
-    Admin,
-    Candidate,
     Voter,
-    Receipt,
     Bulletin,
     Keys,
-    Dec,
     Generator
 };

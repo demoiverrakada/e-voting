@@ -10,9 +10,12 @@
   "description": "",
   "dependencies": {
     "body-parser": "^1.20.3",
+    "child_process": "^1.0.2",
     "cors": "^2.8.5",
     "express": "^4.21.1",
+    "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.4",
     "path": "^0.12.7"
   }
 }

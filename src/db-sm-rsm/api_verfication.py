@@ -35,7 +35,8 @@ def verifier_signature_zksm():
     #status_verfsigs = check_verfsigs(msgs_out['msgs_out'], sigs, verfpk, enc_sigs, enc_sigs_rands, elg_pk['elg_pk'],elg_pk['alpha'])
     #assert status_verfsigs
     #print(bbbatchverify(sigs,msgs_out['msgs_out'],verfpk),"checking bbbatch")
-    print(({"verfpk":serialize_wrapper(verfpk),"sigs":serialize_wrapper(sigs),"enc_sigs":serialize_wrapper(enc_sigs),"enc_sigs_rands":serialize_wrapper(enc_sigs_rands)}))
+    result = [str(serialize_wrapper(verfpk)),str(serialize_wrapper(sigs)),str(serialize_wrapper(enc_sigs)),str(serialize_wrapper(enc_sigs_rands))]
+    print(json.dumps(result))
     #print(type(verfpk),type(sigs),type(enc_sigs),type(enc_sigs_rands))
 
 def verifier_signature_zkrsm():
@@ -47,7 +48,8 @@ def verifier_signature_zkrsm():
         #pfcomms = deserialize_wrapper(ast.literal_eval(pfcomms))
         print(comms,"comms")
         verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands = get_verfsigs_rev(comms,elg_pk,pai_pk)
-    print(({"verfpk": serialize_wrapper(verfpk), "sigs_rev":serialize_wrapper(sigs_rev), "enc_sigs_rev":serialize_wrapper(enc_sigs_rev), "enc_sigs_rev_rands":serialize_wrapper(enc_sigs_rev_rands)}))
+    result = [str(serialize_wrapper(verfpk)),str(serialize_wrapper(sigs_rev)),str(serialize_wrapper(enc_sigs_rev)),str(serialize_wrapper(enc_sigs_rev_rands))]
+    print(json.dumps(result))
 
 
 def pf_zksm_verif(verfpk, sigs, enc_sigs, enc_sigs_rands,dpk_bbsig_pfs,blsigs):
@@ -118,13 +120,73 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplu
     print("status_reverse_set_membership:", status_rev)
 
 
+def audit(commitment,booth_num,bid):
+    f = io.StringIO()
+    g12,h12=load("generators",["g1","h1"]).values()
+    with contextlib.redirect_stdout(f):
+        alpha,_pai_sklist_single,pai_pklist_single=load("setup",['alpha','_pai_sklist_single','pai_pklist_single']).values()
+        mixers = lambda alpha: ["mixer %d" % a for a in range(alpha)]
+        enc_msg=[]
+        comm = []
+        enc_msg_share= []
+        enc_rand_share=[]
+        candidates=load("load",[])
+        for i in range(len(commitment)):
+            enc_msgs,comms,enc_msg_shares,enc_rand_shares,enc_hashs=load("receipt",[commitment[i],"enc_msg","comm","enc_msg_share","enc_rand_share"]).values()
+            enc_msg.append(enc_msgs)
+            comm.append(comms)
+            enc_msg_share.append(enc_msg_shares)
+            enc_rand_share.append(enc_rand_shares)
+        with timer("decryption of individual message/randomness shares", report_subtimers=mixers(alpha)):
+            _msg_shares, _rand_shares = [], []
+            for a in range(alpha):
+                with timer("mixer %d: decryption of individual message/randomness shares" % a):
+                    enc_msg_shares_a = list(zip(*enc_msg_share))[a]
+                    enc_rand_shares_a = list(zip(*enc_rand_share))[a]
+                    #print(enc_msg_shares_a,"enc_msg_shares_a",type(enc_msg_shares_a),"type of enc_msg_shares_a")
+                    _msg_shares_a = [pai_decrypt_single(pai_pklist_single[a], _pai_sklist_single[a], enc_msg_share_a, embedded_q=q) for enc_msg_share_a in enc_msg_shares_a]
+                    _rand_shares_a = [pai_decrypt_single(pai_pklist_single[a], _pai_sklist_single[a], enc_rand_share_a, embedded_q=q) for enc_rand_share_a in enc_rand_shares_a]
+                    _msg_shares.append(_msg_shares_a)
+                    _rand_shares.append(_rand_shares_a)
+    result=[]
+    for i in range(len(commitment)):
+        msg_shares=[]
+        rand_shares=[]
+        for j in range(alpha):
+            msg_shares.append(_msg_shares[j][i])
+            rand_shares.append(_rand_shares[j][i])
+        v_w=reconstruct(msg_shares)
+        r_w=reconstruct(rand_shares)
+        #print(v_w)
+        #print(type(v_w))
+        v_w_nbar =int(str(v_w))%len(candidates)
+        name=candidates[v_w_nbar]
+        gamma_w = (g12**v_w)*(h12**r_w)
+        #print(name,"name")
+        #print(commitment[i])
+        #print(commitment)
+        if(gamma_w==comm[i]):
+            result.append([True, v_w_nbar, name, str(gamma_w), str(comm[i])])
+            if(name=="NOTA"):
+                db=init()
+                receipts_collection=db['receipts']
+                votes_collection=db['votes']
+                receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[i])})
+                random_voter_id = random.randint(1000000000, 9999999999)
+                receipt['voter_id'] = random_voter_id
+                votes_collection.insert_one(receipt)
+        else:
+            result.append([False,None,None,None,None])
+    print(json.dumps(result))
+
 
 if __name__ == "__main__":
     function_map = {
         "verfsmproof":pf_zksm_verif,
         "verfrsmproof":pf_zkrsm_verif,
         "verfsigsm":verifier_signature_zksm,
-        "verfsigrsm":verifier_signature_zkrsm
+        "verfsigrsm":verifier_signature_zkrsm,
+        "audit":audit
     }
 
     func_name = sys.argv[1]
