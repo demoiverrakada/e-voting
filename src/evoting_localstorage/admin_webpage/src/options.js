@@ -48,7 +48,7 @@ function Options() {
     try {
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'http://localhost:5000/runBuild1',
+        'http://localhost:5000/p/runBuild1',
         { alpha: alpha, n: n }, // Replace with actual values if needed
         {
           headers: {
@@ -72,25 +72,65 @@ function Options() {
     }
   };
 
+  // Declare state variables for loading and time
+  const [loadingBallotAudit, setLoadingBallotAudit] = useState(false);
+  const [timeElapsedBallotAudit, setTimeElapsedBallotAudit] = useState(0);
+
+  // Timer function to keep counting time
+  const startTimer = (setTimeElapsed) => {
+    return setInterval(() => {
+      setTimeElapsed((prevTime) => prevTime + 1);
+    }, 1000);
+  };
+
   const handleBallot_audit = async () => {
+    // Start the timer immediately when the button is pressed
+    setLoadingBallotAudit(true);
+    setTimeElapsedBallotAudit(0);
+    const timerInterval = startTimer(setTimeElapsedBallotAudit);
+
+    // Show alert that the process has started
+    alert('Ballot Audit has started. Please wait...');
+
     try {
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'http://localhost:5000/setup',
-        { alpha: alpha, n: n }, // Replace with actual values if needed
+        'http://localhost:5000/runBuild2',
+        { alpha: 'alpha_value', n: 'n_value' }, // Replace with actual values if needed
         {
           headers: {
-            authorization: `Bearer ${token}`
+            authorization: `Bearer ${token}`,
           },
+          responseType: 'blob', // Ensure the response is treated as a file (binary data)
         }
       );
-      console.log('Protected data:', response.data);
-      alert('Setup was successful');
-      setShowSetupForm(false); // Hide the form after successful setup
+
+      // Check if the response contains a file (APK)
+      const contentDisposition = response.headers['content-disposition'];
+      const fileName = contentDisposition
+        ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+        : 'BallotAudit.apk'; // Fallback name if not provided
+
+      // Create a Blob URL to download the APK file
+      const blob = new Blob([response.data], { type: 'application/vnd.android.package-archive' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName; // Set the downloaded file name
+      link.click(); // Simulate the click to trigger download
+
+      // Stop the timer once the process is complete
+      clearInterval(timerInterval);
+      alert('Build completed and APK is ready for download!');
+
+      setLoadingBallotAudit(false); // End loading state
     } catch (err) {
-      alert(`Setup failed: ${err.message}`);
+      clearInterval(timerInterval); // Ensure the timer is cleared on error
+      alert(`Ballot Audit setup failed: ${err.message}`);
+      setLoadingBallotAudit(false);
     }
   };
+  
+  
 
 
 

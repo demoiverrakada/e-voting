@@ -254,58 +254,25 @@ router.post('/upload', requireAuth,async (req, res) => {
 });
 
 
-router.post('/upload_candidate', requireAuth,async (req, res) => {
-    console.log("check 2");
+router.post('/upload_candidate', requireAuth, async (req, res) => {
     try {
         const jsonData = req.body;
 
         // Insert data into MongoDB
-        console.log("check 4");
         console.log(jsonData);
         const result = await Candidate.insertMany(jsonData);
-        console.log("check 1");
 
         if (!result) {
             return res.status(422).send({ error: "Error during uploading process" });
         }
 
-        // Prepare the data to write to a JSON file
-        const inputFileName = 'candidates.json';
-        const filePath = path.join(__dirname, inputFileName);
-
-        // Write the JSON data to the file
-        fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
-
-        console.log(`JSON data written to ${filePath}`);
-
-        // Spawn a Python process to run the voters_upload.py script
-        const pythonProcess = spawn('python3', [path.join(__dirname, 'candidates_upload.py'), filePath]);
-
-        // Handle the output from the Python script
-        pythonProcess.stdout.on('data', (data) => {
-            console.log(`Python Output: ${data}`);
-        });
-
-        // Handle any errors from the Python script
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Error: ${data}`);
-        });
-
-        // Handle the completion of the Python process
-        pythonProcess.on('close', (code) => {
-            console.log(`Python process exited with code ${code}`);
-            if (code === 0) {
-                // If Python script finishes successfully
-                res.send({ status: 'OK', message: 'Upload process successful', result });
-            } else {
-                res.status(500).send({ status: 'Error', message: `Python script failed with exit code ${code}` });
-            }
-        });
+        // Send back a success response with status 200
+        return res.status(200).send({ status: 'OK', message: 'Candidates uploaded successfully', data: result });
 
     } catch (err) {
-        console.log("check 3");
         console.error(err);
-        res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
+        // Handle errors gracefully
+        return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
     }
 });
 
@@ -365,57 +332,24 @@ router.post('/upload_PO', requireAuth,async (req, res) => {
 });
 
 router.post('/upload_voters', requireAuth, async (req, res) => {
-    console.log("check 2");
     try {
         const jsonData = req.body;
 
         // Insert data into MongoDB
-        console.log("check 4");
         console.log(jsonData);
         const result = await Voter.insertMany(jsonData);
-        console.log("check 1");
 
         if (!result) {
             return res.status(422).send({ error: "Error during uploading process" });
         }
 
-        // Prepare the data to write to a JSON file
-        const inputFileName = 'voters.json';
-        const filePath = path.join(__dirname, inputFileName);
-
-        // Write the JSON data to the file
-        fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
-
-        console.log(`JSON data written to ${filePath}`);
-
-        // Spawn a Python process to run the voters_upload.py script
-        const pythonProcess = spawn('python3', [path.join(__dirname, 'voters_upload.py'), filePath]);
-
-        // Handle the output from the Python script
-        pythonProcess.stdout.on('data', (data) => {
-            console.log(`Python Output: ${data}`);
-        });
-
-        // Handle any errors from the Python script
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Error: ${data}`);
-        });
-
-        // Handle the completion of the Python process
-        pythonProcess.on('close', (code) => {
-            console.log(`Python process exited with code ${code}`);
-            if (code === 0) {
-                // If Python script finishes successfully
-                res.send({ status: 'OK', message: 'Upload process successful', result });
-            } else {
-                res.status(500).send({ status: 'Error', message: `Python script failed with exit code ${code}` });
-            }
-        });
+        // Send back a success response with status 200
+        return res.status(200).send({ status: 'OK', message: 'Voters uploaded successfully', data: result });
 
     } catch (err) {
-        console.log("check 3");
         console.error(err);
-        res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
+        // Handle errors gracefully
+        return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
     }
 });
 
