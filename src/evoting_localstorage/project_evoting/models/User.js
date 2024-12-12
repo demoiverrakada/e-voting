@@ -226,24 +226,35 @@ const generatorSchema=new mongoose.Schema({
     fT:{type:String,required:true}
 });
 
-const decSchema=new mongoose.Schema({
-    msgs_out_dec:{
-        type:String,
-        required:true
+const pairingElementSchema = new mongoose.Schema({
+    $binary: {
+      type: String, // Base64 encoded binary data
+      required: true
     },
-    msgs_out:{
-        type:String,
-        required:true
-    }, 
-    _msg_shares:{
-        type:String,
-        required:true
-    }, 
-    _rand_shares:{
-        type:String,
-        required:true
+    subType: {
+      type: String, // Subtype, such as "00"
+      required: true
     }
-})
+  });
+  
+  const decSchema = new mongoose.Schema({
+    msgs_out_dec: {
+      type: [ [ [String, Array] ] ], // Nested arrays with type [ "builtins.list", [ [type, value], ...] ]
+      required: true
+    },
+    msgs_out: {
+      type: [[{ pairingElement: pairingElementSchema }]], // Array of arrays, each containing pairing elements
+      required: true
+    },
+    _msg_shares: {
+      type: [[{ pairingElement: pairingElementSchema }]], // Array of arrays, each containing pairing elements
+      required: true
+    },
+    _rand_shares: {
+      type: [[{ pairingElement: pairingElementSchema }]], // Array of arrays, each containing pairing elements
+      required: true
+    }
+  });
 // Create models for each schema
 const PO = dbConnection.model('PO', PollingSchema);
 const Votes = dbConnection.model('Votes', VotesSchema);

@@ -429,13 +429,46 @@ router.post('/pf_zkrsm', async (req, res) => {
     }
 });
 
-
-// bulletin board
-router.get('/getVotes', async(req, res) => {
-    await Bulletin.find()
-        .then(users => res.json(users))
-        .catch(err => res.status(400).json({ error: err.message }))
-});
+router.get('/getVotes', async (req, res) => {
+    try {
+      // Fetch all Decs documents with .lean() to simplify the result
+      const decs = await Dec.find().lean();
+  
+      // Log the documents to see the full data (optional)
+      console.log('Fetched Decs:', decs);
+  
+      // Assuming the votes are stored in the msgs_out_dec array like [2, 3, 2, 2, 3]
+      const msgs_out_dec = decs.map(dec => dec.msgs_out_dec[1].map(item => item[1])).flat();  // Flatten to get the vote array
+  
+      console.log('Votes:', msgs_out_dec);  // Logs: [2, 3, 2, 2, 3]
+  
+      // Fetch all candidates
+      const candidates = await Candidate.find().lean();
+  
+      // Initialize a vote counts array based on the number of candidates
+      const voteCounts = new Array(candidates.length).fill(0);
+  
+      // Increment the vote count for each candidate
+      msgs_out_dec.forEach(vote => {
+        voteCounts[vote] += 1;
+      });
+  
+      const response = candidates.map((candidate, index) => ({
+        name: candidate.name,
+        votes: voteCounts[index]
+      }));
+  
+      // Return the response as an array of candidate names and votes
+      res.json(response);
+  
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+      
+  
+    
 
 
 
