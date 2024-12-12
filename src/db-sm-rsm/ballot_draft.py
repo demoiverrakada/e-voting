@@ -145,6 +145,9 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
         n += 1
     
     for i, candname in enumerate(candidates):
+        v_w_bar = bid + i
+        y = int(v_w_bar) % len(candidates)
+        candname = candidates[y]
         draw.line((0, text_y, box_endx + 100, text_y), fill='gray', width=5)
         text_y = text_y + int(0.06 * bh *(4/n))
         draw.text((text_x, text_y - 0.008*bh), "%s. %s" % (i, candname), font=font, fill='black')
