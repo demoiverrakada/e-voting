@@ -372,6 +372,10 @@ router.post('/upload', requireAuth,async (req, res) => {
     if (!result) {
         return res.status(422).send({ error: "Error during uploading process"});
     }
+    // const result2=await callPythonFunction('mix')
+    //     if (!result2) {
+    //         return res.status(422).send({ error: "Error during decrypting process" });
+    //     }
     res.send({ status: 'OK', message: 'Upload process successful', result });
     }
     catch(err){
