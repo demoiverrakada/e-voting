@@ -121,7 +121,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     draw.text((center_x + int(0.2 * bh), 0.07 * bh + 100), "(Bring back for scanning)", font=subtitlefont, fill='black')
 
     # QR code containing encrypted votes
-    qr_code2 = "qr_code.png"
+    qr_code2 = "qr_code2.png"
     qr_encvotes = Image.open(qr_code2)
     qr_encvotes = qr_encvotes.resize((600, 600))  # Resize if necessary
     encvotes_x = center_x + (bw // 4) - (qr_encvotes.width // 2) 
