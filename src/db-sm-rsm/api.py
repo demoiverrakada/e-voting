@@ -142,8 +142,9 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
     # Proofs
         dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha,dict["_msg_shares"],dict["_rand_shares"], _blshares)
         #status_dpk_bbsig = dpk_bbsig_nizkverifs(comms, blsigs, verfpk, dpk_bbsig_pfs)
-    #print("status_dpk_bbsig:",status_dpk_bbsig)    
-    print({"dpk_bbsig_pfs":serialize_wrapper(dpk_bbsig_pfs),"blsigs":serialize_wrapper(blsigs)})
+    #print("status_dpk_bbsig:",status_dpk_bbsig)  
+    result= [str(serialize_wrapper(dpk_bbsig_pfs)),str(serialize_wrapper(blsigs))]  
+    print(json.dumps(result))
 def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
     """ Get the list of proofs (dummy or real) for plaintext votes identified by index set J, proving or 
     disproving (in zero-knowledge) whether they are encrypted by some ciphertext identified by index set I.
@@ -159,6 +160,7 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
     with contextlib.redirect_stdout(f):
         verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
         sigs_rev= deserialize_wrapper(ast.literal_eval(sigs_rev))
+        print(enc_sigs_rev)
         enc_sigs_rev= deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
         enc_sigs_rev_rands= deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
         msgs_out,_rand_shares=load("mix",["msgs_out","_rand_shares"]).values()
@@ -192,7 +194,8 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
         dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha, _blshares_S, _blshares_c, _blshares_r)
         #status_dpk_bbsplussig = dpk_bbsplussig_nizkverifs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, dpk_bbsplussig_pfs)
     #print(status_dpk_bbsplussig,"verification is true i.e. system is correct")
-    print({"dpk_bbsplussig_pfs":serialize_wrapper(dpk_bbsplussig_pfs),"blsigs_rev":serialize_wrapper(blsigs_rev)})
+    result= [str(serialize_wrapper(dpk_bbsplussig_pfs)),str(serialize_wrapper(blsigs_rev))]
+    print(json.dumps(result))
 
 
 

@@ -44,6 +44,127 @@ function callPythonFunction(functionName, ...params) {
 }
 
 
+function processElementTuple(parsedInput) {
+    if (Array.isArray(parsedInput)) {
+        // Handle pairing.Element
+        if (parsedInput[0] === "pairing.Element") {
+            return `('pairing.Element', b'${parsedInput[1]}')`;
+        }
+        // Handle builtins.tuple (nested tuples or lists inside)
+        if (parsedInput[0] === "builtins.tuple" && Array.isArray(parsedInput[1])) {
+            const innerElements = parsedInput[1].map(processElementTuple).join(", ");
+            return `('builtins.tuple', [${innerElements}])`;
+        }
+        // Handle builtins.list inside tuples
+        if (parsedInput[0] === "builtins.list" && Array.isArray(parsedInput[1])) {
+            const listElements = parsedInput[1].map(processElementList).join(", ");
+            return `('builtins.list', [${listElements}])`;
+        }
+    }
+    throw new Error("Invalid tuple format in input");
+}
+
+function processElementList(parsedInput) {
+    if (Array.isArray(parsedInput) && parsedInput[0] === "pairing.Element") {
+        return `('pairing.Element', b'${parsedInput[1]}')`;
+    }
+    // Handle nested builtins.list
+    if (Array.isArray(parsedInput) && parsedInput[0] === "builtins.list" && Array.isArray(parsedInput[1])) {
+        const listElements = parsedInput[1].map(processElementList).join(", ");
+        return `('builtins.list', [${listElements}])`;
+    }
+    // Handle tuples inside lists
+    if (Array.isArray(parsedInput) && parsedInput[0] === "builtins.tuple" && Array.isArray(parsedInput[1])) {
+        const tupleElements = parsedInput[1].map(processElementTuple).join(", ");
+        return `('builtins.tuple', [${tupleElements}])`;
+    }
+    throw new Error("Invalid list element format in input");
+}
+
+function reconstructOriginal(parsedInput) {
+    try {
+        // Parse JSON input if it's a string
+        if (typeof parsedInput === "string") {
+            parsedInput = JSON.parse(parsedInput);
+        }
+    } catch (err) {
+        throw new Error("Invalid JSON format: " + parsedInput);
+    }
+
+    console.log("Processing parsedInput:", JSON.stringify(parsedInput, null, 2)); // Debug input
+
+    if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "builtins.list" &&
+        Array.isArray(parsedInput[1])
+    ) {
+        // Handle a list of pairing.Elements or nested structures inside a list
+        const result = parsedInput[1].map(processElementList).join(", ");
+        return `('builtins.list', [${result}])`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "pairing.Element"
+    ) {
+        // Reconstruct a single pairing.Element
+        return `('pairing.Element', b'${parsedInput[1]}')`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "builtins.tuple" &&
+        Array.isArray(parsedInput[1])
+    ) {
+        // Handle tuple with nested elements (can be pairing.Element or other tuples/lists)
+        const result = parsedInput[1].map(processElementTuple).join(", ");
+        return `('builtins.tuple', [${result}])`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "builtins.dict" &&
+        typeof parsedInput[1] === "object"
+    ) {
+        // Handle builtins.dict (map-like structures)
+        const dictEntries = Object.entries(parsedInput[1])
+            .map(([key, value]) => `${JSON.stringify(key)}: ${processElementTuple(value)}`)
+            .join(", ");
+        return `('builtins.dict', {${dictEntries}})`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "builtins.set" &&
+        Array.isArray(parsedInput[1])
+    ) {
+        // Handle builtins.set (sets of elements)
+        const setElements = parsedInput[1].map(processElementTuple).join(", ");
+        return `('builtins.set', {${setElements}})`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.every(
+            (item) => Array.isArray(item) && item.length === 2 && item[0] === "pairing.Element"
+        )
+    ) {
+        // Handle list of pairing.Element arrays (e.g., [[...], [...], ...])
+        const elements = parsedInput.map(processElementList).join(", ");
+        return `[${elements}]`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.every(
+            (item) =>
+                Array.isArray(item) &&
+                item.length === 2 &&
+                item[0] === "builtins.tuple" &&
+                Array.isArray(item[1])
+        )
+    ) {
+        // Handle list of builtins.tuple arrays (e.g., [[...], [...], ...])
+        const tuples = parsedInput.map((tuple) => processElementTuple(tuple)).join(", ");
+        return `[${tuples}]`;
+    }
+
+    // Fallback case for unexpected input
+    throw new Error("Unrecognized input format: " + JSON.stringify(parsedInput, null, 2));
+}
 
 
 
@@ -53,7 +174,23 @@ router.post('/pf_zksm_verf', async (req, res) => {
         if (!verfpk || !sigs || !enc_sigs || !enc_sigs_rands|| !dpk_bbsig_pfs ||!blsigs) {
             return res.status(422).send({ error: "Must provide all signatures" });
         }
-        const result = await callPythonFunction('verfsmproof',verfpk,sigs,enc_sigs,enc_sigs_rands,dpk_bbsig_pfs,blsigs)
+        console.log("Received verfpk:", JSON.stringify(verfpk, null, 2)); // Debug input
+        console.log("Received sigs:", JSON.stringify(sigs, null, 2)); // Debug input
+        console.log("Received enc_sigs:", JSON.stringify(enc_sigs, null, 2)); // Debug input
+
+        const Verfpk = reconstructOriginal(verfpk);
+        const Sigs = reconstructOriginal(sigs);
+        const EncSigs = reconstructOriginal(enc_sigs);
+        const EncSigsRands = reconstructOriginal(enc_sigs_rands);
+        const DpkBbsigPfs = reconstructOriginal(dpk_bbsig_pfs);
+        const Blsigs = reconstructOriginal(blsigs);
+
+        console.log("Processed Verfpk:", Verfpk);
+        console.log("Processed Sigs:", Sigs);
+        console.log("Processed EncSigs:", EncSigs);
+        console.log("Processed EncSigsRands:", EncSigsRands);
+        const result = await callPythonFunction('verfsmproof',Verfpk,Sigs,EncSigs,EncSigsRands,DpkBbsigPfs,Blsigs)
+        //result=true
         if (!result) {
             return res.status(422).send({ error: "Error during set membership proof verification process" });
         }
@@ -72,7 +209,24 @@ router.post('/pf_zkrsm_verf', async (req, res) => {
         if (!verfpk || !sigs_rev || !enc_sigs_rev || !enc_sigs_rev_rands ||!dpk_bbsplussig_pfs ||!blsigs_rev) {
             return res.status(422).send({ error: "Must provide all signatures" });
         }
-        const result = await callPythonFunction('verfrsmproof',verfpk,sigs_rev,enc_sigs_rev,enc_sigs_rev_rands,dpk_bbsplussig_pfs,blsigs_rev)
+
+        console.log("Received verfpk:", JSON.stringify(verfpk, null, 2)); // Debug input
+        console.log("Received sigs_rev:", JSON.stringify(sigs_rev, null, 2)); // Debug input
+        console.log("Received enc_sigs_rev:", JSON.stringify(enc_sigs_rev, null, 2)); // Debug input
+
+        const Verfpk = reconstructOriginal(verfpk);
+        const SigsRev = reconstructOriginal(sigs_rev);
+        const EncSigsRev = reconstructOriginal(enc_sigs_rev);
+        const EncSigsRevRands = reconstructOriginal(enc_sigs_rev_rands);
+        const DpkBbsigPfs = reconstructOriginal(dpk_bbsplussig_pfs);
+        const Blsigs = reconstructOriginal(blsigs_rev);
+
+        console.log("Processed Verfpk:", Verfpk);
+        console.log("Processed Sigs:", SigsRev);
+        console.log("Processed EncSigs:", EncSigsRev);
+        console.log("Processed EncSigsRands:", EncSigsRevRands);
+        //result=true
+        const result = await callPythonFunction('verfrsmproof',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands,DpkBbsigPfs,Blsigs)
         if (!result) {
             return res.status(422).send({ error: "Error during reverse set membership proof verification process" });
         }
@@ -302,7 +456,7 @@ router.post('/verfsigrev',async(req,res) =>{
 
 router.post('/pk', async (req, res) => {
         try {
-            const existingKey = await Keys.find();
+            const existingKey = await Keys.findOne();
             if (!existingKey) {
                 return res.status(422).send({ error: "Setup has not been done yet." });
             }

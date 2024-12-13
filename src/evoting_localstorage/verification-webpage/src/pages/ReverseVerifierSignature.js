@@ -14,9 +14,25 @@ const ReverseVerifierSignature = () => {
       setResult(null); // Clear previous results
 
       // Make an API request to the /verfsig endpoint
-      const response = await axios.post("http://localhost:7000/verfsig");
-      console.log("API Response:", response.data);
+      const response = await axios.post('http://localhost:7000/verfsigrev');
+      console.log(response.data);
+      
+      // Convert JSON response to Blob and download it
+      const jsonBlob = new Blob([JSON.stringify(response.data)], { type: 'application/json' });
+      const url = URL.createObjectURL(jsonBlob);
 
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'reverse_verifier_signature.json'; // The name of the downloaded file
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      alert('reverse_verifier_signature fetched successfully');
       // Set the result with the raw response data
       setResult(response.data);
     } catch (err) {
@@ -24,21 +40,6 @@ const ReverseVerifierSignature = () => {
     }
   };
 
-  const renderNestedArray = (data) => {
-    if (!Array.isArray(data)) return JSON.stringify(data, null, 2);
-
-    return (
-      <ul>
-        {data.map((item, index) => (
-          <li key={index}>{
-            Array.isArray(item) || typeof item === "object"
-              ? renderNestedArray(item) // Recursively render nested arrays/objects
-              : JSON.stringify(item)
-          }</li>
-        ))}
-      </ul>
-    );
-  };
 
   return (
     <div className="form-page">
@@ -53,55 +54,8 @@ const ReverseVerifierSignature = () => {
       >
         Back to Home
       </button>
-
-      {/* Display the results */}
-      {result && (
-        <div className="result-table">
-          <h3>Reverse Set Membership Signature Details:</h3>
-
-          {/* Display Verifier Public Key */}
-          <div className="result-row">
-            <span className="label">Verifier Public Key</span>
-            <span className="value1">
-              {renderNestedArray(result.verfpk)}
-            </span>
-          </div>
-
-          {/* Display Signatures */}
-          {result.sigs && (
-            <div className="result-row">
-              <span className="label">Signatures Reverse</span>
-              <span className="value1">
-                {renderNestedArray(result.sigs[1])}
-              </span>
-            </div>
-          )}
-
-          {/* Display Encrypted Signatures */}
-          {result.enc_sigs && (
-            <div className="result-row">
-              <span className="label">Encrypted Signatures Reverse</span>
-              <span className="value1">
-                {renderNestedArray(result.enc_sigs[1])}
-              </span>
-            </div>
-          )}
-
-          {/* Display Encrypted Signature Random Shares */}
-          {result.enc_sigs_rands && (
-            <div className="result-row">
-              <span className="label">Encrypted Signatures Reverse Randoms</span>
-              <span className="value1">
-                {renderNestedArray(result.enc_sigs_rands[1])}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Display errors */}
-      {error && <div className="error">{error}</div>}
     </div>
+    
   );
 };
 

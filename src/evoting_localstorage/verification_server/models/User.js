@@ -51,13 +51,25 @@ const BulletinSchema=new mongoose.Schema({
     }
 });
 
+
+const pairingElementSchema = new mongoose.Schema({
+    $binary: {
+      type: String, // Base64 encoded binary data
+      required: true
+    },
+    subType: {
+      type: String, // Subtype, such as "00"
+      required: true
+    }
+  });
+
 const keysSchema=new mongoose.Schema({
     alpha:{type:String,required:true},
-    pai_pk:{type:String,required:true},
+    pai_pk:{type: [[String, Array]],required:true},
     _pai_sklist:{type:String,required:true},
-    pai_pklist_single:{type:String,required:true},
+    pai_pklist_single:{type:[[String, Array]],required:true},
     _pai_sklist_single:{type:String,required:true},
-    elg_pk:{type:String,required:true},
+    elg_pk:{type:[[String, Array]],required:true},
     _elg_sklist:{type:String,required:true},
     ck:{type:String,required:true},
     ck_fo:{type:String,required:true},

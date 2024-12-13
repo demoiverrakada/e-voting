@@ -168,6 +168,134 @@ function callPythonFunction5(functionName, ...params) {
     }
 }
 
+
+function processElementTuple(parsedInput) {
+    if (Array.isArray(parsedInput)) {
+        // Handle pairing.Element
+        if (parsedInput[0] === "pairing.Element") {
+            return `('pairing.Element', b'${parsedInput[1]}')`;
+        }
+        // Handle builtins.tuple (nested tuples or lists inside)
+        if (parsedInput[0] === "builtins.tuple" && Array.isArray(parsedInput[1])) {
+            const innerElements = parsedInput[1].map(processElementTuple).join(", ");
+            return `('builtins.tuple', [${innerElements}])`;
+        }
+        // Handle builtins.list inside tuples
+        if (parsedInput[0] === "builtins.list" && Array.isArray(parsedInput[1])) {
+            const listElements = parsedInput[1].map(processElementList).join(", ");
+            return `('builtins.list', [${listElements}])`;
+        }
+    }
+    throw new Error("Invalid tuple format in input");
+}
+
+function processElementList(parsedInput) {
+    if (Array.isArray(parsedInput) && parsedInput[0] === "pairing.Element") {
+        return `('pairing.Element', b'${parsedInput[1]}')`;
+    }
+    // Handle nested builtins.list
+    if (Array.isArray(parsedInput) && parsedInput[0] === "builtins.list" && Array.isArray(parsedInput[1])) {
+        const listElements = parsedInput[1].map(processElementList).join(", ");
+        return `('builtins.list', [${listElements}])`;
+    }
+    // Handle tuples inside lists
+    if (Array.isArray(parsedInput) && parsedInput[0] === "builtins.tuple" && Array.isArray(parsedInput[1])) {
+        const tupleElements = parsedInput[1].map(processElementTuple).join(", ");
+        return `('builtins.tuple', [${tupleElements}])`;
+    }
+    throw new Error("Invalid list element format in input");
+}
+
+function reconstructOriginal(parsedInput) {
+    try {
+        // Parse JSON input if it's a string
+        if (typeof parsedInput === "string") {
+            parsedInput = JSON.parse(parsedInput);
+        }
+    } catch (err) {
+        throw new Error("Invalid JSON format: " + parsedInput);
+    }
+
+    console.log("Processing parsedInput:", JSON.stringify(parsedInput, null, 2)); // Debug input
+
+    if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "builtins.list" &&
+        Array.isArray(parsedInput[1])
+    ) {
+        // Handle a list of pairing.Elements or nested structures inside a list
+        const result = parsedInput[1].map(processElementList).join(", ");
+        return `('builtins.list', [${result}])`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "pairing.Element"
+    ) {
+        // Reconstruct a single pairing.Element
+        return `('pairing.Element', b'${parsedInput[1]}')`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "builtins.tuple" &&
+        Array.isArray(parsedInput[1])
+    ) {
+        // Handle tuple with nested elements (can be pairing.Element or other tuples/lists)
+        const result = parsedInput[1].map(processElementTuple).join(", ");
+        return `('builtins.tuple', [${result}])`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "builtins.dict" &&
+        typeof parsedInput[1] === "object"
+    ) {
+        // Handle builtins.dict (map-like structures)
+        const dictEntries = Object.entries(parsedInput[1])
+            .map(([key, value]) => `${JSON.stringify(key)}: ${processElementTuple(value)}`)
+            .join(", ");
+        return `('builtins.dict', {${dictEntries}})`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.length === 2 &&
+        parsedInput[0] === "builtins.set" &&
+        Array.isArray(parsedInput[1])
+    ) {
+        // Handle builtins.set (sets of elements)
+        const setElements = parsedInput[1].map(processElementTuple).join(", ");
+        return `('builtins.set', {${setElements}})`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.every(
+            (item) => Array.isArray(item) && item.length === 2 && item[0] === "pairing.Element"
+        )
+    ) {
+        // Handle list of pairing.Element arrays (e.g., [[...], [...], ...])
+        const elements = parsedInput.map(processElementList).join(", ");
+        return `[${elements}]`;
+    } else if (
+        Array.isArray(parsedInput) &&
+        parsedInput.every(
+            (item) =>
+                Array.isArray(item) &&
+                item.length === 2 &&
+                item[0] === "builtins.tuple" &&
+                Array.isArray(item[1])
+        )
+    ) {
+        // Handle list of builtins.tuple arrays (e.g., [[...], [...], ...])
+        const tuples = parsedInput.map((tuple) => processElementTuple(tuple)).join(", ");
+        return `[${tuples}]`;
+    }
+
+    // Fallback case for unexpected input
+    throw new Error("Unrecognized input format: " + JSON.stringify(parsedInput, null, 2));
+}
+
+
+
+
+
+
 // endpoint for generating the keys for the election
 router.post('/setup',requireAuth, async (req, res) => {
     const { alpha, n } = req.body;
@@ -396,15 +524,66 @@ router.get('/decvotes',requireAuth, async (req, res) => {
 
 router.post('/pf_zksm', async (req, res) => {
     try {
-        const { verfpk, sigs, enc_sigs, enc_sigs_rands } = req.body;
+        const jsonData = req.body;
+        const { verfpk, sigs, enc_sigs, enc_sigs_rands } = jsonData;
         if (!verfpk || !sigs || !enc_sigs || !enc_sigs_rands) {
             return res.status(422).send({ error: "Must provide all signatures" });
         }
-        const result = await callPythonFunction('pf_zksm',verfpk,sigs,enc_sigs,enc_sigs_rands)
+        const Verfpk = reconstructOriginal(verfpk);
+        const Sigs = reconstructOriginal(sigs);
+        const EncSigs = reconstructOriginal(enc_sigs);
+        const EncSigsRands = reconstructOriginal(enc_sigs_rands);
+
+        const result = await callPythonFunction('pf_zksm',Verfpk,Sigs,EncSigs,EncSigsRands)
         if (!result) {
             return res.status(422).send({ error: "Error during proof process" });
         }
-        res.send({ proof:result});
+
+        let parsedResult;
+        try {
+            // Assuming `result` is a JSON string, try parsing it into an object
+            parsedResult = JSON.parse(result);
+        } catch (error) {
+            console.error("Error parsing JSON:", error);
+            return res.status(500).send("Error parsing the result from Python");
+        }
+
+        // Check if parsedResult is an array (for example, from the Python function)
+        if (!Array.isArray(parsedResult)) {
+            return res.status(500).send("Parsed result is not an array as expected");
+        }
+
+        // Function to parse complex strings
+        function parseComplexString(str) {
+            // Remove outer quotes and escape any remaining quotes
+            str = str.replace(/^"|"$/g, '')
+                     .replace(/\\"/g, '"');
+
+            // Replace Python-style type annotations and byte string markers
+            str = str
+                .replace(/'/g, '"')  // Convert single quotes to double quotes
+                .replace(/b"/g, '"')  // Remove byte string markers
+                .replace(/\(/g, '[')  // Convert tuples to arrays
+                .replace(/\)/g, ']')
+                .replace(/"pairing\.Element"/g, '"pairing.Element"')
+                .replace(/"builtins\.list"/g, '"builtins.list"')
+                .replace(/"builtins\.tuple"/g, '"builtins.tuple"');
+
+            try {
+                return JSON.parse(str);
+            } catch (error) {
+                console.error('Parsing error:', error);
+                console.log('Failed to parse:', str);
+                throw error;
+            }
+        }
+
+        // Use .map() to parse each element if it's an array
+        const formattedResult = parsedResult.map(parseComplexString);
+        res.send({
+            "dpk_bbsig_pfs":formattedResult[0],
+            "blsigs":formattedResult[1]
+        });
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
@@ -418,11 +597,63 @@ router.post('/pf_zkrsm', async (req, res) => {
         if (!verfpk || !sigs_rev || !enc_sigs_rev || !enc_sigs_rev_rands) {
             return res.status(422).send({ error: "Must provide all signatures" });
         }
-        const result = await callPythonFunction('pf_zkrsm',verfpk,sigs_rev,enc_sigs_rev,enc_sigs_rev_rands)
+
+        const Verfpk = reconstructOriginal(verfpk);
+        const SigsRev = reconstructOriginal(sigs_rev);
+        const EncSigsRev = reconstructOriginal(enc_sigs_rev);
+        const EncSigsRevRands = reconstructOriginal(enc_sigs_rev_rands);
+
+        const result = await callPythonFunction('pf_zkrsm',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands)
         if (!result) {
             return res.status(422).send({ error: "Error during proof process" });
         }
-        res.send({ proof: result});
+
+        let parsedResult;
+        try {
+            // Assuming `result` is a JSON string, try parsing it into an object
+            parsedResult = JSON.parse(result);
+        } catch (error) {
+            console.error("Error parsing JSON:", error);
+            return res.status(500).send("Error parsing the result from Python");
+        }
+
+        // Check if parsedResult is an array (for example, from the Python function)
+        if (!Array.isArray(parsedResult)) {
+            return res.status(500).send("Parsed result is not an array as expected");
+        }
+
+        // Function to parse complex strings
+        function parseComplexString(str) {
+            // Remove outer quotes and escape any remaining quotes
+            str = str.replace(/^"|"$/g, '')
+                     .replace(/\\"/g, '"');
+
+            // Replace Python-style type annotations and byte string markers
+            str = str
+                .replace(/'/g, '"')  // Convert single quotes to double quotes
+                .replace(/b"/g, '"')  // Remove byte string markers
+                .replace(/\(/g, '[')  // Convert tuples to arrays
+                .replace(/\)/g, ']')
+                .replace(/"pairing\.Element"/g, '"pairing.Element"')
+                .replace(/"builtins\.list"/g, '"builtins.list"')
+                .replace(/"builtins\.tuple"/g, '"builtins.tuple"')
+                .replace(/"builtins\.mpz"/g, '"builtins.mpz"');
+
+            try {
+                return JSON.parse(str);
+            } catch (error) {
+                console.error('Parsing error:', error);
+                console.log('Failed to parse:', str);
+                throw error;
+            }
+        }
+
+        // Use .map() to parse each element if it's an array
+        const formattedResult = parsedResult.map(parseComplexString);
+        res.send({
+            "dpk_bbsplussig_pfs":formattedResult[0],
+            "blsigs_rev":formattedResult[1]
+        });
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
