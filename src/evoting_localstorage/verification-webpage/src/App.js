@@ -7,8 +7,6 @@ import logo from './logo.svg';
 
 // Pages for endpoints
 import GetPublicKeys from "./pages/GetPublicKeys.js";
-import ReverseVerifierSignature from "./pages/ReverseVerifierSignature.js";
-import ForwardVerifierSignature from "./pages/ForwardVerifierSignature.js";
 import VerifySetMembership from "./pages/VerifySetMembership.js";
 import VerifyReverseSetMembership from "./pages/VerifyReverseSetMembership.js";
 
@@ -25,12 +23,6 @@ const App = () => {
             <Link to="/pk" className="btn">
               Get Public Keys
             </Link>
-            <Link to="/genrsig" className="btn">
-              Reverse set membership Verifier Signature
-            </Link>
-            <Link to="/gensig" className="btn">
-              Set membership Verifier Signature
-            </Link>
             <Link to="/pf_zksm_verf" className="btn">
               Verify Set Membership
             </Link>
@@ -42,14 +34,6 @@ const App = () => {
 
         <Routes>
           <Route path="/pk" element={<GetPublicKeys />} />
-          <Route
-            path="/genrsig"
-            element={<ReverseVerifierSignature />}
-          />
-          <Route
-            path="/gensig"
-            element={<ForwardVerifierSignature />}
-          />
           <Route
             path="/pf_zksm_verf"
             element={<VerifySetMembership />}

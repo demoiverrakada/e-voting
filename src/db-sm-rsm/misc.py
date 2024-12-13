@@ -103,6 +103,8 @@ def serialize_wrapper(item):
 def deserialize_wrapper(sitem):
     """ Try to deserialize the serialized item as a group element.
     If it fails, deserialize using pickle. """
+    if isinstance(sitem, str):
+        return sitem
     fn, _sitem = sitem
     if fn == "integer.Element":
         item = pai_group.deserialize(_sitem)

@@ -165,6 +165,7 @@ def dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha, _msg_shares, _rand_shares
 
 def dpk_bbsig_nizkverifs(comms, blsigs, verfpk, pfs):
     zero_Zq = group.init(ZR, 0)
+    result_comms=[]
     g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     with timer("verifier: verifying dpk_bbsig proof"):
         chals, zvs, zrs, zbls = pfs
@@ -183,10 +184,10 @@ def dpk_bbsig_nizkverifs(comms, blsigs, verfpk, pfs):
             verif = ((pair(blsigs[i], (verfpk**chals[i]) * (f2**(-zv[i]))) * (eg1f2 ** (zbl[i]))),
                     (comms[i] ** chals[i]) * (h1 ** zr[i]) * (g1 ** zv[i]))
             #print(verif,"verif")
-            print("chals[i]",chals[i])
-            print("group.hash",group.hash((g1,h1,f2,comms[i],blsigs[i])+verif,type=ZR))
+            #print("chals[i]",chals[i])
+            result_comms.append(chals[i] == group.hash((g1, h1, f2, comms[i], blsigs[i]) + verif, type=ZR))
             status = status and (chals[i] == group.hash((g1, h1, f2, comms[i], blsigs[i]) + verif, type=ZR))
-    return status
+    return status,result_comms
 
 #### DPK{(bS,bC,br,delta0,delta1,delta2):                #######################################
 ####            z1     = g4^bS g5^delta0             AND #######################################
@@ -266,6 +267,7 @@ def dpk_bbsplussig_nizkproofs(msgs, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha,
     return z1, chals, zbSs, zbcs, zbrs, zdelta0s, zdelta1s, zdelta2s
 
 def dpk_bbsplussig_nizkverifs(msgs, blsigs_S, blsigs_c, blsigs_r, verfpk, pfs):
+    result_msgs=[]
     zero_Zq = group.init(ZR, 0)
     g1,f2,eg1f2,h1,ef1f2,inveh1f2,inveg1f2,fT,eh1f2,f1,idenT = load("generators",["g1","f2","eg1f2","h1","ef1f2","inveh1f2","inveg1f2","fT","eh1f2","f1","idenT"]).values()
     with timer("verifier: verifying dpk_bbsplussig proofs"):
@@ -299,5 +301,6 @@ def dpk_bbsplussig_nizkverifs(msgs, blsigs_S, blsigs_c, blsigs_r, verfpk, pfs):
                 (z1[j] ** chals[j]) * (genh2 ** zbS[j]) * (genh3 ** zdelta0[j]),
                 (idenT ** chals[j]) * (z1[j] ** (-zbc[j])) * (genh2 ** zdelta1[j]) * (genh3 * zdelta2[j])     
             )
+            result_msgs.append((chals[j] == group.hash(stmt[j] + verif, type=ZR)))
             status = status and (chals[j] == group.hash(stmt[j] + verif, type=ZR))
-    return status
+    return status,result_msgs

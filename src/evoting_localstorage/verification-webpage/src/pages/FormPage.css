@@ -1,5 +1,5 @@
 .form-page {
-    max-width: 600px;
+    max-width: 1000px;
     margin: 2rem auto;
     padding: 1.5rem;
     background: white;
@@ -83,6 +83,38 @@
     margin-top: 1rem;
     color: red;
     font-weight: bold;
+  }
+
+  .result-table {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+  }
+  
+  .forward-set-membership {
+    margin-bottom: 20px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+  pre {
+    text-align: left;
+    background-color: #eee;
+    padding: 10px;
   }
   
   

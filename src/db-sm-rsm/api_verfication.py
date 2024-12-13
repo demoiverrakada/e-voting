@@ -72,14 +72,16 @@ def pf_zksm_verif(verfpk, sigs, enc_sigs, enc_sigs_rands,dpk_bbsig_pfs,blsigs):
         dict=load("mix",["msgs_out"])
         alpha,elg_pk,=load("setup",["alpha","elg_pk"]).values()
         comms=list(load("enc",["comm"]).values())[0]
-     
+        enc_hashes=list(load("enc",["enc_hash"]).values())[0]
+
         status_verfsigs = check_verfsigs(dict['msgs_out'], sigs, verfpk, enc_sigs, enc_sigs_rands, elg_pk,alpha)
         assert status_verfsigs
-        status_dpk_bbsig = dpk_bbsig_nizkverifs(comms, blsigs, verfpk, dpk_bbsig_pfs)
-        assert status_dpk_bbsig
+        status_dpk_bbsig,result_comms = dpk_bbsig_nizkverifs(comms, blsigs, verfpk, dpk_bbsig_pfs)
+        #assert status_dpk_bbsig
 
     status_fwd = status_verfsigs and status_dpk_bbsig
-    print("status_forward_set_membership:", status_fwd)
+    result=[enc_hashes,result_comms,status_fwd]
+    print(json.dumps(result))
 
 def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplussig_pfs,blsigs_rev):
     """ Get the list of proofs (dummy or real) for plaintext votes identified by index set J, proving or 
@@ -100,7 +102,7 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplu
         enc_sigs_rev_rands= deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
         dpk_bbsplussig_pfs=deserialize_wrapper(ast.literal_eval(dpk_bbsplussig_pfs))
         blsigs_rev= deserialize_wrapper(ast.literal_eval(blsigs_rev))
-        msgs_out,_rand_shares=load("mix",["msgs_out","_rand_shares"]).values()
+        msgs_out_dec,msgs_out,=load("mix",["msgs_out_dec","msgs_out"]).values()
         alpha, pai_pk,elg_pk,ck, ck_fo, permcomm=load("setup",['alpha','pai_pk','elg_pk','ck','ck_fo','permcomm']).values()
         comms=comms=list(load("enc",["comm"]).values())[0]
         enc_rands=list(load("enc",["enc_rand"]).values())[0]
@@ -113,11 +115,14 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplu
         # Proofs
         blsigs_S, blsigs_c, blsigs_r = blsigs_rev
         #_blshares_S, _blshares_c, _blshares_r = _blshares_rev
-        status_dpk_bbsplussig = dpk_bbsplussig_nizkverifs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, dpk_bbsplussig_pfs)
-        assert status_dpk_bbsplussig
+        status_dpk_bbsplussig,result_msgs = dpk_bbsplussig_nizkverifs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, dpk_bbsplussig_pfs)
+        #assert status_dpk_bbsplussig
         #print("status_dpk_bbsplussig:", status_dpk_bbsplussig)
         status_rev = status_verfsigs_rev and status_dpk_bbsplussig
-    print("status_reverse_set_membership:", status_rev)
+        candidates=load("load",[])
+        updated_msgs_out_dec = [candidates[msg] for msg in msgs_out_dec]
+    result=[updated_msgs_out_dec,result_msgs,status_rev]
+    print(json.dumps(result))
 
 
 def audit(commitment,booth_num,bid):

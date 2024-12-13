@@ -44,11 +44,46 @@ function callPythonFunction(functionName, ...params) {
 }
 
 
+function callPythonFunction2(functionName, ...params) {
+    const scriptPath = join(__dirname, '../../../db-sm-rsm/api.py');
+    const pythonExecutable = 'python3';
+    const args = [scriptPath, functionName, JSON.stringify(params)];
+
+    console.log(`Running: precomputing=0 ${pythonExecutable} ${args.join(' ')}`);
+    const pythonProcess = spawnSync(pythonExecutable, args, {
+        env: { ...process.env, precomputing: '0' },
+    });
+
+    if (pythonProcess.error) {
+        throw pythonProcess.error;
+    }
+
+    const stdout = pythonProcess.stdout.toString().trim();
+    const stderr = pythonProcess.stderr.toString().trim();
+
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+
+    try {
+        const result = stdout;
+        console.log(result)
+        return (result);
+    } catch (error) {
+        console.error('Error reading or parsing result from file:', error);
+        throw error;
+    }
+}
+
 function processElementTuple(parsedInput) {
     if (Array.isArray(parsedInput)) {
         // Handle pairing.Element
         if (parsedInput[0] === "pairing.Element") {
             return `('pairing.Element', b'${parsedInput[1]}')`;
+        }
+        // Handle builtins.mpz
+        if (parsedInput[0] === "builtins.mpz") {
+            return `('builtins.mpz', ${parsedInput[1]})`; // Ensure correct formatting for mpz
         }
         // Handle builtins.tuple (nested tuples or lists inside)
         if (parsedInput[0] === "builtins.tuple" && Array.isArray(parsedInput[1])) {
@@ -167,35 +202,117 @@ function reconstructOriginal(parsedInput) {
 }
 
 
+function handleParsedResult(result, res) {
+    let parsedResult;
+
+    // Try parsing the JSON result
+    try {
+        parsedResult = JSON.parse(result);
+    } catch (error) {
+        console.error("Error parsing JSON:", error);
+        return res.status(500).send("Error parsing the result from Python");
+    }
+
+    // Validate that the parsed result is an array
+    if (!Array.isArray(parsedResult)) {
+        return res.status(500).send("Parsed result is not an array as expected");
+    }
+
+    // Helper function to parse complex strings
+    function parseComplexString(str) {
+        if (typeof str !== 'string') {
+            return str; // If not a string, return it as-is
+        }
+
+        str = str.replace(/^"|"$/g, '')
+                 .replace(/\\"/g, '"')
+                 .replace(/'/g, '"') // Replace single quotes with double quotes
+                 .replace(/b"/g, '"') // Handle Python byte string format
+                 .replace(/\(/g, '[')  // Replace parentheses with brackets
+                 .replace(/\)/g, ']')
+                 .replace(/"pairing\.Element"/g, '"pairing.Element"')
+                 .replace(/"builtins\.list"/g, '"builtins.list"')
+                 .replace(/"builtins\.tuple"/g, '"builtins.tuple"')
+                 .replace(/"builtins\.mpz"/g, '"builtins.mpz"');
+
+        try {
+            return JSON.parse(str);
+        } catch (error) {
+            console.error("Parsing error:", error);
+            console.log("Failed to parse:", str);
+            throw error;
+        }
+    }
+
+    // Recursive function to handle nested structures
+    function parseNested(item) {
+        if (typeof item === 'string') {
+            return parseComplexString(item);
+        } else if (Array.isArray(item)) {
+            return item.map(parseNested); // Process each element recursively
+        } else if (item && typeof item === 'object') {
+            // If it's an object, process each key-value pair recursively
+            return Object.fromEntries(Object.entries(item).map(([key, value]) => [key, parseNested(value)]));
+        }
+        return item; // Return as-is for unsupported types
+    }
+
+    // Map the parsed result using the recursive function
+    const formattedResult = parsedResult.map(parseNested);
+
+    // Return formatted result for further usage
+    return formattedResult;
+}
+
+
+
+
 
 router.post('/pf_zksm_verf', async (req, res) => {
     try {
-        const { verfpk, sigs, enc_sigs, enc_sigs_rands,dpk_bbsig_pfs,blsigs} = req.body;
-        if (!verfpk || !sigs || !enc_sigs || !enc_sigs_rands|| !dpk_bbsig_pfs ||!blsigs) {
-            return res.status(422).send({ error: "Must provide all signatures" });
+        const result1 = await callPythonFunction('verfsigsm');
+        if (!result1) {
+            return res.status(422).send({ error: "Error during generation of signatures" });
         }
-        console.log("Received verfpk:", JSON.stringify(verfpk, null, 2)); // Debug input
-        console.log("Received sigs:", JSON.stringify(sigs, null, 2)); // Debug input
-        console.log("Received enc_sigs:", JSON.stringify(enc_sigs, null, 2)); // Debug input
+        console.log("Raw result1:", result1);
+        const formattedResult = handleParsedResult(result1,res)
+        console.log("formattedResult1",formattedResult)
+        const verfpk=formattedResult[0]
+        const sigs=formattedResult[1]
+        const enc_sigs=formattedResult[2]
+        const enc_sigs_rands=formattedResult[3]
 
         const Verfpk = reconstructOriginal(verfpk);
         const Sigs = reconstructOriginal(sigs);
         const EncSigs = reconstructOriginal(enc_sigs);
         const EncSigsRands = reconstructOriginal(enc_sigs_rands);
-        const DpkBbsigPfs = reconstructOriginal(dpk_bbsig_pfs);
-        const Blsigs = reconstructOriginal(blsigs);
 
         console.log("Processed Verfpk:", Verfpk);
         console.log("Processed Sigs:", Sigs);
         console.log("Processed EncSigs:", EncSigs);
         console.log("Processed EncSigsRands:", EncSigsRands);
-        const result = await callPythonFunction('verfsmproof',Verfpk,Sigs,EncSigs,EncSigsRands,DpkBbsigPfs,Blsigs)
-        //result=true
-        if (!result) {
+
+        const result2= await callPythonFunction2('pf_zksm',Verfpk,Sigs,EncSigs,EncSigsRands)
+        if(!result2){
+            return res.status(422).send({ error: "Error during set membership proof generation process" });
+        }
+        console.log("Raw result2:", result2);
+        const formattedResult2=handleParsedResult(result2,res)
+        console.log("formattedResult2",formattedResult2)
+        const dpk_bbsig_pfs=formattedResult2[0]
+        const blsigs=formattedResult2[1]
+
+        const DpkBbsigPfs = reconstructOriginal(dpk_bbsig_pfs);
+        const Blsigs = reconstructOriginal(blsigs);
+
+        const result3 = await callPythonFunction('verfsmproof',Verfpk,Sigs,EncSigs,EncSigsRands,DpkBbsigPfs,Blsigs)
+
+        if (!result3) {
             return res.status(422).send({ error: "Error during set membership proof verification process" });
         }
-        
-        return res.send(result);
+        console.log(result3)
+        let result=JSON.parse(result3)
+        return res.send({"encrypted_votes":result[0],"results":result[1],"status_forward_set_membership":result[2]});
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
@@ -205,32 +322,38 @@ router.post('/pf_zksm_verf', async (req, res) => {
 
 router.post('/pf_zkrsm_verf', async (req, res) => {
     try {
-        const { verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplussig_pfs,blsigs_rev} = req.body;
-        if (!verfpk || !sigs_rev || !enc_sigs_rev || !enc_sigs_rev_rands ||!dpk_bbsplussig_pfs ||!blsigs_rev) {
-            return res.status(422).send({ error: "Must provide all signatures" });
+        const result1 = await callPythonFunction('verfsigrsm');
+        if (!result1) {
+            return res.status(422).send({ error: "Error during generation of signatures" });
         }
-
-        console.log("Received verfpk:", JSON.stringify(verfpk, null, 2)); // Debug input
-        console.log("Received sigs_rev:", JSON.stringify(sigs_rev, null, 2)); // Debug input
-        console.log("Received enc_sigs_rev:", JSON.stringify(enc_sigs_rev, null, 2)); // Debug input
+        const formattedResult = handleParsedResult(result1,res)
+        const verfpk=formattedResult[0]
+        const sigs_rev=formattedResult[1]
+        const enc_sigs_rev=formattedResult[2]
+        const enc_sigs_rev_rands=formattedResult[3]
 
         const Verfpk = reconstructOriginal(verfpk);
         const SigsRev = reconstructOriginal(sigs_rev);
         const EncSigsRev = reconstructOriginal(enc_sigs_rev);
         const EncSigsRevRands = reconstructOriginal(enc_sigs_rev_rands);
-        const DpkBbsigPfs = reconstructOriginal(dpk_bbsplussig_pfs);
-        const Blsigs = reconstructOriginal(blsigs_rev);
 
-        console.log("Processed Verfpk:", Verfpk);
-        console.log("Processed Sigs:", SigsRev);
-        console.log("Processed EncSigs:", EncSigsRev);
-        console.log("Processed EncSigsRands:", EncSigsRevRands);
-        //result=true
-        const result = await callPythonFunction('verfrsmproof',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands,DpkBbsigPfs,Blsigs)
-        if (!result) {
+        const result2= await callPythonFunction2('pf_zkrsm',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands)
+        if(!result2){
+            return res.status(422).send({ error: "Error during reverse set membership proof generation process" });
+        }
+        const formattedResult2=handleParsedResult(result2,res)
+        console.log(formattedResult2,"formattedResult2")
+        const dpk_bbsplussig_pfs=formattedResult2[0]
+        const blsigs_rev=formattedResult2[1]
+
+        const DpkBbplussigPfs = reconstructOriginal(dpk_bbsplussig_pfs);
+        const BlsigsRev = reconstructOriginal(blsigs_rev);
+        const result3 = await callPythonFunction('verfrsmproof',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands,DpkBbplussigPfs,BlsigsRev)
+        if (!result3) {
             return res.status(422).send({ error: "Error during reverse set membership proof verification process" });
         }
-        return res.send(result);
+        let result = JSON.parse(result3)
+        return res.send({"decrypted_votes":result[0],"results":result[1],"status_reverse_set_membership":result[2]});
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
@@ -321,138 +444,6 @@ router.post('/audit', async (req, res) => {
         }
     });
 
-router.post('/verfsig', async (req, res) => {
-        try{
-            const result = await callPythonFunction('verfsigsm');
-
-        // Check if result exists and is a string before processing
-        if (!result) {
-            return res.status(422).send({ error: "Error during generation of proofs" });
-        }
-
-        // Parse the result string as JSON
-        let parsedResult;
-        try {
-            // Assuming `result` is a JSON string, try parsing it into an object
-            parsedResult = JSON.parse(result);
-        } catch (error) {
-            console.error("Error parsing JSON:", error);
-            return res.status(500).send("Error parsing the result from Python");
-        }
-
-        // Check if parsedResult is an array (for example, from the Python function)
-        if (!Array.isArray(parsedResult)) {
-            return res.status(500).send("Parsed result is not an array as expected");
-        }
-
-        // Function to parse complex strings
-        function parseComplexString(str) {
-            // Remove outer quotes and escape any remaining quotes
-            str = str.replace(/^"|"$/g, '')
-                     .replace(/\\"/g, '"');
-
-            // Replace Python-style type annotations and byte string markers
-            str = str
-                .replace(/'/g, '"')  // Convert single quotes to double quotes
-                .replace(/b"/g, '"')  // Remove byte string markers
-                .replace(/\(/g, '[')  // Convert tuples to arrays
-                .replace(/\)/g, ']')
-                .replace(/"pairing\.Element"/g, '"pairing.Element"')
-                .replace(/"builtins\.list"/g, '"builtins.list"')
-                .replace(/"builtins\.tuple"/g, '"builtins.tuple"');
-
-            try {
-                return JSON.parse(str);
-            } catch (error) {
-                console.error('Parsing error:', error);
-                console.log('Failed to parse:', str);
-                throw error;
-            }
-        }
-
-        // Use .map() to parse each element if it's an array
-        const formattedResult = parsedResult.map(parseComplexString);
-
-        // Return the formatted result as a response
-        return res.send({
-            "verfpk": formattedResult[0],
-            "sigs": formattedResult[1],
-            "enc_sigs": formattedResult[2],
-            "enc_sigs_rands": formattedResult[3]
-        });
-    }
-    catch(err){
-            console.error(err);
-            res.status(500).send(err.message);
-    }
-});
-    
-    
-router.post('/verfsigrev',async(req,res) =>{
-        try{
-        const result = await callPythonFunction('verfsigrsm');
-        if (!result) {
-            return res.status(422).send({ error: "Error during generation of proofs" });
-        }
-
-        // Parse the result string as JSON
-        let parsedResult;
-        try {
-            // Assuming `result` is a JSON string, try parsing it into an object
-            parsedResult = JSON.parse(result);
-        } catch (error) {
-            console.error("Error parsing JSON:", error);
-            return res.status(500).send("Error parsing the result from Python");
-        }
-
-        // Check if parsedResult is an array (for example, from the Python function)
-        if (!Array.isArray(parsedResult)) {
-            return res.status(500).send("Parsed result is not an array as expected");
-        }
-
-        // Function to parse complex strings
-        function parseComplexString(str) {
-            // Remove outer quotes and escape any remaining quotes
-            str = str.replace(/^"|"$/g, '')
-                     .replace(/\\"/g, '"');
-
-            // Replace Python-style type annotations and byte string markers
-            str = str
-                .replace(/'/g, '"')  // Convert single quotes to double quotes
-                .replace(/b"/g, '"')  // Remove byte string markers
-                .replace(/\(/g, '[')  // Convert tuples to arrays
-                .replace(/\)/g, ']')
-                .replace(/"pairing\.Element"/g, '"pairing.Element"')
-                .replace(/"builtins\.list"/g, '"builtins.list"')
-                .replace(/"builtins\.tuple"/g, '"builtins.tuple"')
-                .replace(/"builtins\.mpz"/g, '"builtins.mpz"');
-
-            try {
-                return JSON.parse(str);
-            } catch (error) {
-                console.error('Parsing error:', error);
-                console.log('Failed to parse:', str);
-                throw error;
-            }
-        }
-
-        // Use .map() to parse each element if it's an array
-        const formattedResult = parsedResult.map(parseComplexString);
-
-        // Return the formatted result as a response
-        return res.send({
-            "verfpk": formattedResult[0],
-            "sigs_rev": formattedResult[1],
-            "enc_sigs_rev": formattedResult[2],
-            "enc_sigs_rev_rands": formattedResult[3]
-        });
-    }
-    catch(err){
-            console.error(err);
-            res.status(500).send(err.message);
-    }
-    
-    });
 
 router.post('/pk', async (req, res) => {
         try {
