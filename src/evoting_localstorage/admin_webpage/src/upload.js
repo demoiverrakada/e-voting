@@ -72,10 +72,10 @@ function Upload() {
         reader.readAsText(file);
     };
 
-    const handleUpload = () => uploadFile('https://2a61-223-229-214-187.ngrok-free.app/upload'); // Default upload
-    const handleUploadCandidate = () => uploadFile('https://2a61-223-229-214-187.ngrok-free.app/upload_candidate');
-    const handleUploadPO = () => uploadFile('https://2a61-223-229-214-187.ngrok-free.app/upload_PO');
-    const handleUploadVoters = () => uploadFile('https://2a61-223-229-214-187.ngrok-free.app/upload_voters');
+    const handleUpload = () => uploadFile('http://localhost:5000/upload'); // Default upload
+    const handleUploadCandidate = () => uploadFile('http://localhost:5000/upload_candidate');
+    const handleUploadPO = () => uploadFile('http://localhost:5000/upload_PO');
+    const handleUploadVoters = () => uploadFile('http://localhost:5000/upload_voters');
 
     const GoBack = async () => {
         navigate('/opts', { replace: true });

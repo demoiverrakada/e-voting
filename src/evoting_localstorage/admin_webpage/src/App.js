@@ -32,7 +32,7 @@ function App() {
       const my_Email = values.Email;
       const my_Password = values.Password;
       axios
-        .post(`https://2a61-223-229-214-187.ngrok-free.app/signin/admin`, 
+        .post(`http://localhost:5000/signin/admin`, 
           { email: my_Email, password: my_Password },
           {
             headers: {

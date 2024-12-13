@@ -28,7 +28,7 @@ function Options() {
       //const n = 5;
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'https://2a61-223-229-214-187.ngrok-free.app/setup',
+        'http://localhost:5000/setup',
         { alpha: alpha, n: n }, // Replace with actual values if needed
         {
           headers: {
@@ -48,7 +48,7 @@ function Options() {
     try {
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'https://2a61-223-229-214-187.ngrok-free.app/p/runBuild1',
+        'http://localhost:5000/p/runBuild1',
         { alpha: alpha, n: n }, // Replace with actual values if needed
         {
           headers: {
@@ -95,7 +95,7 @@ function Options() {
     try {
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'https://2a61-223-229-214-187.ngrok-free.app/runBuild2',
+        'http://localhost:5000/runBuild2',
         { alpha: 'alpha_value', n: 'n_value' }, // Replace with actual values if needed
         {
           headers: {
@@ -138,7 +138,7 @@ function Options() {
     try {
       const token = ReactSession.get('access_token');
       const response = await axios.post(
-        'https://2a61-223-229-214-187.ngrok-free.app/generate',
+        'http://localhost:5000/generate',
         { n: n },
         {
           headers: {
@@ -184,7 +184,7 @@ function Options() {
 
   const handleGetPublicKeys = async () => {
     try {
-      const response = await axios.get('https://2a61-223-229-214-187.ngrok-free.app/pk');
+      const response = await axios.get('http://localhost:5000/pk');
       console.log(response.data);
       alert('Public keys fetched successfully');
     } catch (err) {
@@ -195,7 +195,7 @@ function Options() {
   const handlebulletintovotes = async () => {
     try {
       const token = ReactSession.get('access_token');
-      const response = await axios.post('https://2a61-223-229-214-187.ngrok-free.app/mix', 
+      const response = await axios.post('http://localhost:5000/mix', 
         {}, // Replace this empty object with the appropriate request body if needed
         {
           headers: {
@@ -213,7 +213,7 @@ function Options() {
 
   const handleGetEncVotes = async () => {
     try {
-      const response = await axios.get('https://2a61-223-229-214-187.ngrok-free.app/encvotes');
+      const response = await axios.get('http://localhost:5000/encvotes');
       console.log(response.data);
 
       // Convert JSON response to Blob and download it
@@ -240,7 +240,7 @@ function Options() {
   const handleDecryptVotes = async () => {
     try {
       const token = ReactSession.get('access_token');
-      const response = await axios.get('https://2a61-223-229-214-187.ngrok-free.app/decvotes', {
+      const response = await axios.get('http://localhost:5000/decvotes', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -254,7 +254,7 @@ function Options() {
 
   const handleGetDcrpVotes = async () => {
     try {
-      const response = await axios.get('https://2a61-223-229-214-187.ngrok-free.app/getVotes');
+      const response = await axios.get('http://localhost:5000/getVotes');
       console.log(response.data);
       
       // Convert JSON response to Blob and download it
