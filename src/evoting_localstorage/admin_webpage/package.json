@@ -17,6 +17,11 @@
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0"
   },
+  "overrides": {
+    "react-client-session": {
+      "react": "^18.3.1"
+    }
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
