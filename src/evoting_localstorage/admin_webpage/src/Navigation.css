@@ -1,0 +1,50 @@
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 30px;
+}
+
+.nav-buttons button {
+  width: 150px;
+  padding: 10px;
+  font-size: 1rem;
+  background: #343a40;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.nav-buttons button:hover {
+  background: #212529;
+  transform: scale(1.05);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nav-buttons button:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  h1 {
+      font-size: 2.2rem;
+  }
+
+  .options-buttons {
+      grid-template-columns: 1fr; /* Single column layout */
+  }
+
+  button {
+      font-size: 1rem;
+      padding: 12px;
+  }
+
+  .nav-buttons {
+      flex-direction: column;
+      gap: 10px;
+  }
+}

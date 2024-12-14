@@ -1,0 +1,66 @@
+/* Center the Container */
+.generate-container {
+  padding: 30px;
+  max-width: 600px;
+  margin: 50px auto; /* Centers horizontally with top margin */
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+
+  display: flex; /* Enables flexbox */
+  flex-direction: column;
+  align-items: center; /* Centers content horizontally */
+  justify-content: center; /* Centers content vertically */
+  min-height: 70vh; /* Ensures enough vertical space */
+}
+
+/* Form Styling */
+.generate-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Spacing between form elements */
+  width: 100%; /* Ensures the form uses full width of the container */
+  max-width: 400px; /* Limits form width for better appearance */
+}
+
+/* Label and Input */
+.generate-container label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.generate-container input[type="number"] {
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.generate-container input[type="number"]:focus {
+  outline: none;
+  border-color: #145cf7;
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+}
+
+/* Button Styling */
+.generate-container button {
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ffffff;
+  background: linear-gradient(135deg, #145cf7, #6a99ff);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.generate-container button:hover {
+  background: linear-gradient(135deg, #6a99ff, #0956fc);
+  transform: translateY(-3px);
+}
+

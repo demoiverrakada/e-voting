@@ -1,0 +1,42 @@
+/* Container Styling */
+.decrypted-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec); /* Subtle blue gradient */
+  min-height: 100vh; /* Full viewport height */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Headings */
+.decrypted-container h2 {
+  font-size: 2.5rem;
+  color: #2c3e50; /* Darker blue for text */
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+  font-weight: 700;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Styling */
+
+.decrypted-container button {
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ffffff;
+  background: linear-gradient(135deg, #145cf7, #6a99ff);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.decrypted-container button:hover {
+  background: linear-gradient(135deg, #6a99ff, #0956fc);
+  transform: translateY(-3px);
+}

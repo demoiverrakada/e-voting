@@ -1,0 +1,39 @@
+/* Public Keys Styles */
+.public-keys-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef); /* Light gradient background */
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .public-keys-container h2 {
+  font-size: 2.8rem;
+  color: #343a40;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .public-container button {
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ffffff;
+    background: linear-gradient(135deg, #145cf7, #6a99ff);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  
+  .public-container button:hover {
+    background: linear-gradient(135deg, #6a99ff, #0956fc);
+    transform: translateY(-3px);
+  }

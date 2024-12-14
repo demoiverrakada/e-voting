@@ -1,0 +1,101 @@
+/* Full Page Container */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #4a90e2, #007bff); /* Blue gradient background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
+}
+
+/* Heading Styling */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #f8f9fa;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Form Container: Elegant card style */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 350px;
+  transition: all 0.3s ease-in-out;
+}
+
+form:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Input Fields */
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #cdd7e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333333;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 6px rgba(74, 144, 226, 0.5);
+}
+
+/* Login Button */
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 6px 12px rgba(0, 91, 179, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Error Message Styling */
+p {
+  width: 100%;
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin: 5px 0;
+  text-align: left;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 500px) {
+  h1 {
+      font-size: 2rem;
+  }
+  form {
+      width: 90%;
+      padding: 20px;
+  }
+}
+
+  
