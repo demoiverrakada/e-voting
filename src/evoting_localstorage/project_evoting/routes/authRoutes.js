@@ -386,20 +386,15 @@ router.post('/mix', requireAuth, async (req, res) => {
 });
 
 // Example route to call the decvotes function
-router.get('/decvotes',requireAuth, async (req, res) => {
-    try{
-    const dec=await Dec.findOne();
-    if(!dec){return res.status(422).send({ error: "Decryption of votes has not been done" });}
-    res.send({msgs_out: dec.msgs_out});
-    }
-    catch(err){
-        res.status(500).send(err.message);
-    }
+router.get('/bulletin', async (req, res) => {
+    await Bulletin.find()
+        .then(users => res.json(users))
+        .catch(err => res.status(400).json({ error: err.message }))
 });
 
 
 
-router.get('/getVotes', async (req, res) => {
+router.get('/getVotes',async (req, res) => {
     try {
       // Fetch all Decs documents with .lean() to simplify the result
       const decs = await Dec.find().lean();

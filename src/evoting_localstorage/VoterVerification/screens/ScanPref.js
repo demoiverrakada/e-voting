@@ -91,30 +91,34 @@ const formattedRequestBody=JSON.stringify(requestBody);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
+    backgroundColor: '#E4F7FC',  // Lighter and more refreshing background color
     justifyContent: 'center',
-    padding: 16,
+    padding: 24,  // Increased padding for more space around content
   },
   headerText: {
-    fontSize: 35,
-    marginLeft: 18,
-    marginTop: 10,
-    color: '#3b3b3b',
+    fontSize: 32,  // Slightly smaller and more balanced size
+    color: '#333',  // Darker text for better readability
+    fontWeight: '500',  // Semi-bold for a modern look
+    textAlign: 'center',  // Centered text for balance
+    marginBottom: 30,  // Increased margin to create more space between header and scanner
   },
   marker: {
-    borderColor: '#1995AD',
-    borderRadius: 10,
+    borderColor: '#1E90FF',  // Bright blue for marker color to stand out
+    borderRadius: 15,  // Smoother corners for the marker
+    borderWidth: 3,  // Slightly thicker border for emphasis
   },
   button: {
-    marginTop: 20,
-    marginHorizontal: 18,
-    backgroundColor: '#D9534F',
-    borderRadius: 25,
-    elevation: 3,
+    marginTop: 25,  // Increased margin for more space between QR scanner and the button
+    marginHorizontal: 24,  // Even horizontal padding for balance
+    backgroundColor: '#FF5733',  // Vibrant and modern red color for the button
+    borderRadius: 30,  // Rounded corners for a smoother look
+    paddingVertical: 12,  // Increased padding to make the button feel more clickable
+    elevation: 5,  // Increased elevation for a stronger shadow effect, adding depth
   },
   buttonLabel: {
-    color: '#F1F1F2',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#FFFFFF',  // White text for clear contrast
+    fontSize: 18,  // Larger font for readability
+    fontWeight: 'bold',  // Bold text for emphasis and clarity
   },
 });
+

@@ -66,7 +66,7 @@ const postVote = async (preference, commitments,booth_num) => {
     const booth = cleaned.split("");
     // Update the data
     console.log("Creating new vote object...");
-    const newVote = { voter_id: voter_id,booth_num:parseInt(booth[0], 10), commitment: comms[num].replace(/^'|'$/g, '')};
+    const newVote = { voter_id: voter_id,booth_num:parseInt(booth[0], 10), commitment: comms[num].replace(/^'|'$/g, ''),pref_id:num};
     console.log("New vote:", newVote);
 
     console.log("Updating voter data...");

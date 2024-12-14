@@ -58,30 +58,38 @@ export default function Scanner(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
+    backgroundColor: '#F3F7FA', // Soft background color for a clean and modern look
     justifyContent: 'center',
-    padding: 16,
+    padding: 20,
   },
   headerText: {
-    fontSize: 35,
-    marginLeft: 18,
-    marginTop: 10,
-    color: '#3b3b3b',
+    fontSize: 36,  // Slightly larger for better prominence
+    marginLeft: 20,  // Adjusted for a better left margin
+    marginTop: 15,  // Increased space from the top for better balance
+    color: '#333',  // Softer color for better readability
+    fontWeight: '600',  // A semi-bold font for a more modern look
+    textAlign: 'center',  // Centered for symmetry
   },
   marker: {
-    borderColor: '#1995AD',
-    borderRadius: 10,
+    borderColor: '#4A90E2',  // Slightly softer, modern blue for the marker
+    borderWidth: 3,  // Increased border width for clearer visibility
+    borderRadius: 12,  // More rounded corners for a friendlier look
   },
   button: {
-    marginTop: 20,
-    marginHorizontal: 18,
-    backgroundColor: '#D9534F',
-    borderRadius: 25,
-    elevation: 3,
+    marginTop: 25,  // Increased spacing from the QR code scanner for balance
+    marginHorizontal: 20,
+    backgroundColor: '#D9534F', // Retaining the red, but slightly more vibrant
+    borderRadius: 30,  // Increased border radius for a smoother, modern look
+    paddingVertical: 14,  // Increased padding for better tap targets
+    shadowColor: '#000',  // Added shadow for better depth and focus
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
   },
   buttonLabel: {
-    color: '#F1F1F2',
+    color: '#FFFFFF',  // Ensuring the button text stands out
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: 'bold',  // Making the text bold to emphasize the action
+    textTransform: 'uppercase',  // Uppercase for a more professional look
   },
 });

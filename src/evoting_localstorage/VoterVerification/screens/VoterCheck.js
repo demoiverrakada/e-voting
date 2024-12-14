@@ -43,33 +43,42 @@ const VoterVoted = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
+    backgroundColor: '#F1F8FF',  // Lighter and fresher background color
     justifyContent: 'center',
-    padding: 16,
+    padding: 24,  // Increased padding for more space around content
   },
-  headerText: {
-    fontSize: 35,
-    marginLeft: 18,
-    marginTop: 10,
-    color: '#3b3b3b',
+  heading: {
+    fontSize: 28,  // Slightly smaller heading for a cleaner look
+    color: '#333',  // Darker color for better contrast and readability
+    fontWeight: '600',  // Semi-bold for a more modern look
+    marginBottom: 30,  // Increased margin to give space between heading and input
+    textAlign: 'center',  // Centered text for a more balanced design
   },
-  marker: {
-    borderColor: '#1995AD',
-    borderRadius: 10,
+  textInput: {
+    marginBottom: 20,  // More space between input and button
+    borderRadius: 10,  // Rounded corners for the input box
+    paddingHorizontal: 12,  // Padding inside the input for a more comfortable feel
+    height: 50,  // Increased height for easier typing and visibility
+    fontSize: 16,  // Larger font for better readability
   },
   button: {
-    marginTop: 20,
-    marginHorizontal: 18,
-    backgroundColor: '#D9534F',
-    borderRadius: 25,
-    elevation: 3,
+    marginTop: 20,  // Space from input field
+    marginHorizontal: 24,
+    backgroundColor: '#007BFF',  // Changed to a more modern blue
+    borderRadius: 30,  // More rounded corners for a friendlier appearance
+    paddingVertical: 12,  // Increased vertical padding for better clickability
+    elevation: 4,  // Slightly stronger shadow for emphasis
   },
   buttonLabel: {
-    color: '#F1F1F2',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#FFF',  // White color to make the button label pop
+    fontSize: 18,  // Larger font for better readability and visibility
+    fontWeight: 'bold',  // Bold text for emphasis
+  },
+  buttonContent: {
+    paddingHorizontal: 30,  // Adjusted padding to ensure text stays centered within the button
   },
 });
+
 export default VoterVoted;
 
 

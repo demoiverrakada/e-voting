@@ -1,97 +1,88 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text,StyleSheet,Alert,StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-export default function Scanner(props){
+export default function Scanner(props) {
 
-  const checkSend=async(qrcodedata)=>
-  {
-    try{
-        console.log(qrcodedata);
-        console.log("successfully submitted ballot_id login");
-            Alert.alert(
-              'Booth Number successfully identified',
-              `commitments: ${qrcodedata}`,
-              [{ text: 'OK', onPress: () => props.navigation.navigate('booth', {commitments: qrcodedata}) }],
-              { cancelable: false }
-            ); 
-      }
-  catch(err)
-  {
-    console.log("some problem in posting",err);
-    Alert.alert('Data Upload unsuccessful, try again',[{ text: 'OK' }], { cancelable: false })
-    props.navigation.navigate("start");
-  }
-
+  const checkSend = async (qrcodedata) => {
+    try {
+      console.log(qrcodedata);
+      console.log("successfully submitted ballot_id login");
+      Alert.alert(
+        'Booth Number successfully identified',
+        `commitments: ${qrcodedata}`,
+        [{ text: 'OK', onPress: () => props.navigation.navigate('booth', { commitments: qrcodedata }) }],
+        { cancelable: false }
+      );
+    } catch (err) {
+      console.log("some problem in posting", err);
+      Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
+      props.navigation.navigate("start");
+    }
   }
 
   const isValidQRCode = (data) => {
-    if(data==undefined)
-    {
+    if (data == undefined) {
       return false;
-    }
-    else
-    {
+    } else {
       return true;
     }
-};
-  
+  };
+
   return (
     <View style={styles.container}>
-        <Text style={styles.headerText}>Scan Ballot ID</Text>
-        <QRCodeScanner
-          onRead={async ({ data }) => {
-            if (isValidQRCode(data)) {
-              await checkSend(data);
-              console.log('Valid QR code detected:', data);
-            } else {
-              console.log('Invalid QR code detected:', data);
-            }
-          }}
-          showMarker={true}
-          markerStyle={styles.marker}
-        />
-      </View>
+      <Text style={styles.headerText}>Scan Ballot ID</Text>
+      <QRCodeScanner
+        onRead={async ({ data }) => {
+          if (isValidQRCode(data)) {
+            await checkSend(data);
+            console.log('Valid QR code detected:', data);
+          } else {
+            console.log('Invalid QR code detected:', data);
+          }
+        }}
+        showMarker={true}
+        markerStyle={styles.marker}
+      />
+    </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
-    justifyContent: 'top',
-    padding: 16,
+    backgroundColor: '#F5F8FC', // Lighter background for a fresh look
+    justifyContent: 'center',
+    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 35,
-    textAlign: 'center',
-    marginBottom: 20,
-    color: 'black',
+  headerText: {
+    fontSize: 28,
     fontWeight: 'bold',
-  },
-  underline: {
-    borderBottomColor: 'black',
-    borderBottomWidth: 4,
-    borderRadius: 10,
-    alignSelf: 'center',
-    width: 100,
-    marginBottom: 10,
-  },
-  credentialsText: {
-    fontSize: 20,
     textAlign: 'center',
     marginBottom: 20,
+    color: '#4A90E2', // Subtle blue color
+    letterSpacing: 1.2,
   },
-  textInput: {
-    marginBottom: 20,
+  marker: {
+    borderColor: '#4A90E2', // Blue border for the marker
+    borderWidth: 2,
   },
   button: {
     marginBottom: 10,
     borderRadius: 25,
-    elevation: 3,
+    backgroundColor: '#4A90E2', // Blue button for consistency
+    paddingVertical: 12,
+    elevation: 4,
   },
   buttonLabel: {
-    color: '#F1F1F2',
+    color: '#F1F1F2', // Light color for text on button
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  alert: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#333',
   },
 });

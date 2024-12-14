@@ -1,97 +1,87 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text,StyleSheet,Alert,StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-export default function Scanner(props){
-    const commitments = props.route.params.commitments;
-  const checkSend=async(qrcodedata)=>
-  {
-    try{
-        console.log(qrcodedata);
-        console.log("successfully submitted ballot_id login");
-            Alert.alert(
-              'Booth Number successfully identified',
-              `booth_num: ${qrcodedata}`,
-              [{ text: 'OK', onPress: () => props.navigation.navigate('bid', {commitments: commitments,booth_num:qrcodedata}) }],
-              { cancelable: false }
-            ); 
-      }
-  catch(err)
-  {
-    console.log("some problem in posting",err);
-    Alert.alert('Data Upload unsuccessful, try again',[{ text: 'OK' }], { cancelable: false })
-    props.navigation.navigate("start");
-  }
+export default function Scanner(props) {
+  const commitments = props.route.params.commitments;
 
+  const checkSend = async (qrcodedata) => {
+    try {
+      console.log(qrcodedata);
+      console.log("successfully submitted ballot_id login");
+      Alert.alert(
+        'Booth Number successfully identified',
+        `booth_num: ${qrcodedata}`,
+        [{ text: 'OK', onPress: () => props.navigation.navigate('bid', { commitments: commitments, booth_num: qrcodedata }) }],
+        { cancelable: false }
+      );
+    } catch (err) {
+      console.log("some problem in posting", err);
+      Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
+      props.navigation.navigate("start");
+    }
   }
 
   const isValidQRCode = (data) => {
-    if(data==undefined)
-    {
-      return false;
-    }
-    else
-    {
-      return true;
-    }
-};
-  
+    return data !== undefined;
+  };
+
   return (
     <View style={styles.container}>
-        <Text style={styles.headerText}>Scan Booth Number</Text>
-        <QRCodeScanner
-          onRead={async ({ data }) => {
-            if (isValidQRCode(data)) {
-              await checkSend(data);
-              console.log('Valid QR code detected:', data);
-            } else {
-              console.log('Invalid QR code detected:', data);
-            }
-          }}
-          showMarker={true}
-          markerStyle={styles.marker}
-        />
-      </View>
+      <Text style={styles.headerText}>Scan Booth Number</Text>
+      <QRCodeScanner
+        onRead={async ({ data }) => {
+          if (isValidQRCode(data)) {
+            await checkSend(data);
+            console.log('Valid QR code detected:', data);
+          } else {
+            console.log('Invalid QR code detected:', data);
+          }
+        }}
+        showMarker={true}
+        markerStyle={styles.marker}
+      />
+    </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
-    justifyContent: 'top',
-    padding: 16,
+    backgroundColor: '#F2F7FC', // Light blue for a clean, modern feel
+    justifyContent: 'center', // Center the content vertically
+    alignItems: 'center', // Center the content horizontally
+    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 35,
-    textAlign: 'center',
-    marginBottom: 20,
-    color: 'black',
+  headerText: {
+    fontSize: 30, // Larger font size for the header
     fontWeight: 'bold',
-  },
-  underline: {
-    borderBottomColor: 'black',
-    borderBottomWidth: 4,
-    borderRadius: 10,
-    alignSelf: 'center',
-    width: 100,
-    marginBottom: 10,
-  },
-  credentialsText: {
-    fontSize: 20,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 30, // Space between header and scanner
+    color: '#4A90E2', // Soft blue color for the header
+    letterSpacing: 1.5,
   },
-  textInput: {
-    marginBottom: 20,
+  marker: {
+    borderColor: '#4A90E2', // Blue color for the marker
+    borderWidth: 2,
+    borderRadius: 5,
   },
   button: {
-    marginBottom: 10,
+    marginTop: 20,
+    paddingVertical: 12,
     borderRadius: 25,
-    elevation: 3,
+    backgroundColor: '#4A90E2', // Matching button color to the header
+    elevation: 4,
   },
   buttonLabel: {
-    color: '#F1F1F2',
+    color: '#F1F1F2', // Light color text for the button
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  alert: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#333', // Dark color for alert text
   },
 });

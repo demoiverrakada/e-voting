@@ -190,7 +190,16 @@ const BulletinSchema=new mongoose.Schema({
         type:String,
         unique:true,
         required:true
+    },
+    pref_id:{
+        type:String,
+        required:true
+    },
+    hash_value:{
+        type:String,
+        required:true
     }
+
 });
 
 const keysSchema=new mongoose.Schema({
