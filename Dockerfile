@@ -20,5 +20,8 @@ RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron && npm install --
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification && npm install"
 RUN /bin/bash --login -c "cd evoting_localstorage/admin_webpage && npm install --force"
 RUN /bin/bash --login -c "cd evoting_localstorage/verification-webpage && npm install --force"
+RUN ln -s /root/.nvm/versions/node/v22.3.0/bin/node /usr/bin/node && \
+    ln -s /root/.nvm/versions/node/v22.3.0/bin/npm /usr/bin/npm
+
 # Set working directory
 COPY src /app

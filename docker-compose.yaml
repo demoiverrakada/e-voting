@@ -31,12 +31,12 @@ services:
     - ./output:/output
   
 
-  # bulletin:
-  #     build: .
-  #     working_dir: /app/evoting_localstorage/bulletin
-  #     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
-  #     ports:
-  #       - "5001:3000"
+  bulletin:
+      build: .
+      working_dir: /app/evoting_localstorage/bulletin
+      command: /root/.nvm/versions/node/v22.3.0/bin/npm start
+      ports:
+        - "5001:3000"
 
   # admin-webpage:
   #     build: .
