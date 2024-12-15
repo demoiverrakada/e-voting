@@ -9,7 +9,8 @@ import logo from './logo.svg';
 import GetPublicKeys from "./pages/GetPublicKeys.js";
 import VerifySetMembership from "./pages/VerifySetMembership.js";
 import VerifyReverseSetMembership from "./pages/VerifyReverseSetMembership.js";
-
+import BallotAudit from "./pages/BallotAudit.js";
+import VoterVerificationApp from "./pages/VoterVerification.js";
 const App = () => {
   return (
     <Router>
@@ -29,6 +30,12 @@ const App = () => {
             <Link to="/pf_zkrsm_verf" className="btn">
               Verify Reverse Set Membership
             </Link>
+            <Link to ="/ballotaudit" className="btn">
+              Generate Ballot Audit app
+            </Link>
+            <Link to ="/voterverification" className="btn">
+              Generate Voter Verification app
+            </Link>
           </div>
         </main>
 
@@ -41,6 +48,14 @@ const App = () => {
           <Route
             path="/pf_zkrsm_verf"
             element={<VerifyReverseSetMembership />}
+          />
+          <Route
+            path="/ballotaudit"
+            element={<BallotAudit />}
+          />
+          <Route
+            path="/voterverification"
+            element={<VoterVerificationApp />}
           />
         </Routes>
       </div>

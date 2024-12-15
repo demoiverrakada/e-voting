@@ -119,12 +119,14 @@ const VotesSchema = new mongoose.Schema({
         unique: true,
         required: true,
     },
-    enc_msg:{type: String,required: true}, 
-    comm:{type: String,required: true}, 
-    enc_msg_share:{type: String,required: true}, 
-    enc_rand_share:{type: String,required: true}, 
+    ov_hash:{type: String,required: true},
+    enc_hash:{type: String,required: true},
+    enc_msg:{type: [mongoose.Schema.Types.Mixed],required: true}, 
+    comm:{type: [mongoose.Schema.Types.Mixed],required: true}, 
+    enc_msg_share:{type: [mongoose.Schema.Types.Mixed],required: true}, 
+    enc_rand_share:{type: [mongoose.Schema.Types.Mixed],required: true}, 
     pfcomm:{type: String,required: true}, 
-    enc_rand:{type: String,required: true}, 
+    enc_rand:{type: [mongoose.Schema.Types.Mixed],required: true}, 
     pf_encmsg:{type: String,required: true}, 
     pf_encrand:{type: String,required: true}, 
     pfs_enc_msg_share:{type: String,required: true}, 
@@ -173,7 +175,8 @@ const ReceiptSchema = new mongoose.Schema({
     pf_encmsg:{type: String,required: true}, 
     pf_encrand:{type: String,required: true}, 
     pf_enc_msg_shares:{type: String,required: true}, 
-    pf_enc_rand_shares:{type: String,required: true}
+    pf_enc_rand_shares:{type: String,required: true},
+    accessed:{type:Boolean,required:true}
 });
 
 const BulletinSchema=new mongoose.Schema({
@@ -204,21 +207,21 @@ const BulletinSchema=new mongoose.Schema({
 
 const keysSchema=new mongoose.Schema({
     alpha:{type:String,required:true},
-    pai_pk:{type:String,required:true},
-    _pai_sklist:{type:String,required:true},
-    pai_pklist_single:{type:String,required:true},
-    _pai_sklist_single:{type:String,required:true},
-    elg_pk:{type:String,required:true},
-    _elg_sklist:{type:String,required:true},
-    ck:{type:String,required:true},
-    ck_fo:{type:String,required:true},
-    _pi:{type:String,required:true},
-    _re_pi:{type:String,required:true},
-    _svecperm:{type:String,required:true},
-    permcomm:{type:String,required:true},
-    beaver_a_shares:{type:String,required:true},
-    beaver_b_shares:{type:String,required:true},
-    beaver_c_shares:{type:String,required:true}
+    pai_pk:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _pai_sklist:{type:[mongoose.Schema.Types.Mixed],required:true},
+    pai_pklist_single:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _pai_sklist_single:{type:[mongoose.Schema.Types.Mixed],required:true},
+    elg_pk:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _elg_sklist:{type:[mongoose.Schema.Types.Mixed],required:true},
+    ck:{type:[mongoose.Schema.Types.Mixed],required:true},
+    ck_fo:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _pi:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _re_pi:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _svecperm:{type:[mongoose.Schema.Types.Mixed],required:true},
+    permcomm:{type:[mongoose.Schema.Types.Mixed],required:true},
+    beaver_a_shares:{type:[mongoose.Schema.Types.Mixed],required:true},
+    beaver_b_shares:{type:[mongoose.Schema.Types.Mixed],required:true},
+    beaver_c_shares:{type:[mongoose.Schema.Types.Mixed],required:true}
 });
 
 const generatorSchema=new mongoose.Schema({

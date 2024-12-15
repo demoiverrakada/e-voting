@@ -31,26 +31,26 @@ services:
     - ./output:/output
   
 
-  # bulletin:
-  #     build: .
-  #     working_dir: /app/evoting_localstorage/bulletin
-  #     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
-  #     ports:
-  #       - "5001:3000"
+  bulletin:
+      build: .
+      working_dir: /app/evoting_localstorage/bulletin
+      command: /root/.nvm/versions/node/v22.3.0/bin/npm start
+      ports:
+        - "5001:3000"
 
-  # admin-webpage:
-  #     build: .
-  #     working_dir: /app/evoting_localstorage/admin-webpage
-  #     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
-  #     ports:
-  #       - "3000:3000"
+  admin-webpage:
+      build: .
+      working_dir: /app/evoting_localstorage/admin_webpage
+      command: /root/.nvm/versions/node/v22.3.0/bin/npm start
+      ports:
+        - "3000:3000"
 
-  # verification-webpage:
-  #     build: .
-  #     working_dir: /app/evoting_localstorage/verification-webpage
-  #     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
-  #     ports:
-  #       - "7001:3000" 
+  verification-webpage:
+      build: .
+      working_dir: /app/evoting_localstorage/verification-webpage
+      command: /root/.nvm/versions/node/v22.3.0/bin/npm start
+      ports:
+        - "7001:3000" 
   
 
   

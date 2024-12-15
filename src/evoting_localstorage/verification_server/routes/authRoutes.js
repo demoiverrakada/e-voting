@@ -264,9 +264,94 @@ function handleParsedResult(result, res) {
     return formattedResult;
 }
 
+function callPythonFunction4(functionName, ...params) {
+    const scriptPath = '/app/evoting_localstorage/BallotAudit/android/automation.py';
+    const pythonExecutable = 'python3';
 
+    console.log("Resolved script path:", scriptPath);
 
+    const formattedParams = params.map(param =>
+        typeof param === 'string' ? `'${param}'` : param
+    ).join(' ');
 
+    console.log(`Formatted params: ${formattedParams}`);
+
+    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
+        env: {
+            ...process.env,
+            PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Explicitly add Node path
+            precomputing: '0'
+        },
+        cwd: '/app/evoting_localstorage/BallotAudit/android/', // Make sure the working directory is correct
+        encoding: 'utf-8',
+    });
+
+    if (pythonProcess.error) {
+        console.error('Error spawning Python process:', pythonProcess.error);
+        throw pythonProcess.error;
+    }
+
+    const stdout = pythonProcess.stdout.trim();
+    const stderr = pythonProcess.stderr.trim();
+
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+
+    console.log('Python stdout:', stdout);
+
+    if (pythonProcess.status !== 0) {
+        throw new Error(`Python script failed with exit code ${pythonProcess.status}: ${stderr}`);
+    }
+
+    return stdout || stderr;
+}
+
+function callPythonFunction5(functionName, ...params) {
+    // Use the correct relative path
+    const scriptPath = '/app/evoting_localstorage/VoterVerification/android/automation.py'; // Adjust as needed
+    const pythonExecutable = 'python3';
+
+    console.log("Resolved script path:", scriptPath);
+
+    console.log("Resolved script path:", scriptPath);
+
+    const formattedParams = params.map(param =>
+        typeof param === 'string' ? `'${param}'` : param
+    ).join(' ');
+
+    console.log(`Formatted params: ${formattedParams}`);
+
+    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
+        env: {
+            ...process.env,
+            PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Explicitly add Node path
+            precomputing: '0'
+        },
+        cwd: '/app/evoting_localstorage/VoterVerification/android/', // Make sure the working directory is correct
+        encoding: 'utf-8',
+    });
+
+    if (pythonProcess.error) {
+        console.error('Error spawning Python process:', pythonProcess.error);
+        throw pythonProcess.error;
+    }
+
+    const stdout = pythonProcess.stdout.trim();
+    const stderr = pythonProcess.stderr.trim();
+
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+
+    console.log('Python stdout:', stdout);
+
+    if (pythonProcess.status !== 0) {
+        throw new Error(`Python script failed with exit code ${pythonProcess.status}: ${stderr}`);
+    }
+
+    return stdout || stderr;
+}
 
 router.post('/pf_zksm_verf', async (req, res) => {
     try {
@@ -445,23 +530,95 @@ router.post('/audit', async (req, res) => {
     });
 
 
-router.post('/pk', async (req, res) => {
-        try {
-            const existingKey = await Keys.findOne();
-            if (!existingKey) {
-                return res.status(422).send({ error: "Setup has not been done yet." });
-            }
-            console.log("here")
-            // Sending the response in correct JSON format
-            console.log(existingKey)
-            res.send({
-                pai_pk: existingKey.pai_pk,
-                pai_pklist_single: existingKey.pai_pklist_single,
-                elg_pk: existingKey.elg_pk
-            });
-            console.log(res);
-        } catch (err) {
-            res.status(500).send(err.message);
+router.get('/pk', async (req, res) => {
+    try {
+        const existingKey = await Keys.findOne();
+        if (!existingKey) {
+            return res.status(422).send({ error: "Setup has not been done yet." });
         }
-    });
+        console.log("here")
+        // Sending the response in correct JSON format
+        console.log(existingKey)
+        res.status(200).send({
+            pai_pk: JSON.stringify(existingKey.pai_pk),
+            pai_pklist_single: JSON.stringify(existingKey.pai_pklist_single),
+            elg_pk: JSON.stringify(existingKey.elg_pk)
+        });
+        console.log(res);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+
+router.post('/runBuild2', async (req, res) => {
+    try {
+        // Call the Python function to start the build process
+        console.log('Calling Python function to start the build process');
+        const result = await callPythonFunction4("runBuild2");
+
+        // Log the result
+        console.log('Build process result:', result);
+
+        // Path to the generated app (adjust to match your build script's output location)
+        const appPath = '/app/evoting_localstorage/BallotAudit/android/app/build/outputs/apk/release/app-release.apk'
+
+        // Check if the file exists
+        if (!fs.existsSync(appPath)) {
+            return res.status(404).json({
+                success: false,
+                message: 'Build process completed, but the app file was not found.'
+            });
+        }
+
+        // Send the app file as a download
+        console.log('Sending the generated app file to the client');
+        res.download(appPath, 'app-release.apk', (err) => {
+            if (err) {
+                console.error('Error sending the app file:', err);
+                res.status(500).json({ error: 'Failed to send the app file.' });
+            }
+        });
+    } catch (err) {
+        // Handle any errors that occur
+        console.error('Error during build process:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+router.post('/runBuild3', async (req, res) => {
+    try {
+        // Call the Python function to start the build process
+        console.log('Calling Python function to start the build process');
+        const result = await callPythonFunction5("runBuild3");
+
+        // Log the result
+        console.log('Build process result:', result);
+
+        // Path to the generated app (adjust to match your build script's output location)
+        const appPath = '/app/evoting_localstorage/VoterVerification/android/app/build/outputs/apk/release/app-release.apk'
+
+        // Check if the file exists
+        if (!fs.existsSync(appPath)) {
+            return res.status(404).json({
+                success: false,
+                message: 'Build process completed, but the app file was not found.'
+            });
+        }
+
+        // Send the app file as a download
+        console.log('Sending the generated app file to the client');
+        res.download(appPath, 'app-release.apk', (err) => {
+            if (err) {
+                console.error('Error sending the app file:', err);
+                res.status(500).json({ error: 'Failed to send the app file.' });
+            }
+        });
+    } catch (err) {
+        // Handle any errors that occur
+        console.error('Error during build process:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
 module.exports = router;

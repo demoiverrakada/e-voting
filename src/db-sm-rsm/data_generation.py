@@ -49,6 +49,8 @@ for voter in voters_cursor:
 # Process receipts in groups of num_candidates
 group = []
 for receipt in receipts_cursor:
+    if(receipt['accessed']==True):
+        continue
     enc_hash = receipt['enc_hash'].strip()
     group.append(enc_hash)
 

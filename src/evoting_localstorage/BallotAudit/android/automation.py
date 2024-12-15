@@ -10,7 +10,7 @@ def run_gradle_commands():
 
     # Add the paths for Android SDK, Java, Node.js, and other necessary binaries
     env["ANDROID_HOME"] = "/root/android-sdk"
-    env["PATH"] = "/root/android-sdk/platform-tools:/root/android-sdk/cmdline-tools/latest/bin:/usr/lib/jvm/java-17-openjdk-amd64/bin:/root/.nvm/versions/node/v22.3.0/bin:/opt/venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" + ":" + env["PATH"]
+    env["PATH"] = "/root/android-sdk/platform-tools:/root/android-sdk/cmdline-tools/latest/bin:/usr/lib/jvm/java-23-openjdk-amd64/bin:/root/.nvm/versions/node/v22.3.0/bin:/opt/venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" + ":" + env["PATH"]
 
     try:
         # Change to the project directory

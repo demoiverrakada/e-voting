@@ -128,6 +128,11 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplu
 def audit(commitment,booth_num,bid):
     f = io.StringIO()
     g12,h12=load("generators",["g1","h1"]).values()
+    for i in range(len(commitment)):
+        accessed,enc_hashes=load("receipt",[commitment[i],"accessed"]).values()
+        if(accessed==True):
+            print("The ballot has already been audited or the ballot has been used to cast a vote.")
+            return 
     with contextlib.redirect_stdout(f):
         alpha,_pai_sklist_single,pai_pklist_single=load("setup",['alpha','_pai_sklist_single','pai_pklist_single']).values()
         mixers = lambda alpha: ["mixer %d" % a for a in range(alpha)]
@@ -171,12 +176,13 @@ def audit(commitment,booth_num,bid):
         #print(commitment[i])
         #print(commitment)
         if(gamma_w==comm[i]):
+            db=init()
+            receipts_collection=db['receipts']
+            votes_collection=db['votes']
+            receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[i])})
+            receipt['accessed']=True
             result.append([True, v_w_nbar, name, str(gamma_w), str(comm[i])])
             if(name=="NOTA"):
-                db=init()
-                receipts_collection=db['receipts']
-                votes_collection=db['votes']
-                receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[i])})
                 random_voter_id = random.randint(1000000000, 9999999999)
                 receipt['voter_id'] = random_voter_id
                 votes_collection.insert_one(receipt)

@@ -47,47 +47,7 @@ function callPythonFunction(functionName, ...params) {
 //function for running evoting_fron app generation script
 function callPythonFunction3(functionName, ...params) {
     // Use the correct relative path
-    const scriptPath = join(__dirname, '../../evoting_fron/android/automation.py'); // Adjust as needed
-    const pythonExecutable = 'python3';
-
-    console.log("Resolved script path:", scriptPath);
-
-    const formattedParams = params.map(param => 
-        typeof param === 'string' ? `'${param}'` : param
-    ).join(', ');
-
-    const command = `${pythonExecutable} ${scriptPath}`;
-    console.log(`Running: ${command}`);
-
-    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
-        env: { ...process.env, precomputing: '0' },
-    });
-
-    if (pythonProcess.error) {
-        console.error('Python process error:', pythonProcess.error);
-        throw pythonProcess.error;
-    }
-
-    const stdout = pythonProcess.stdout.toString().trim();
-    const stderr = pythonProcess.stderr.toString().trim();
-
-    if (stderr) {
-        console.error('Python stderr:', stderr);
-    }
-
-    try {
-        console.log('Python stdout:', stdout);
-        return stdout || stderr;
-    } catch (error) {
-        console.error('Error reading or parsing result:', error);
-        throw error;
-    }
-}
-
-//function for running BallotAudit app generation script
-
-function callPythonFunction4(functionName, ...params) {
-    const scriptPath = '/app/evoting_localstorage/BallotAudit/android/automation.py';
+    const scriptPath = '/app/evoting_localstorage/evoting_fron/android/automation.py'; // Adjust as needed
     const pythonExecutable = 'python3';
 
     console.log("Resolved script path:", scriptPath);
@@ -104,7 +64,7 @@ function callPythonFunction4(functionName, ...params) {
             PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Explicitly add Node path
             precomputing: '0'
         },
-        cwd: '/app/evoting_localstorage/BallotAudit/android/', // Make sure the working directory is correct
+        cwd: '/app/evoting_localstorage/evoting_fron/android/', // Make sure the working directory is correct
         encoding: 'utf-8',
     });
 
@@ -128,46 +88,6 @@ function callPythonFunction4(functionName, ...params) {
 
     return stdout || stderr;
 }
-
-function callPythonFunction5(functionName, ...params) {
-    // Use the correct relative path
-    const scriptPath = join(__dirname, '../../VoterVerification/android/automation.py'); // Adjust as needed
-    const pythonExecutable = 'python3';
-
-    console.log("Resolved script path:", scriptPath);
-
-    const formattedParams = params.map(param => 
-        typeof param === 'string' ? `'${param}'` : param
-    ).join(', ');
-
-    const command = `${pythonExecutable} ${scriptPath}`;
-    console.log(`Running: ${command}`);
-
-    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
-        env: { ...process.env, precomputing: '0' },
-    });
-
-    if (pythonProcess.error) {
-        console.error('Python process error:', pythonProcess.error);
-        throw pythonProcess.error;
-    }
-
-    const stdout = pythonProcess.stdout.toString().trim();
-    const stderr = pythonProcess.stderr.toString().trim();
-
-    if (stderr) {
-        console.error('Python stderr:', stderr);
-    }
-
-    try {
-        console.log('Python stdout:', stdout);
-        return stdout || stderr;
-    } catch (error) {
-        console.error('Error reading or parsing result:', error);
-        throw error;
-    }
-}
-
 
 // endpoint for generating the keys for the election
 router.post('/setup',requireAuth, async (req, res) => {
@@ -235,26 +155,40 @@ router.post('/generate',requireAuth, async (req, res) => {
 
 
 // endpoint for uploading the votes list
-router.post('/upload', requireAuth,async (req, res) => {
-    console.log("check 1")
-    try{
-    console.log("check 2")
-    const jsonData = req.body;
-    console.log(jsonData)
-    const result= await Bulletin.insertMany(jsonData);
-    if (!result) {
-        return res.status(422).send({ error: "Error during uploading process"});
-    }
-    // const result2=await callPythonFunction('mix')
-    //     if (!result2) {
-    //         return res.status(422).send({ error: "Error during decrypting process" });
-    //     }
-    res.send({ status: 'OK', message: 'Upload process successful', result });
-    }
-    catch(err){
-    	console.log("check 3")
+router.post('/upload', requireAuth, async (req, res) => {
+    console.log("check 1");
+    try {
+        console.log("check 2");
+        const jsonData = req.body;
+        console.log(jsonData);
+
+        // Insert data into the Bulletin collection
+        const result = await Bulletin.insertMany(jsonData);
+        if (!result) {
+            return res.status(422).send({ error: "Error during uploading process" });
+        }
+
+        // Update the Receipt collection
+        await Promise.all(result.map(async (entry) => {
+            const { commitment } = entry;
+            const updatedReceipt = await Receipt.findOneAndUpdate(
+                { enc_hash: commitment }, // Find the matching receipt by enc_hash
+                { accessed: true },       // Update the accessed field to true
+                { new: true }             // Return the updated document
+            );
+            if (updatedReceipt) {
+                console.log(`Updated Receipt with enc_hash: ${commitment}`);
+            } else {
+                console.log(`No Receipt found with enc_hash: ${commitment}`);
+            }
+        }));
+
+        // Respond to the client
+        res.send({ status: 'OK', message: 'Upload process and receipt updates successful', result });
+    } catch (err) {
+        console.log("check 3");
         console.error(err);
-        res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.'});
+        res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
     }
 });
 
@@ -287,53 +221,22 @@ router.post('/upload_PO', requireAuth,async (req, res) => {
         const jsonData = req.body;
 
         // Insert data into MongoDB
-        console.log("check 4");
         console.log(jsonData);
         const result = await PO.insertMany(jsonData);
-        console.log("check 1");
 
         if (!result) {
             return res.status(422).send({ error: "Error during uploading process" });
         }
 
-        // Prepare the data to write to a JSON file
-        const inputFileName = 'pos.json';
-        const filePath = path.join(__dirname, inputFileName);
-
-        // Write the JSON data to the file
-        fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
-
-        console.log(`JSON data written to ${filePath}`);
-
-        // Spawn a Python process to run the voters_upload.py script
-        const pythonProcess = spawn('python3', [path.join(__dirname, 'pos_upload.py'), filePath]);
-
-        // Handle the output from the Python script
-        pythonProcess.stdout.on('data', (data) => {
-            console.log(`Python Output: ${data}`);
-        });
-
-        // Handle any errors from the Python script
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Error: ${data}`);
-        });
-
-        // Handle the completion of the Python process
-        pythonProcess.on('close', (code) => {
-            console.log(`Python process exited with code ${code}`);
-            if (code === 0) {
-                // If Python script finishes successfully
-                res.send({ status: 'OK', message: 'Upload process successful', result });
-            } else {
-                res.status(500).send({ status: 'Error', message: `Python script failed with exit code ${code}` });
-            }
-        });
+        // Send back a success response with status 200
+        return res.status(200).send({ status: 'OK', message: 'Polling Officer uploaded successfully', data: result });
 
     } catch (err) {
-        console.log("check 3");
         console.error(err);
-        res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
+        // Handle errors gracefully
+        return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
     }
+        
 });
 
 router.post('/upload_voters', requireAuth, async (req, res) => {
@@ -358,13 +261,26 @@ router.post('/upload_voters', requireAuth, async (req, res) => {
     }
 });
 
-
-// endpoint for getting the encrypted votes
-router.get('/encvotes',async(req,res)=>{
-    Votes.find()
-        .then(users => res.json(users))
-        .catch(err => res.status(400).json({ error: err.message }))
+router.get('/pk', async (req, res) => {
+    try {
+        const existingKey = await Keys.findOne();
+        if (!existingKey) {
+            return res.status(422).send({ error: "Setup has not been done yet." });
+        }
+        console.log("here")
+        // Sending the response in correct JSON format
+        console.log(existingKey)
+        res.status(200).send({
+            pai_pk: JSON.stringify(existingKey.pai_pk),
+            pai_pklist_single: JSON.stringify(existingKey.pai_pklist_single),
+            elg_pk: JSON.stringify(existingKey.elg_pk)
+        });
+        console.log(res);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
+
 
 // endpoint to 
 router.post('/mix', requireAuth, async (req, res) => {
@@ -510,76 +426,8 @@ router.post('/runBuild1', async (req, res) => {
     }
 });
 
-// Your Express endpoint where the build process is triggered
-router.post('/runBuild2', async (req, res) => {
-    try {
-        // Call the Python function to start the build process
-        console.log('Calling Python function to start the build process');
-        const result = await callPythonFunction4("runBuild2");
 
-        // Log the result
-        console.log('Build process result:', result);
 
-        // Path to the generated app (adjust to match your build script's output location)
-        const appPath = path.join(__dirname, '../../BallotAudit/android/app/build/outputs/apk/release/app-release.apk');
-
-        // Check if the file exists
-        if (!fs.existsSync(appPath)) {
-            return res.status(404).json({
-                success: false,
-                message: 'Build process completed, but the app file was not found.'
-            });
-        }
-
-        // Send the app file as a download
-        console.log('Sending the generated app file to the client');
-        res.download(appPath, 'app-release.apk', (err) => {
-            if (err) {
-                console.error('Error sending the app file:', err);
-                res.status(500).json({ error: 'Failed to send the app file.' });
-            }
-        });
-    } catch (err) {
-        // Handle any errors that occur
-        console.error('Error during build process:', err.message);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-router.post('/runBuild3', async (req, res) => {
-    try {
-        // Call the Python function to start the build process
-        console.log('Calling Python function to start the build process');
-        const result = await callPythonFunction5("runBuild3");
-
-        // Log the result
-        console.log('Build process result:', result);
-
-        // Path to the generated app (adjust to match your build script's output location)
-        const appPath = path.join(__dirname, '../../VoterVerification/android/app/build/outputs/apk/release/app-release.apk');
-
-        // Check if the file exists
-        if (!fs.existsSync(appPath)) {
-            return res.status(404).json({
-                success: false,
-                message: 'Build process completed, but the app file was not found.'
-            });
-        }
-
-        // Send the app file as a download
-        console.log('Sending the generated app file to the client');
-        res.download(appPath, 'app-release.apk', (err) => {
-            if (err) {
-                console.error('Error sending the app file:', err);
-                res.status(500).json({ error: 'Failed to send the app file.' });
-            }
-        });
-    } catch (err) {
-        // Handle any errors that occur
-        console.error('Error during build process:', err.message);
-        res.status(500).json({ error: err.message });
-    }
-});
 module.exports = router;
 
   

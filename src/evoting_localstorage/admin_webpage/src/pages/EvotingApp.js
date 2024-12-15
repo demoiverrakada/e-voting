@@ -19,9 +19,9 @@ function EvotingApp() {
   }, [navigate]);
   const handleEvoting = async () => {
     try {
-      const token = ReactSession.get('access_token');
+      const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
-        'http://localhost:5000/p/runBuild1',
+        'http://localhost:5000/runBuild1',
         { alpha, n },
         {
           headers: { authorization: `Bearer ${token}` },

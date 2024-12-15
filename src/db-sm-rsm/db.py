@@ -77,6 +77,8 @@ def load(funcs,params):
         return result
     elif(function_map[funcs]=='decs'):
         document=collection.find_one()
+        if not (document):
+           return result
         for param in params:
             result[param] = deserialize_wrapper(document[param])
         return result

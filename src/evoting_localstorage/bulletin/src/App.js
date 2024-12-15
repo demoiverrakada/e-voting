@@ -15,36 +15,41 @@ function App() {
 
   return (
     <div
-      className="w-100 vh-100 d-flex justify-content-center align-items-center"
-      style={{ background: "linear-gradient(to right, #4facfe, #00f2fe)" }}
+      className="container-fluid d-flex justify-content-center align-items-center"
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(to right, #4facfe, #00f2fe)",
+      }}
     >
       <div className="card w-75 p-4" style={{ boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)" }}>
         <h1 className="text-center mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
           PUBLIC BULLETIN BOARD
         </h1>
         {users ? (
-          <table className="table table-striped table-hover">
-            <thead className="table-dark">
-              <tr>
-                <th>Voter ID</th>
-                <th>Booth Number</th>
-                <th>Encrypted Vote</th>
-                <th>Preference Number Selected</th>
-                <th>Hash Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user._id} style={{ cursor: "pointer" }}>
-                  <td>{user.voter_id}</td>
-                  <td>{user.booth_num}</td>
-                  <td>{user.commitment}</td>
-                  <td>{user.pref_id}</td>
-                  <td>{user.hash_value}</td>
+          <div className="table-responsive">
+            <table className="table table-striped table-hover table-bordered">
+              <thead className="table-dark">
+                <tr>
+                  <th>Voter ID</th>
+                  <th>Booth Number</th>
+                  <th>Encrypted Vote</th>
+                  <th>Preference Number Selected</th>
+                  <th>Hash Value</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user._id} style={{ cursor: "pointer" }}>
+                    <td>{user.voter_id}</td>
+                    <td>{user.booth_num}</td>
+                    <td>{user.commitment}</td>
+                    <td>{user.pref_id}</td>
+                    <td>{user.hash_value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="text-center">
             <h2 style={{ color: "#ffffff" }}>Under Construction</h2>

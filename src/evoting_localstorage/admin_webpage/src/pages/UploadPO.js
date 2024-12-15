@@ -36,7 +36,7 @@ function UploadPO() {
     reader.onload = async (e) => {
       try {
         const jsonData = JSON.parse(e.target.result);
-        const token = ReactSession.get('access_token');
+        const token = sessionStorage.getItem('access_token');
 
         const response = await axios.post('http://localhost:5000/upload_PO', jsonData, {
           headers: {

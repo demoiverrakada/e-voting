@@ -37,35 +37,39 @@ def setup(n,alpha):
     """
     
     # Generate Paillier and ElGamal public/private keys
-    store("generators",[g1,f2,eg1f2,ef1f2,f1,h1,eh1f2,idenT,inveh1f2,inveg1f2,fT])
-    _pai_sklist, pai_pk = pai_th_keygen(alpha)
-    _pai_sklist_single, pai_pklist_single = [], []
-    for a in range(alpha):
-        _pai_sk_a, pai_pk_a = pai_keygen_single()
-        _pai_sklist_single.append(_pai_sk_a)
-        pai_pklist_single.append(pai_pk_a)
+    f = io.StringIO()
+    #if(True):
+    with contextlib.redirect_stdout(f):
+        store("generators",[g1,f2,eg1f2,ef1f2,f1,h1,eh1f2,idenT,inveh1f2,inveg1f2,fT])
+        _pai_sklist, pai_pk = pai_th_keygen(alpha)
+        _pai_sklist_single, pai_pklist_single = [], []
+        for a in range(alpha):
+            _pai_sk_a, pai_pk_a = pai_keygen_single()
+            _pai_sklist_single.append(_pai_sk_a)
+            pai_pklist_single.append(pai_pk_a)
 
-    _elg_sklist, elg_pk = elgamal_th_keygen(alpha)
+        _elg_sklist, elg_pk = elgamal_th_keygen(alpha)
 
-    # Generate beaver triples (offline preprocessing step for multiplicative 
-    # secret sharing used in DPK2)
-    beaver_a_shares,beaver_b_shares,beaver_c_shares = gen_beaver_triples(n, alpha)
-    # Generate a commitment to the permutation and prove knowledge of its opening
-    ck = commkey(n)
-    ck_fo = commkey_fo(n, N=pai_pk[0])
-    _pi, _re_pi = genperms(n, alpha)
-    _svecperm = [[group.random(ZR) for i in range(n)] for a in range(alpha)]
-    permcomm = [commit_perm(ck, _re_pi[a], _svecperm[a]) for a in range(alpha)]
-    evec = [[group.init(ZR, random.getrandbits(kappa_e)) for i in range(n)] for a in range(alpha)]
-    pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a]) for a in range(alpha)]
-    status_permcomm = True
-    for a in range(alpha):
-        status_permcomm = status_permcomm and perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a])
-    assert status_permcomm
-     
-    store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,
-         # ...beaver triples (to add) ...
-         ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares])
+        # Generate beaver triples (offline preprocessing step for multiplicative 
+        # secret sharing used in DPK2)
+        beaver_a_shares,beaver_b_shares,beaver_c_shares = gen_beaver_triples(n, alpha)
+        # Generate a commitment to the permutation and prove knowledge of its opening
+        ck = commkey(n)
+        ck_fo = commkey_fo(n, N=pai_pk[0])
+        _pi, _re_pi = genperms(n, alpha)
+        _svecperm = [[group.random(ZR) for i in range(n)] for a in range(alpha)]
+        permcomm = [commit_perm(ck, _re_pi[a], _svecperm[a]) for a in range(alpha)]
+        evec = [[group.init(ZR, random.getrandbits(kappa_e)) for i in range(n)] for a in range(alpha)]
+        pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a]) for a in range(alpha)]
+        status_permcomm = True
+        for a in range(alpha):
+            status_permcomm = status_permcomm and perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a])
+        assert status_permcomm
+        
+        store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,
+            # ...beaver triples (to add) ...
+            ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares])
+    print("Setup was done successful")
 
 def generate_ballots(num):
     ballot_draft(num)
@@ -77,24 +81,31 @@ def mixer():
     
     Produces a permuted list of decrypted votes in the database.
     """
-    process_bulletins()
-    alpha,pai_pk,pai_pklist_single,ck,ck_fo,permcomm,_pai_sklist,_pai_sklist_single,_pi,_svecperm=load("setup",["alpha","pai_pk","pai_pklist_single","ck","ck_fo","permcomm","_pai_sklist","_pai_sklist_single","_pi","_svecperm"]).values()
+    f = io.StringIO()
+    with contextlib.redirect_stdout(f):
+        process_bulletins()
+        alpha,pai_pk,pai_pklist_single,ck,ck_fo,permcomm,_pai_sklist,_pai_sklist_single,_pi,_svecperm=load("setup",["alpha","pai_pk","pai_pklist_single","ck","ck_fo","permcomm","_pai_sklist","_pai_sklist_single","_pi","_svecperm"]).values()
 
-    enc_msgs, enc_msg_shares, enc_rand_shares=load("enc",["enc_msg", "enc_msg_share", "enc_rand_share"]).values()
+        enc_msgs, enc_msg_shares, enc_rand_shares=load("enc",["enc_msg", "enc_msg_share", "enc_rand_share"]).values()
 
-    # Check validity of stored encryptions
-    #status_encs = check_encs(pai_pk, pai_pklist_single, enc_msgs, enc_rands, enc_msg_shares, enc_rand_shares, pf_encmsgs, pf_encrands, pfs_enc_msg_shares, pfs_enc_rand_shares)
-    #assert status_encs
-    res=load("load",[])
-    # Mix
-    msgs_out, _msg_shares, _rand_shares = mix(ck, ck_fo, permcomm, enc_msgs, enc_msg_shares, enc_rand_shares, alpha, pai_pk, pai_pklist_single, _pai_sklist, _pai_sklist_single, _pi, _svecperm)
-    msgs_out_dec=[]
-    for j in range(len(msgs_out)):
-        i=int(str(msgs_out[j]))
-        i=i%(len(res))
-        msgs_out_dec.append(i)
-    # Store the results
+        # Check validity of stored encryptions
+        #status_encs = check_encs(pai_pk, pai_pklist_single, enc_msgs, enc_rands, enc_msg_shares, enc_rand_shares, pf_encmsgs, pf_encrands, pfs_enc_msg_shares, pfs_enc_rand_shares)
+        #assert status_encs
+        res=load("load",[])
+        # Mix
+        msgs_out, _msg_shares, _rand_shares = mix(ck, ck_fo, permcomm, enc_msgs, enc_msg_shares, enc_rand_shares, alpha, pai_pk, pai_pklist_single, _pai_sklist, _pai_sklist_single, _pi, _svecperm)
+        msgs_out_dec=[]
+        for j in range(len(msgs_out)):
+            i=int(str(msgs_out[j]))
+            i=i%(len(res))
+            msgs_out_dec.append(i)
+        # Store the results
+    existing_mix_data = load("mix", ["msgs_out","_msgs_shares","_rand_shares"])
+    if existing_mix_data: 
+        print("Decryption has already been done. No further action is required.")
+        return
     store("mix",[msgs_out_dec,msgs_out, _msg_shares, _rand_shares])
+    print("Mixing and decryption was successful")
 
 #done
 #def pfcomms():

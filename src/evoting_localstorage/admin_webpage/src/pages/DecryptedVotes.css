@@ -23,7 +23,6 @@
 }
 
 /* Button Styling */
-
 .decrypted-container button {
   padding: 12px;
   font-size: 1.1rem;
@@ -40,3 +39,73 @@
   background: linear-gradient(135deg, #6a99ff, #0956fc);
   transform: translateY(-3px);
 }
+
+/* Table Styling */
+.votes-table {
+  width: 100%;
+  max-width: 100%; /* Allow the table to expand as needed */
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow-x: auto; /* Enable horizontal scrolling */
+  display: block; /* Make the table scrollable */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.votes-table th,
+.votes-table td {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 0.9rem; /* Slightly reduce font size for readability */
+  word-break: break-word; /* Allow breaking long words */
+}
+
+.votes-table th {
+  background-color: #f4f4f4;
+  color: #2c3e50;
+  font-weight: bold;
+  text-align: center; /* Center align the header text */
+}
+
+.votes-table td {
+  background-color: #fff;
+  color: #555;
+}
+
+.votes-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.votes-table tr:hover {
+  background-color: #e0e0e0;
+}
+
+.votes-table-wrapper {
+  overflow-x: auto; /* Enable horizontal scrolling for the table container */
+  margin-top: 20px;
+}
+
+.votes-table a {
+  color: #145cf7;
+  text-decoration: none;
+}
+
+.votes-table a:hover {
+  text-decoration: underline;
+}
+
+.votes-table-container {
+  margin: 0 auto;
+  max-width: 95%; /* Ensure the table doesn't take up the full width of the screen */
+}
+
+.table-header {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #333;
+}
+
+

@@ -1,13 +1,14 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ReactSession } from 'react-client-session';
 import './DecryptedVotes.css';
-import Navigation from '../Navigation'
+import Navigation from '../Navigation';
 import { useNavigate } from 'react-router-dom';
-ReactSession.setStoreType('sessionStorage');
+
 
 function DecryptedVotes() {
   const navigate = useNavigate();
+  const [decryptedVotes, setDecryptedVotes] = useState([]); // State to store decrypted votes
 
   // Check for authentication when the page loads
   useEffect(() => {
@@ -15,12 +16,18 @@ function DecryptedVotes() {
       navigate('/'); // Redirect to login page if no token
     }
   }, [navigate]);
+
+  // Decrypt votes on button click
   const handleDecryptVotes = async () => {
     try {
-      const token = ReactSession.get('access_token');
-      const response = await axios.get('http://localhost:5000/decvotes', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const token = sessionStorage.getItem('access_token');
+      const response = await axios.post(
+        'http://localhost:5000/mix',
+        {},
+        {
+          headers: { authorization: `Bearer ${token}` }
+        },
+      );
       console.log('Decrypted votes:', response.data);
       alert('Votes decrypted successfully.');
     } catch (err) {
@@ -28,17 +35,11 @@ function DecryptedVotes() {
     }
   };
 
+  // Fetch decrypted votes from backend and render them as a table
   const handleGetDcrpVotes = async () => {
     try {
       const response = await axios.get('http://localhost:5000/getVotes');
-      const jsonBlob = new Blob([JSON.stringify(response.data)], { type: 'application/json' });
-      const url = URL.createObjectURL(jsonBlob);
-
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'decrypted_votes.json';
-      link.click();
-
+      setDecryptedVotes(response.data); // Set the response data in state
       alert('Decrypted votes fetched successfully.');
     } catch (err) {
       alert(`Failed to fetch decrypted votes: ${err.message}`);
@@ -47,12 +48,34 @@ function DecryptedVotes() {
 
   return (
     <div className="decrypted-container">
-      <h2 >Decrypted Votes</h2>
+      <h2>Decrypted Votes</h2>
       <button onClick={handleDecryptVotes}>Decrypt Votes</button>
       <button onClick={handleGetDcrpVotes}>Fetch Decrypted Votes</button>
+
+      {/* Render table if decrypted votes are available */}
+      {decryptedVotes.length > 0 && (
+        <table className="votes-table">
+          <thead>
+            <tr>
+              <th>Candidate Name</th>
+              <th>Votes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {decryptedVotes.map((vote, index) => (
+              <tr key={index}>
+                <td>{vote.name}</td>
+                <td>{vote.votes}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
       <Navigation />
     </div>
   );
 }
 
 export default DecryptedVotes;
+

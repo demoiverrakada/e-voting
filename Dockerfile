@@ -22,6 +22,8 @@ RUN /bin/bash --login -c "cd evoting_localstorage/admin_webpage && npm install -
 RUN /bin/bash --login -c "cd evoting_localstorage/verification-webpage && npm install --force"
 RUN ln -s /root/.nvm/versions/node/v22.3.0/bin/node /usr/bin/node && \
     ln -s /root/.nvm/versions/node/v22.3.0/bin/npm /usr/bin/npm
-
+RUN apt-get update && apt-get install -y openjdk-23-jdk
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
 # Set working directory
 COPY src /app

@@ -38,7 +38,6 @@ function OptionsPage() {
         <div className="section post-poll">
           <h2>Post-Polling process</h2>
           <div className="buttons">
-            <button onClick={() => handleNavigation('/encrypted_votes')}>Get Encrypted Votes</button>
             <button onClick={() => handleNavigation('/decrypted_votes')}>Get/Decrypt Votes</button>
             <button onClick={() => handleNavigation('/public_keys')}>Fetch Public Keys</button>
           </div>

@@ -92,7 +92,8 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
             'pf_encmsg': None,
             'pf_encrand': None,
             'pfs_enc_msg_share': None,
-            'pfs_enc_rand_share': None
+            'pfs_enc_rand_share': None,
+            'accessed':False
         })
     
     # Constants for A5 size in pixels (300 DPI)

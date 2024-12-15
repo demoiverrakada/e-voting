@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import OptionsPage from './pages/Options';
-import EncryptedVotes from './pages/EncryptedVotes'
 import DecryptedVotes from './pages/DecryptedVotes';
 import PublicKeys from './pages/PublicKeys';
 import EvotingApp from './pages/EvotingApp';
@@ -21,7 +20,6 @@ function App() {
         <Route path="/setup" element={<Setup />} />
         <Route path="/generate_ballots" element={<GenerateBallot />} />
         <Route path = "/decrypted_votes" element = {<DecryptedVotes />}/>
-        <Route path = "/encrypted_votes" element = {<EncryptedVotes />}/>
         <Route path = "/public_keys" element = {<PublicKeys />}/>
         <Route path = "/evoting_app" element = {<EvotingApp />}/>
         <Route path="/upload_votes" element={<UploadDefault />} />

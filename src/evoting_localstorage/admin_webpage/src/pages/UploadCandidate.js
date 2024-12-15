@@ -36,7 +36,8 @@ function UploadCandidate() {
     reader.onload = async (e) => {
       try {
         const jsonData = JSON.parse(e.target.result);
-        const token = ReactSession.get('access_token');
+        console.log(jsonData)
+        const token = sessionStorage.getItem('access_token');
 
         const response = await axios.post('http://localhost:5000/upload_candidate', jsonData, {
           headers: {
