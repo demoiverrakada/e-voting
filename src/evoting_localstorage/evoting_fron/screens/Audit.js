@@ -70,30 +70,37 @@ export default function Scanner(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
-    justifyContent: 'center',
-    padding: 16,
+    backgroundColor: '#A1D6E2', // Light calming background color
+    justifyContent: 'center', // Centers content vertically
+    paddingHorizontal: 16, // Adds horizontal padding for better layout
   },
   headerText: {
-    fontSize: 35,
-    marginLeft: 18,
-    marginTop: 10,
-    color: '#3b3b3b',
+    fontSize: 35, // Larger font size for the header to stand out
+    marginLeft: 18, // Adds left margin for spacing from the edge
+    marginTop: 10, // Top margin to create space between header and top of screen
+    color: '#3b3b3b', // Dark gray color for header for contrast and readability
+    fontWeight: '700', // Bold font for emphasis
+    textAlign: 'center', // Centers the header text for better alignment
+    letterSpacing: 0.5, // Adds slight spacing for cleaner text rendering
   },
   marker: {
-    borderColor: '#1995AD',
-    borderRadius: 10,
+    borderColor: '#1995AD', // Blue border to make the marker visually distinct
+    borderWidth: 1, // Border width for visibility
+    borderRadius: 10, // Rounded corners for a softer, modern look
+    padding: 12, // Adds padding inside the marker for content spacing
   },
   button: {
-    marginTop: 20,
-    marginHorizontal: 18,
-    backgroundColor: '#D9534F',
-    borderRadius: 25,
-    elevation: 3,
+    marginTop: 20, // Top margin to separate button from other content
+    marginHorizontal: 18, // Horizontal margin for symmetrical button placement
+    backgroundColor: '#D9534F', // Red background for a bold button look
+    borderRadius: 25, // Rounded corners for a sleek, modern design
+    elevation: 3, // Shadow effect for depth and interaction feedback
+    paddingVertical: 14, // Vertical padding to make the button larger and easier to click
   },
   buttonLabel: {
-    color: '#F1F1F2',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#F1F1F2', // Light-colored text for contrast against the red button
+    fontSize: 16, // Standard font size for button text
+    fontWeight: 'bold', // Bold text for better visibility
+    textAlign: 'center', // Centers the text inside the button
   },
 });

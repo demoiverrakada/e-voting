@@ -52,35 +52,42 @@ function StartScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
-    justifyContent: 'center',
+    backgroundColor: '#A1D6E2', // Soft blue background for a calming effect
+    justifyContent: 'center', // Centers content vertically
+    paddingHorizontal: 16, // Added horizontal padding for better responsiveness
+    paddingVertical: 20, // Added vertical padding for layout consistency
   },
   keyboardAvoidingView: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'center', // Keeps UI aligned when the keyboard appears
   },
   heading: {
-    color: '#1995AD',
+    color: '#1995AD', // Distinct blue-green shade for the heading
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 30,
-    marginBottom: 40,
-    // fontFamily: 'Montserrat-Bold', // Uncomment this line if using a custom font
+    fontSize: 32, // Slightly larger font size for better emphasis
+    marginBottom: 40, // Keeps spacing consistent
+    // fontFamily: 'Montserrat-Bold', // Uncomment if a custom font is in use
+    letterSpacing: 1.2, // Adds spacing between letters for a polished look
   },
   button: {
-    marginHorizontal: 18,
+    marginHorizontal: 20, // Slightly increased margin for a balanced layout
     marginTop: 20,
-    backgroundColor: '#1995AD',
-    borderRadius: 25,
-    elevation: 3,
+    backgroundColor: '#1995AD', // Rich color for visual prominence
+    borderRadius: 30, // Increased rounding for a modern aesthetic
+    elevation: 5, // Enhanced shadow for better depth
+    paddingVertical: 12, // Added vertical padding for a larger tap target
   },
   buttonLabel: {
-    color: '#F1F1F2',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#FFFFFF', // White color for contrast with the button background
+    fontSize: 18, // Larger font size for better accessibility
+    fontWeight: '600', // Slightly lighter font weight for a modern feel
+    textAlign: 'center', // Ensures proper alignment
   },
   buttonContent: {
-    height: 50,
+    height: 55, // Slightly increased height for better tap area
+    justifyContent: 'center', // Centers content within the button
+    alignItems: 'center', // Ensures label stays aligned
   },
 });
 

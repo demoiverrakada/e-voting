@@ -8,6 +8,11 @@ def run_gradle_commands():
     try:
         # Run the `./gradlew clean` command
         print("Running './gradlew clean'...")
+        preprocess = subprocess.run(["sed", "-i", "s/\r$//", "gradlew"], capture_output=True, text=True)
+        if preprocess.returncode != 0:
+            print("Error during 'sed' process:")
+            print(preprocess.stderr)
+            return False
         result_clean = subprocess.run(["./gradlew", "clean"], capture_output=True, text=True)
         if result_clean.returncode != 0:
             print("Error during 'clean' process:")
@@ -17,7 +22,7 @@ def run_gradle_commands():
 
         # Run the `./gradlew assembleRelease` command
         print("Running './gradlew assembleRelease'...")
-        result_assemble = subprocess.run(["./gradlew", "assembleRelease"], capture_output=True, text=True)
+        result_assemble = subprocess.run(["nice", "-n", "19", "./gradlew", "assembleRelease"], capture_output=True, text=True)
         if result_assemble.returncode != 0:
             print("Error during 'assembleRelease' process:")
             print(result_assemble.stderr)

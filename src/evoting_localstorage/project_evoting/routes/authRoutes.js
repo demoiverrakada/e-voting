@@ -47,8 +47,24 @@ function callPythonFunction(functionName, ...params) {
 //function for running evoting_fron app generation script
 function callPythonFunction3(functionName, ...params) {
     // Use the correct relative path
+    const path2 = '/app/db-sm-rsm/data_generation.py'
+
     const scriptPath = '/app/evoting_localstorage/evoting_fron/android/automation.py'; // Adjust as needed
     const pythonExecutable = 'python3';
+
+    const pythonProcess1 = spawnSync(pythonExecutable, [path2], {
+        env: {
+            ...process.env,
+            PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Add Node path if necessary
+            precomputing: '0' // Set custom environment variable if needed
+        },
+        cwd: '/app/db-sm-rsm/', // Ensure the working directory is correct
+        encoding: 'utf-8', // Use UTF-8 encoding for consistent output
+    });
+    if (pythonProcess1.error) {
+        console.error('Error spawning Python process:', pythonProcess1.error);
+        throw pythonProcess1.error;
+    }
 
     console.log("Resolved script path:", scriptPath);
 
@@ -164,20 +180,30 @@ router.post('/upload', requireAuth, async (req, res) => {
 
         // Insert data into the Bulletin collection
         const result = await Bulletin.insertMany(jsonData);
+        console.log(result);
         if (!result) {
             return res.status(422).send({ error: "Error during uploading process" });
         }
-
+        console.log("check 4");
         // Update the Receipt collection
         await Promise.all(result.map(async (entry) => {
             const { commitment } = entry;
-            const updatedReceipt = await Receipt.findOneAndUpdate(
-                { enc_hash: commitment }, // Find the matching receipt by enc_hash
-                { accessed: true },       // Update the accessed field to true
-                { new: true }             // Return the updated document
-            );
-            if (updatedReceipt) {
-                console.log(`Updated Receipt with enc_hash: ${commitment}`);
+        
+            // Find the ov_hash associated with the given enc_hash
+            const receipt = await Receipt.findOne({ enc_hash: commitment });
+            console.log(receipt);
+            console.log("check 5");
+            if (receipt) {
+                const { ov_hash } = receipt;
+        
+                // Update all entries containing the same ov_hash
+                console.log("check 6");
+                const updatedReceipts = await Receipt.updateMany(
+                    { ov_hash },               // Find all entries with the same ov_hash
+                    { accessed: true }         // Set accessed to true
+                );
+        
+                console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
             } else {
                 console.log(`No Receipt found with enc_hash: ${commitment}`);
             }

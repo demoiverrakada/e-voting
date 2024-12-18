@@ -197,10 +197,6 @@ const BulletinSchema=new mongoose.Schema({
     pref_id:{
         type:String,
         required:true
-    },
-    hash_value:{
-        type:String,
-        required:true
     }
 
 });

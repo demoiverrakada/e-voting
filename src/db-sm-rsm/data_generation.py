@@ -47,43 +47,57 @@ for voter in voters_cursor:
     })
 
 # Process receipts in groups of num_candidates
-group = []
+# group = []
+i = 0
 for receipt in receipts_cursor:
     if(receipt['accessed']==True):
         continue
+    
     enc_hash = receipt['enc_hash'].strip()
-    group.append(enc_hash)
-
-    # Once we have a full group, process it
-    if len(group) == num_candidates:
-        concatenated_hashes = ''.join(group)
-        concatenated_hashes = "'" + concatenated_hashes + "'"
-        print(concatenated_hashes)
-        overall_hash = compute_hash(concatenated_hashes)
-
-        print(overall_hash)
+    ov_hash = receipt['ov_hash'].strip()
+    # group.append(enc_hash)
+    i += 1
+    if i % num_candidates == 0:
         final_data['receipt'].append({
             "commitment_identifier": "",
-            "ballot_id": overall_hash,
+            "ballot_id": ov_hash,
             "voter_id": "",
             "accessed": False
         })
-        group = []  # Reset for the next group
+        i = 0
+
+    # # Once we have a full group, process it
+    # if len(group) == num_candidates:
+    #     concatenated_hashes = ''.join(group)
+    #     concatenated_hashes = "'" + concatenated_hashes + "'"
+    #     print(concatenated_hashes)
+    #     overall_hash = compute_hash(concatenated_hashes)
+
+    #     print(overall_hash)
+    #     final_data['receipt'].append({
+    #         "commitment_identifier": "",
+    #         "ballot_id": overall_hash,
+    #         "voter_id": "",
+    #         "accessed": False
+    #     })
+    #     group = []  # Reset for the next group
 
 # If there are leftover receipts that didn't fill a complete group
-if group:
-    concatenated_hashes = ''.join(group)
-    overall_hash = compute_hash(concatenated_hashes)
-    #print(overall_hash)
-    final_data['receipt'].append({
-        "commitment_identifier": "",
-        "ballot_id": overall_hash,
-        "voter_id": "",
-        "accessed": False
-    })
+# if group:
+#     concatenated_hashes = ''.join(group)
+#     overall_hash = compute_hash(concatenated_hashes)
+#     #print(overall_hash)
+#     final_data['receipt'].append({
+#         "commitment_identifier": "",
+#         "ballot_id": overall_hash,
+#         "voter_id": "",
+#         "accessed": False
+#     })
 
 # Output the final JSON
-with open('final_output.json', 'w') as outfile:
+output_path = '/app/evoting_localstorage/evoting_fron/android/app/src/main/assets/data.json'
+
+with open(output_path, 'w') as outfile:
     json.dump(final_data, outfile, indent=4)
 
-print("Final JSON data saved to 'final_output.json'.")
+print("Final JSON data saved to usable location as data.json'.")

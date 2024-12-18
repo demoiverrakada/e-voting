@@ -71,30 +71,39 @@ export default function Scanner(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
+    backgroundColor: '#A1D6E2', // Retains a clean, calming background
     justifyContent: 'center',
-    padding: 16,
+    paddingHorizontal: 20, // Increased padding for improved responsiveness
+    paddingVertical: 16, // Balanced vertical padding
   },
   headerText: {
-    fontSize: 35,
-    marginLeft: 18,
-    marginTop: 10,
-    color: '#3b3b3b',
+    fontSize: 36, // Slightly increased for better emphasis
+    marginLeft: 20, // Adjusted for alignment with modern spacing trends
+    marginTop: 15, // Added more breathing room at the top
+    color: '#3B3B3B', // Dark gray for better contrast
+    fontWeight: '700', // Bold weight for improved visual hierarchy
+    letterSpacing: 1, // Subtle letter spacing for better readability
   },
   marker: {
-    borderColor: '#1995AD',
-    borderRadius: 10,
+    borderColor: '#1995AD', // Maintains the distinct blue-green color
+    borderWidth: 2, // Added border width for a more prominent marker
+    borderRadius: 12, // Slightly increased rounding for a polished look
+    padding: 5, // Added padding to create breathing room within the marker
+    alignSelf: 'center', // Centers the marker for balanced design
   },
   button: {
-    marginTop: 20,
-    marginHorizontal: 18,
-    backgroundColor: '#D9534F',
-    borderRadius: 25,
-    elevation: 3,
+    marginTop: 25, // Increased for better spacing from other components
+    marginHorizontal: 20, // Consistent horizontal margin
+    backgroundColor: '#D9534F', // Bold red for high visibility
+    borderRadius: 30, // More rounded corners for a modern design
+    elevation: 5, // Enhanced shadow for depth
+    paddingVertical: 12, // Increased padding for better usability
   },
   buttonLabel: {
-    color: '#F1F1F2',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#FFFFFF', // Pure white for excellent contrast
+    fontSize: 18, // Slightly larger font size for readability
+    fontWeight: '600', // Balanced boldness for an elegant appearance
+    textAlign: 'center', // Ensures alignment within the button
+    letterSpacing: 0.8, // Subtle spacing for a polished look
   },
 });

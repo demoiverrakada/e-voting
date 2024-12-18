@@ -62,31 +62,40 @@ export default function Scanner(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
+    backgroundColor: '#A1D6E2', // Soft blue background for a clean, calming UI
     justifyContent: 'center',
-    padding: 16,
+    paddingHorizontal: 20, // Improved responsiveness with better padding
+    paddingVertical: 16, // Balanced vertical spacing
   },
   headerText: {
-    fontSize: 35,
-    marginLeft: 18,
-    marginTop: 10,
-    color: '#3b3b3b',
+    fontSize: 36, // Slightly larger for emphasis
+    marginLeft: 20, // Increased for alignment with modern spacing trends
+    marginTop: 15, // Added more breathing room from the top
+    color: '#3B3B3B', // Retained dark gray for better contrast
+    fontWeight: '700', // Added weight for a bolder appearance
+    letterSpacing: 1.1, // Improved readability with subtle spacing
   },
   marker: {
-    borderColor: '#1995AD',
-    borderRadius: 10,
+    borderColor: '#1995AD', // Highlighted blue-green for distinction
+    borderWidth: 2, // Added border width for a more defined marker
+    borderRadius: 12, // Slightly more rounded for a polished look
+    padding: 5, // Added padding for a cleaner design
+    alignSelf: 'center', // Centered marker for better alignment
   },
   button: {
-    marginTop: 20,
-    marginHorizontal: 18,
-    backgroundColor: '#D9534F',
-    borderRadius: 25,
-    elevation: 3,
+    marginTop: 25, // Increased top margin for better spacing
+    marginHorizontal: 20, // Balanced horizontal spacing
+    backgroundColor: '#D9534F', // Bold red for attention-grabbing call-to-action
+    borderRadius: 30, // Modern rounded design
+    elevation: 5, // Enhanced shadow for better depth
+    paddingVertical: 12, // Increased padding for accessibility and comfort
   },
   buttonLabel: {
-    color: '#F1F1F2',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#FFFFFF', // White for better contrast
+    fontSize: 18, // Slightly larger font size for improved readability
+    fontWeight: '600', // Balanced weight for a cleaner look
+    textAlign: 'center', // Ensures proper alignment within the button
+    letterSpacing: 0.8, // Subtle spacing for improved aesthetics
   },
 });
 

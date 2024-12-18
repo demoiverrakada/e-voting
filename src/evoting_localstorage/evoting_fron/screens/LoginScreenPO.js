@@ -81,43 +81,86 @@ function LoginScreenPO(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2',
+    backgroundColor: '#A1D6E2', // Calm pastel blue for the background
     justifyContent: 'center',
-    padding: 16,
+    alignItems: 'center', // Ensures the content is centered
+    padding: 20, // Slightly more padding for better spacing
   },
   title: {
-    fontSize: 35,
+    fontSize: 36, // Slightly larger for better emphasis
     textAlign: 'center',
-    marginBottom: 20,
-    color: 'black',
+    marginBottom: 16, // Reduced spacing for better layout balance
+    color: '#333', // Darker shade for better text contrast
     fontWeight: 'bold',
   },
   underline: {
-    borderBottomColor: 'black',
-    borderBottomWidth: 4,
-    borderRadius: 10,
+    borderBottomColor: '#333', // Consistent with title text color
+    borderBottomWidth: 3, // Slightly thinner underline
+    borderRadius: 5, // Softer rounded edges
     alignSelf: 'center',
-    width: 100,
-    marginBottom: 10,
+    width: 120, // Increased width for a more balanced look
+    marginBottom: 20, // Matches spacing with other components
   },
   credentialsText: {
-    fontSize: 20,
+    fontSize: 18, // Slightly smaller for better visual hierarchy
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 24, // Increased spacing for readability
+    color: '#555', // Subtle gray for secondary text
   },
   textInput: {
+    width: '100%', // Full width input for better usability
+    padding: 14, // Increased padding for comfortable touch targets
     marginBottom: 20,
+    borderWidth: 1, // Adds a border for better visibility
+    borderColor: '#ccc', // Neutral gray border
+    borderRadius: 10, // Rounded corners for modern design
+    backgroundColor: '#fff', // White background for input fields
+    color: '#333', // Text color for readability
+    fontSize: 16,
+    shadowColor: '#000', // Shadow for focus effect
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, // Light shadow for focus effect
+    shadowRadius: 4, // Slight blur on the shadow
+    elevation: 3, // Subtle elevation for depth
+  },
+  textInputFocused: {
+    borderColor: '#0278ae', // Highlighted border color on focus
+    shadowOpacity: 0.2, // Slightly stronger shadow on focus
   },
   button: {
-    marginBottom: 10,
+    width: '100%', // Standardized width for buttons
+    paddingVertical: 14, // Vertical padding for better touch feedback
     borderRadius: 25,
-    elevation: 3,
+    backgroundColor: '#0278ae', // Slightly deeper blue for contrast
+    elevation: 4, // Enhanced elevation for a modern effect
+    alignItems: 'center', // Center the button label
+    marginBottom: 20, // Consistent spacing between buttons
+    shadowColor: '#0278ae', // Button shadow color for depth
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   buttonLabel: {
-    color: '#F1F1F2',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#FFFFFF', // White text for better visibility
+    fontSize: 18, // Larger font for clarity
+    fontWeight: '600', // Slightly less bold for a refined look
+    letterSpacing: 1, // Adds modern spacing between letters
   },
+  buttonHover: {
+    backgroundColor: '#026c92', // Darker shade when hovering (you can implement this with interactivity)
+  },
+  inputLabel: {
+    fontSize: 16, // Clear label text size
+    marginBottom: 8, // Margin to separate label from the input field
+    color: '#333', // Dark text for readability
+    textAlign: 'left', // Left-aligned for input labels
+    width: '100%',
+  },
+  formContainer: {
+    width: '100%',
+    marginBottom: 40, // Adds some space between the form fields and button
+  }
 });
+
 
 export default LoginScreenPO;

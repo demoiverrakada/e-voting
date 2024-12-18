@@ -1,6 +1,6 @@
 import React from 'react';
+import { View, Alert, StyleSheet, Linking, StatusBar } from 'react-native'; // Added StatusBar import
 import { Button } from 'react-native-paper';
-import { StyleSheet, View, StatusBar } from 'react-native';
 import RNFS from 'react-native-fs';
 
 const writeFilePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
@@ -62,7 +62,6 @@ const extractVotesToExternalStorage = async () => {
   }
 };
 
-
 function HomeScreenPO(props) {
   const check = () => {
     props.navigation.navigate('VoterCheck');
@@ -72,9 +71,35 @@ function HomeScreenPO(props) {
     props.navigation.navigate('scanner2');
   };
 
-  const audit= ()=>{
+  const audit = () => {
     props.navigation.navigate('Audit');
-  }
+  };
+
+  const saveToDownloads = async () => {
+    try {
+      // Source file path in the app's internal storage
+      const sourcePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
+  
+      // Destination file path in the Downloads folder
+      const destPath = `${RNFS.DownloadDirectoryPath}/updated_data.json`;
+  
+      // Check if the source file exists
+      const fileExists = await RNFS.exists(sourcePath);
+      if (!fileExists) {
+        Alert.alert('Error', 'Source file does not exist. Please ensure the file is created.');
+        return;
+      }
+  
+      // Copy the file to the Downloads folder
+      await RNFS.copyFile(sourcePath, destPath);
+  
+      Alert.alert('Success', 'File has been saved to your Downloads folder.');
+    } catch (err) {
+      // Handle errors
+      Alert.alert('Error', `An error occurred: ${err.message}`);
+    }
+  };
+
   const logout = async () => {
     await extractVotesToExternalStorage();
     props.navigation.replace('start');
@@ -112,6 +137,15 @@ function HomeScreenPO(props) {
 
       <Button
         mode='contained'
+        onPress={saveToDownloads}
+        style={[styles.button, { backgroundColor: '#1995AD' }]}
+        labelStyle={styles.buttonLabel}
+      >
+        Save to Downloads
+      </Button>
+
+      <Button
+        mode='contained'
         onPress={logout}
         style={[styles.button, { backgroundColor: '#D9534F' }]} // Red color for logout
         labelStyle={styles.buttonLabel}
@@ -128,18 +162,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#A1D6E2',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
   },
   button: {
-    marginVertical: 10,
-    width: '80%',
-    borderRadius: 25,
-    elevation: 3,
+    marginVertical: 12,
+    width: '85%',
+    borderRadius: 30,
+    elevation: 4,
+    backgroundColor: '#3B9FBF',
   },
   buttonLabel: {
-    color: '#F1F1F2',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    paddingVertical: 10,
   },
 });
 

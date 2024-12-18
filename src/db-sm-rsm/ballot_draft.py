@@ -38,15 +38,43 @@ def connect_to_mongodb():
     collection = db['receipts']
     return collection
 
+def remove_non_alphabets(input_string):
+    # Keep only alphabetic characters
+    cleaned_string = ''
+    for char in input_string:
+        if char.isalpha():  # Check if the character is an alphabet
+            cleaned_string += char
+    return cleaned_string
+
 def sha256_of_array(array):
     # Convert the array to a string representation
     array_string = str(array)
+    # print("1")
+    # print(array_string)
+    # cleaned_string = remove_non_alphabets(array_string)
     
     # Encode the string to bytes
     array_bytes = array_string.encode('utf-8')
+    # print("2")
+    # print(array_bytes)
+    # Compute the SHA-256 hash
+    sha256_hash = hashlib.sha256(array_bytes).hexdigest()
+    # print("3")
+    # print(array_bytes)    
+    return sha256_hash
+
+def sha256_of_array2(array):
+    # Concatenate the array elements into a single string
+    array_string = ''.join(array)  # Joins ["a", "b", "c", "d"] into "abcd"
+    print("Concatenated String:", array_string)
+    
+    # Encode the string to bytes
+    array_bytes = array_string.encode('utf-8')
+    print("Encoded Bytes:", array_bytes)
     
     # Compute the SHA-256 hash
     sha256_hash = hashlib.sha256(array_bytes).hexdigest()
+    print("SHA-256 Hash:", sha256_hash)
     
     return sha256_hash
 
@@ -97,6 +125,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
         })
     
     # Constants for A5 size in pixels (300 DPI)
+    print("testing3")
     bw = 2480
     bh = 1748
     
@@ -130,7 +159,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     draw.text((encvotes_x + 130, encvotes_y - 80), "Encrypted candidate IDs", font=boldfont, fill='black')
     draw.text((encvotes_x + 130, encvotes_y - 40), "(In the same order as the VVPAT side)", font=smallfont, fill='black')
     image.paste(qr_encvotes, (encvotes_x + 100, encvotes_y))
-
+    print("testing4")
     # Candidate names
     text_x = int(0.3 * (bw // 2))  
     text_y = int(0.25 * bh) 
@@ -142,6 +171,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     draw.text((center_x + 20, text_y - 100), "Your choice", font=boldfont, fill='black')
     draw.text((center_x - (center_x - box_startx) // 2, text_y - 50), "(Mark across the line)", font=smallfont, fill='black')
     n = 0
+    print("testing5")
     for i, candname in enumerate(candidates):
         n += 1
     
@@ -160,7 +190,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     #draw.line((box_endx, candname_top, box_endx, candname_bot), fill='gray', width=5)
     draw.line((box_endx + 100, candname_top, box_endx + 100, candname_bot), fill='gray', width=5)
     draw.text((box_startx + 30, candname_bot + 20), "(Separate along the line after marking)", font=smallfont, fill='black')
-
+    print("testing6")
     # QR code containing the bid
     qr_code = "qr_code.png"
     qr_bid = Image.open(qr_code)
@@ -169,7 +199,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     bid_y = text_y + 150
     draw.text((bid_x + 60, bid_y - 50), "Ballot ID", font=boldfont, fill='black')
     image.paste(qr_bid, (bid_x, bid_y))
-
+    print("testing7")
     # QR code containing the booth num
     qr_code3 = "qr_code3.png"
     qr_ballot_num = Image.open(qr_code3)
@@ -180,8 +210,19 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     image.paste(qr_ballot_num, (ballot_num_x, ballot_num_y))
 
     # Save the image
-    image.save(filename)
+    print("testing1")
+        # Attempt to save the file
+    error = None
+    result = None
+    try:
+        result = image.save(filename)
+    except Exception as e:
+        error = str(e)
 
+    print(f"Image save result: {result}")
+    if error:
+        print("Error saving image:", error)
+    print("testing2")
     
     # A4 dimensions in points (1 point = 1/72 inch)
     #width, height = A4
@@ -375,6 +416,8 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
         c_w_all.append(c_w_h)
         
         k = i
+        print(candidate)
+        print(c_w_h)
         #c.drawString(right_x + 40, right_y - 60 * (i + 1) - 10, f"{i}")
         
         # Calculate the width of the candidate name
@@ -384,7 +427,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
         #candidate_x = candidate_x_center - candidate_width / 2
         
     _sk = group.random(ZR)
-    ov_hash = sha256_of_array(c_w_all)
+    ov_hash = sha256_of_array2(c_w_all)
     commitment_identifier = str(uuid.uuid4())
     
     c_w_all_updated = []
@@ -460,7 +503,7 @@ def ballot_draft(num):
         print(f"Creating PDF for ballot {i+1}...")
         create_pdf(m, collection, "/output/"+f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
         print(f"PDF ballot_{i+1}.pdf created successfully!")
-        if os.path.exists("/output"+f"ballot_{i+1}.pdf"): 
+        if os.path.exists("/output/"+f"ballot_{i+1}.pdf"): 
             print(f"ballot_{i+1}.pdf saved successfully.")
         else:
             print(f"Failed to save ballot_{i+1}.pdf!")
