@@ -128,11 +128,11 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,dpk_bbsplu
 def audit(commitment,booth_num,bid):
     f = io.StringIO()
     g12,h12=load("generators",["g1","h1"]).values()
-    for i in range(len(commitment)):
-        accessed,enc_hashes=load("receipt",[commitment[i],"accessed"]).values()
-        if(accessed==True):
-            print("The ballot has already been audited or the ballot has been used to cast a vote.")
-            return 
+    # for i in range(len(commitment)):
+    #     accessed,enc_hashes=load("receipt",[commitment[i],"accessed"]).values()
+    #     if(accessed==True):
+    #         print("The ballot has already been audited or the ballot has been used to cast a vote.")
+    #         return 
     with contextlib.redirect_stdout(f):
         alpha,_pai_sklist_single,pai_pklist_single=load("setup",['alpha','_pai_sklist_single','pai_pklist_single']).values()
         mixers = lambda alpha: ["mixer %d" % a for a in range(alpha)]

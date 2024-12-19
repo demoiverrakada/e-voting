@@ -175,7 +175,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     for i, candname in enumerate(candidates):
         n += 1
     
-    for i, candname in enumerate(candidates):
+    for i in range(len(candidates)):
         v_w_bar = bid + i
         y = int(v_w_bar) % len(candidates)
         candname = candidates[y]
@@ -385,8 +385,8 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
         # Step 15
         alpha = len(candidates)
         
-        epsilon_v_w_bar_dash = optthpaillier.pai_encrypt(pai_pk_optthpaillier, eps_v_w_ls[i])
-        epsilon_r_w_dash = optthpaillier.pai_encrypt(pai_pk_optthpaillier, eps_r_w_ls[i])
+        epsilon_v_w_bar_dash = optthpaillier.pai_reencrypt(pai_pk_optthpaillier, eps_v_w_ls[i])
+        epsilon_r_w_dash = optthpaillier.pai_reencrypt(pai_pk_optthpaillier, eps_r_w_ls[i])
         
         # Step 16
         v_w_k_dash = secretsharing.share(0, m)
@@ -434,7 +434,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
     for i, candidate in enumerate(candidates):
         v_w_bar = bid + i
         y = int(v_w_bar) % len(candidates)
-        c_w_all_i = c_w_all[y]
+        c_w_all_i = c_w_all[i]
         c_w_all_updated.append(c_w_all_i)
     qr_data = c_w_all_updated
     print(qr_data)
