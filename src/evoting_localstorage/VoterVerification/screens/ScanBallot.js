@@ -8,9 +8,9 @@ export default function Scanner(props) {
   const checkSend = async (qrcodedata) => {
     const voter_id = props.route.params.voter_id;
     try {
-        Alert.alert(
-            'Ballot scanning successful',
-            "scan your preference next",
+        Alert.alert( 
+            "Encrypted candidate ID's scanning successful",
+            "Enter your preference number next",
             [{ text: 'OK', onPress: () => props.navigation.navigate('scanner3', {voter_id: voter_id,commitment:qrcodedata }) }],
             { cancelable: false }
           );

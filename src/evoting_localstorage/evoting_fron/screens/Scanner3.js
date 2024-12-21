@@ -50,7 +50,7 @@ export default function Scanner3(props) {
   
     // Show alert with data being sent to postVote
     Alert.alert(
-      'Preference hosen',
+      'Preference chosen',
       `Input: ${inputValue}`,
       [
         { text: 'Cancel', style: 'cancel' },

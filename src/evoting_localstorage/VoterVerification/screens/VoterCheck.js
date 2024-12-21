@@ -7,7 +7,7 @@ const VoterVoted = (props) => {
       try {
         Alert.alert(
             'Voter login successful',
-            "scan ballot next",
+            "Scan Encrypted candidate ID's next",
             [{ text: 'OK', onPress: () => props.navigation.navigate('scanner2', {voter_id: entryNum }) }],
             { cancelable: false }
           );

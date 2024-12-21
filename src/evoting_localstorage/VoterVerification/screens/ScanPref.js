@@ -4,7 +4,8 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { Button } from 'react-native-paper';
 
 export default function Scanner(props) {
-  const checkSend = async (qrcodedata) => {
+  const [inputValue, setInputValue] = useState('');
+  const checkSend = async (enteredData) => {
     const voter_id = String(props.route.params.voter_id); // Convert voter_id to string
     const commitment = props.route.params.commitment;
 
@@ -12,7 +13,7 @@ export default function Scanner(props) {
     const requestBody = {
       commitment: commitment, // Should match the expected format
       voter_id: voter_id,
-      preference: parseInt(qrcodedata, 10), // Convert to integer
+      preference: parseInt(enteredData, 10), // Convert to integer
     };
 
     // Log the request body to verify its contents
@@ -57,25 +58,43 @@ const formattedRequestBody=JSON.stringify(requestBody);
     props.navigation.navigate("scanner");
   };
 
-  const isValidQRCode = (data) => {
-    return data !== undefined;
-  };
+  const handleInputSubmit = async () => {
+      if (inputValue.trim() === '' || isNaN(inputValue)) {
+        Alert.alert('Invalid Input', 'Please enter a valid integer.', [{ text: 'OK' }], { cancelable: false });
+        return;
+      }
+    
+      // Show alert with data being sent to postVote
+      Alert.alert(
+        'Preference chosen',
+        `Input: ${inputValue}`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Proceed', onPress: async () => await checkSend(inputValue) }, // Proceed to send data on confirmation
+        ],
+        { cancelable: true }
+      );
+    };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Scan Preference</Text>
-      <QRCodeScanner
-        onRead={async ({ data }) => {
-          if (isValidQRCode(data)) {
-            await checkSend(data);
-            console.log("Valid QR code detected:", data);
-          } else {
-            console.log("Invalid QR code detected:", data);
-          }
-        }}
-        showMarker={true}
-        markerStyle={styles.marker}
-      />
+      <Text style={styles.headerText}>Enter Voter Preference</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter a valid integer"
+              keyboardType="numeric"
+              value={inputValue} // Display the value from state
+              onChangeText={setInputValue} // Update state as user types
+              placeholderTextColor="#888"
+            />
+            <Button
+              mode="contained"
+              onPress={handleInputSubmit}
+              style={styles.button}
+              labelStyle={styles.buttonLabel}
+            >
+              Submit
+            </Button>
       <Button
         mode="contained"
         onPress={logout}
