@@ -60,6 +60,28 @@ const extractVotesToExternalStorage = async () => {
   } catch (err) {
     console.error('Error copying file with final hash:', err);
   }
+  try {
+    // Source file path in the app's internal storage
+    const sourcePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
+
+    // Destination file path in the Downloads folder
+    const destPath = `${RNFS.DownloadDirectoryPath}/updated_data.json`;
+
+    // Check if the source file exists
+    const fileExists = await RNFS.exists(sourcePath);
+    if (!fileExists) {
+      Alert.alert('Error', 'Source file does not exist. Please ensure the file is created.');
+      return;
+    }
+
+    // Copy the file to the Downloads folder
+    await RNFS.copyFile(sourcePath, destPath);
+
+    Alert.alert('Success', 'File has been saved to your Downloads folder.');
+  } catch (err) {
+    // Handle errors
+    Alert.alert('Error', `An error occurred: ${err.message}`);
+  }
 };
 
 function HomeScreenPO(props) {
@@ -73,31 +95,6 @@ function HomeScreenPO(props) {
 
   const audit = () => {
     props.navigation.navigate('Audit');
-  };
-
-  const saveToDownloads = async () => {
-    try {
-      // Source file path in the app's internal storage
-      const sourcePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
-  
-      // Destination file path in the Downloads folder
-      const destPath = `${RNFS.DownloadDirectoryPath}/updated_data.json`;
-  
-      // Check if the source file exists
-      const fileExists = await RNFS.exists(sourcePath);
-      if (!fileExists) {
-        Alert.alert('Error', 'Source file does not exist. Please ensure the file is created.');
-        return;
-      }
-  
-      // Copy the file to the Downloads folder
-      await RNFS.copyFile(sourcePath, destPath);
-  
-      Alert.alert('Success', 'File has been saved to your Downloads folder.');
-    } catch (err) {
-      // Handle errors
-      Alert.alert('Error', `An error occurred: ${err.message}`);
-    }
   };
 
   const logout = async () => {
@@ -128,29 +125,11 @@ function HomeScreenPO(props) {
 
       <Button
         mode='contained'
-        onPress={audit}
-        style={[styles.button, { backgroundColor: '#1995AD' }]}
-        labelStyle={styles.buttonLabel}
-      >
-        Scan Unused Ballots and Upload Votes Corresponding to Them
-      </Button>
-
-      <Button
-        mode='contained'
-        onPress={saveToDownloads}
-        style={[styles.button, { backgroundColor: '#1995AD' }]}
-        labelStyle={styles.buttonLabel}
-      >
-        Save to Downloads
-      </Button>
-
-      <Button
-        mode='contained'
         onPress={logout}
         style={[styles.button, { backgroundColor: '#D9534F' }]} // Red color for logout
         labelStyle={styles.buttonLabel}
       >
-        Logout Now
+        Logout and Download Encrypted votes
       </Button>
     </View>
   );
