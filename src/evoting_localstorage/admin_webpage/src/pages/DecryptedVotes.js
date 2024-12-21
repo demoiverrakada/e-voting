@@ -3,7 +3,8 @@ import axios from 'axios';
 import { ReactSession } from 'react-client-session';
 import './DecryptedVotes.css';
 import Navigation from '../Navigation';
-import { useNavigate } from 'react-router-dom';
+import FinalVotes from './FinalVotes';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 
 
 function DecryptedVotes() {
@@ -39,8 +40,10 @@ function DecryptedVotes() {
   const handleGetDcrpVotes = async () => {
     try {
       const response = await axios.get('http://localhost:5000/getVotes');
-      setDecryptedVotes(response.data); // Set the response data in state
-      alert('Decrypted votes fetched successfully.');
+      const votesData = response.data;
+      localStorage.setItem("decryptedVotes", JSON.stringify(votesData));
+      alert("Decrypted votes fetched successfully.");
+      navigate("/final_votes");
     } catch (err) {
       alert(`Failed to fetch decrypted votes: ${err.message}`);
     }
@@ -51,6 +54,9 @@ function DecryptedVotes() {
       <h2>Decrypted Votes</h2>
       <button onClick={handleDecryptVotes}>Decrypt Votes</button>
       <button onClick={handleGetDcrpVotes}>Fetch Decrypted Votes</button>
+      <Routes>
+        <Route path="/final_votes" element={<FinalVotes />} />
+      </Routes>
 
       {/* Render table if decrypted votes are available */}
       {decryptedVotes.length > 0 && (

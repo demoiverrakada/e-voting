@@ -11,6 +11,7 @@ import UploadDefault from './pages/UploadDefault';
 import UploadCandidate from './pages/UploadCandidate';
 import UploadPO from './pages/UploadPO';
 import UploadVoters from './pages/UploadVoter';
+import FinalVotes from './pages/FinalVotes';
 function App() {
   return (
     <Router>
@@ -26,6 +27,7 @@ function App() {
         <Route path="/upload_candidate" element={<UploadCandidate />} />
         <Route path="/upload_po" element={<UploadPO />} />
         <Route path="/upload_voters" element={<UploadVoters />} />
+        <Route path="/final_votes" element={<FinalVotes />} />
       </Routes>
     </Router>
   );

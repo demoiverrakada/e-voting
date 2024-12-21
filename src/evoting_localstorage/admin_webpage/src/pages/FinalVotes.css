@@ -1,0 +1,95 @@
+/* Background container */
+.final-votes-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* Card styling */
+  .final-votes-card {
+    background: #ffffff;
+    width: 90%; /* Increase width to cover more of the page */
+    max-width: 1200px; /* Allow table to expand on larger screens */
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Title styling */
+  .final-votes-title {
+    text-align: center;
+    margin-bottom: 2rem; /* Space out the title from the table */
+    font-size: 3rem; /* Increase font size for the title */
+    color: #333333;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  /* Table styling */
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .votes-table {
+    width: 100%; /* Table spans the full width of the card */
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 1.8rem; /* Increase table text size */
+    text-align: center;
+  }
+  
+  .votes-table th,
+  .votes-table td {
+    padding: 1.5rem; /* Increase padding for larger cells */
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .votes-table th {
+    background-color: #333333;
+    color: #ffffff;
+    text-transform: uppercase;
+  }
+  
+  .votes-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .votes-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .votes-table td {
+    font-size: 1.8rem; /* Increase size for table content */
+    font-weight: bold;
+    color: #555555;
+  }
+  
+  /* "Under Construction" spinner */
+  .under-construction {
+    text-align: center;
+    color: #666666;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    margin-top: 1.5rem;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
