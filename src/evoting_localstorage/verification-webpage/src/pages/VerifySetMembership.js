@@ -28,7 +28,7 @@ const VerifySetMembership = () => {
 
   return (
     <div className="form-page">
-      <h2>Set Membership Verification</h2>
+      <h2>Verification of Individual Encrypted Votes</h2>
 
       {/* Verify Button */}
       <button onClick={handleVerify} className="btn">
@@ -45,7 +45,7 @@ const VerifySetMembership = () => {
       {/* Display the Forward Set Membership Status */}
       {result && result.status_forward_set_membership && (
         <div className="forward-set-membership">
-          <h3>Forward Set Membership Status: {result.status_forward_set_membership ? 'True' : 'False'}</h3>
+          <h3>Overall Status: {result.status_forward_set_membership ? 'True' : 'False'}</h3>
         </div>
       )}
 

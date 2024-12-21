@@ -28,7 +28,7 @@ const VerifyReverseSetMembership = () => {
 
   return (
     <div className="form-page">
-      <h2>Reverse Set Membership Verification</h2>
+      <h2>Verification of Individual Decrypted Votes</h2>
 
       {/* Verify Button */}
       <button onClick={handleVerify} className="btn">
@@ -45,7 +45,7 @@ const VerifyReverseSetMembership = () => {
       {/* Display the results */}
       {result && (
         <div className="result-table">
-          <h3>Status: {result.status_reverse_set_membership ? "True" : "False"}</h3>
+          <h3>Overall Status: {result.status_reverse_set_membership ? "True" : "False"}</h3>
           
           <table className="table">
             <thead>

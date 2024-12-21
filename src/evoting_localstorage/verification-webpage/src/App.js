@@ -21,10 +21,10 @@ const App = () => {
           <h2>Select an Endpoint</h2>
           <div className="button-container">
             <Link to="/pf_zksm_verf" className="btn">
-              Verify Set Membership
+              Verify Encrypted Votes
             </Link>
             <Link to="/pf_zkrsm_verf" className="btn">
-              Verify Reverse Set Membership
+              Verify Decrypted Votes
             </Link>
             <Link to ="/ballotaudit" className="btn">
               Generate Ballot Audit app
