@@ -6,7 +6,6 @@ import "./App.css";
 import logo from './logo.svg';
 
 // Pages for endpoints
-import GetPublicKeys from "./pages/GetPublicKeys.js";
 import VerifySetMembership from "./pages/VerifySetMembership.js";
 import VerifyReverseSetMembership from "./pages/VerifyReverseSetMembership.js";
 import BallotAudit from "./pages/BallotAudit.js";
@@ -21,9 +20,6 @@ const App = () => {
         <main className="main-content">
           <h2>Select an Endpoint</h2>
           <div className="button-container">
-            <Link to="/pk" className="btn">
-              Get Public Keys
-            </Link>
             <Link to="/pf_zksm_verf" className="btn">
               Verify Set Membership
             </Link>
@@ -40,7 +36,6 @@ const App = () => {
         </main>
 
         <Routes>
-          <Route path="/pk" element={<GetPublicKeys />} />
           <Route
             path="/pf_zksm_verf"
             element={<VerifySetMembership />}

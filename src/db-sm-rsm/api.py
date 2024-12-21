@@ -27,7 +27,27 @@ from bbsig import bbbatchverify
 import io
 import contextlib
 
-def setup(n,alpha):
+def update_keys_with_n(ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares):
+    db=init()
+    collection=db['keys']
+    document=collection.find_one()
+    if not document:
+        raise ValueError("No existing setup found. Please run setup first.")
+    collection.update_one(
+        {"_id": document["_id"]},
+        {"$set": {
+            "ck": serialize_wrapper(ck),
+            "ck_fo": serialize_wrapper(ck_fo),
+            "_pi": serialize_wrapper(_pi),
+            "_re_pi": serialize_wrapper(_re_pi),
+            "_svecperm": serialize_wrapper(_svecperm),
+            "permcomm": serialize_wrapper(permcomm),
+            "beaver_a_shares": serialize_wrapper(beaver_a_shares),
+            "beaver_b_shares": serialize_wrapper(beaver_b_shares),
+            "beaver_c_shares": serialize_wrapper(beaver_c_shares)
+        }})
+
+def setup(alpha):
     """ Setup keys and other performance-enhancing artefacts. Accessible only to an administrator. 
     
     Stores a public key, a set of secret keys, and other globals in the database.
@@ -49,26 +69,8 @@ def setup(n,alpha):
             pai_pklist_single.append(pai_pk_a)
 
         _elg_sklist, elg_pk = elgamal_th_keygen(alpha)
-
-        # Generate beaver triples (offline preprocessing step for multiplicative 
-        # secret sharing used in DPK2)
-        beaver_a_shares,beaver_b_shares,beaver_c_shares = gen_beaver_triples(n, alpha)
-        # Generate a commitment to the permutation and prove knowledge of its opening
-        ck = commkey(n)
-        ck_fo = commkey_fo(n, N=pai_pk[0])
-        _pi, _re_pi = genperms(n, alpha)
-        _svecperm = [[group.random(ZR) for i in range(n)] for a in range(alpha)]
-        permcomm = [commit_perm(ck, _re_pi[a], _svecperm[a]) for a in range(alpha)]
-        evec = [[group.init(ZR, random.getrandbits(kappa_e)) for i in range(n)] for a in range(alpha)]
-        pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a]) for a in range(alpha)]
-        status_permcomm = True
-        for a in range(alpha):
-            status_permcomm = status_permcomm and perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a])
-        assert status_permcomm
         
-        store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,
-            # ...beaver triples (to add) ...
-            ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares])
+        store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist])
     print("Setup was done successful")
 
 def generate_ballots(num):
@@ -84,10 +86,25 @@ def mixer():
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
         process_bulletins()
-        alpha,pai_pk,pai_pklist_single,ck,ck_fo,permcomm,_pai_sklist,_pai_sklist_single,_pi,_svecperm=load("setup",["alpha","pai_pk","pai_pklist_single","ck","ck_fo","permcomm","_pai_sklist","_pai_sklist_single","_pi","_svecperm"]).values()
-
+        alpha,pai_pk,pai_pklist_single,_pai_sklist,_pai_sklist_single=load("setup",["alpha","pai_pk","pai_pklist_single","_pai_sklist","_pai_sklist_single"]).values()
+        
         enc_msgs, enc_msg_shares, enc_rand_shares=load("enc",["enc_msg", "enc_msg_share", "enc_rand_share"]).values()
+        n=len(enc_msgs)
+        beaver_a_shares,beaver_b_shares,beaver_c_shares = gen_beaver_triples(n, alpha)
+        # Generate a commitment to the permutation and prove knowledge of its opening
+        ck = commkey(n)
+        ck_fo = commkey_fo(n, N=pai_pk[0])
+        _pi, _re_pi = genperms(n, alpha)
+        _svecperm = [[group.random(ZR) for i in range(n)] for a in range(alpha)]
+        permcomm = [commit_perm(ck, _re_pi[a], _svecperm[a]) for a in range(alpha)]
+        evec = [[group.init(ZR, random.getrandbits(kappa_e)) for i in range(n)] for a in range(alpha)]
+        pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a]) for a in range(alpha)]
+        status_permcomm = True
+        for a in range(alpha):
+            status_permcomm = status_permcomm and perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a])
+        assert status_permcomm
 
+        update_keys_with_n(ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares)
         # Check validity of stored encryptions
         #status_encs = check_encs(pai_pk, pai_pklist_single, enc_msgs, enc_rands, enc_msg_shares, enc_rand_shares, pf_encmsgs, pf_encrands, pfs_enc_msg_shares, pfs_enc_rand_shares)
         #assert status_encs
@@ -229,4 +246,3 @@ if __name__ == "__main__":
         params = sys.argv[2]
         params=json.loads(params)
         function_map[func_name](*params)
-    

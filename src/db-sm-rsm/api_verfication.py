@@ -182,10 +182,6 @@ def audit(commitment,booth_num,bid):
             receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[i])})
             receipt['accessed']=True
             result.append([True, v_w_nbar, name, str(gamma_w), str(comm[i])])
-            if(name=="NOTA"):
-                random_voter_id = random.randint(1000000000, 9999999999)
-                receipt['voter_id'] = random_voter_id
-                votes_collection.insert_one(receipt)
         else:
             result.append([False,None,None,None,None])
     print(json.dumps(result))

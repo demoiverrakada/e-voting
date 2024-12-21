@@ -8,7 +8,6 @@ ReactSession.setStoreType('sessionStorage');
 
 function Setup() {
   const [alpha, setAlpha] = useState('');
-  const [n, setN] = useState('');
   const navigate = useNavigate();
 
   // Check for authentication when the page loads
@@ -22,7 +21,7 @@ function Setup() {
       const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
         'http://localhost:5000/setup',
-        { alpha, n },
+        {alpha},
         {
           headers: {
             authorization: `Bearer ${token}`,

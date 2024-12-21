@@ -41,16 +41,7 @@ def store(funcs,params):
             "pai_pklist_single":(serialize_wrapper(params[3])),
             "_pai_sklist_single":(serialize_wrapper(params[4])),
             "elg_pk":(serialize_wrapper(params[5])),
-            "_elg_sklist":(serialize_wrapper(params[6])),
-            "ck":(serialize_wrapper(params[7])),
-            "ck_fo":(serialize_wrapper(params[8])),
-            "_pi":(serialize_wrapper(params[9])),
-            "_re_pi":(serialize_wrapper(params[10])),
-            "_svecperm":(serialize_wrapper(params[11])),
-            "permcomm":(serialize_wrapper(params[12])),
-            "beaver_a_shares":(serialize_wrapper(params[13])),
-            "beaver_b_shares":(serialize_wrapper(params[14])),
-            "beaver_c_shares":(serialize_wrapper(params[15]))
+            "_elg_sklist":(serialize_wrapper(params[6]))
         })
     elif(function_map[funcs]=='decs'):
         collection.insert_one({

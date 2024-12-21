@@ -107,14 +107,13 @@ function callPythonFunction3(functionName, ...params) {
 
 // endpoint for generating the keys for the election
 router.post('/setup',requireAuth, async (req, res) => {
-    const { alpha, n } = req.body;
+    const {alpha} = req.body;
     const alp = Number(JSON.parse(alpha));
-    const nu = Number(JSON.parse(n));
 
     try {
         document= await Keys.find();
         if(document.length==1) return res.status(400).send("Setup has already been done.")
-        const result= await callPythonFunction('setup',nu,alp);
+        const result= await callPythonFunction('setup',alp);
         console.log(result); // Log the result or handle it internally
         res.send('Setup was successful.'); // Custom response
     } catch (error) {
