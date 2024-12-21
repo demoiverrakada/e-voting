@@ -20,11 +20,8 @@ import LoadingScreen from './screens/LoadingScreen.js'
 import HomeScreenPO from './screens/HomeScreenPO.js';
 import StartScreen from './screens/StartScreen.js';
 import VoterCheck from './screens/VoterCheck.js';
-import Scanner from './screens/Scanner.js';
 import Scanner2 from './screens/Scanner2.js';
 import Scanner3 from  './screens/Scanner3.js';
-import BoothNum from './screens/BoothNum.js';
-import Audit from './screens/Audit.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack =createNativeStackNavigator();
 function App(){
@@ -53,11 +50,8 @@ function App(){
             <Stack.Screen name="loading" component ={LoadingScreen} options={{ headerShown: false }}/>
             <Stack.Screen name="homePO" component ={HomeScreenPO} options={{ headerShown: false }}/>
             <Stack.Screen name="loginPO" component ={LoginScreenPO} options={{ headerShown: false }}/>
-            <Stack.Screen name="scanner1" component={Scanner} options={{ headerShown: false }}/>
             <Stack.Screen name='VoterCheck' component={VoterCheck} options={{ headerShown: false }}/>
-            <Stack.Screen name='Audit' component={Audit} options={{ headerShown: false }}/>
             <Stack.Screen name='scanner2' component={Scanner2} options={{ headerShown: false }}/>
-            <Stack.Screen name='booth_num' component={BoothNum} options={{ headerShown: false }}/>
             <Stack.Screen name='scanner3' component={Scanner3} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>

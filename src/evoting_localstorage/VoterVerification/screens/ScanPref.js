@@ -7,7 +7,7 @@ export default function Scanner(props) {
   const [inputValue, setInputValue] = useState('');
   const checkSend = async (enteredData) => {
     const voter_id = String(props.route.params.voter_id); // Convert voter_id to string
-    const commitment = props.route.params.commitment;
+    const commitment = props.route.params.commitment[0];
 
     // Ensure preference is sent as an integer
     const requestBody = {

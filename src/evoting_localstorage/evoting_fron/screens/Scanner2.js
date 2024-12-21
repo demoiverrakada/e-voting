@@ -10,15 +10,15 @@ export default function Scanner(props) {
 
   const checkSend = async (qrcodedata) => {
     try {
-        const data=await checkReceipt2(qrcodedata);     
+        const data=await checkReceipt2(qrcodedata[0]);     
       console.log(data);
     
-        if (data.message === 'Ballot exists and verified successfully. Go inside the booth.') {
+        if (data.message === 'Ballot exists and verified successfully.') {
           console.log("successfully submitted voter receipt");
           Alert.alert(
-            'Ballot successfully verified',
-            'Scan Booth Number',
-            [{ text: 'OK', onPress: () => props.navigation.navigate('booth_num', { commitments: qrcodedata }) }],
+            'Encrypted candidate ID successfully verified',
+            'Enter the voter preference number',
+            [{ text: 'OK', onPress: () => props.navigation.navigate('scanner3', { commitments: qrcodedata }) }],
             { cancelable: false }
           );
         }
@@ -43,7 +43,7 @@ export default function Scanner(props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Scan ballot</Text>
+      <Text style={styles.headerText}>Scan Encrypted Candidates ID's</Text>
       <QRCodeScanner
         onRead={async ({ data }) => {
           if (isValidQRCode(data)) {

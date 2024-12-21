@@ -7,11 +7,10 @@ export default function Scanner(props) {
   const checkSend = async (qrcodedata) => {
     try {
       console.log(qrcodedata);
-      console.log("successfully submitted ballot_id login");
       Alert.alert(
-        'Booth Number successfully identified',
-        `commitments: ${qrcodedata}`,
-        [{ text: 'OK', onPress: () => props.navigation.navigate('booth', { commitments: qrcodedata }) }],
+        "Encrypted candidate ID's scanned successfully",
+        "Scan Ballot ID next"
+        [{ text: 'OK', onPress: () => props.navigation.navigate('bid', { commitments: qrcodedata }) }],
         { cancelable: false }
       );
     } catch (err) {
@@ -31,7 +30,7 @@ export default function Scanner(props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Scan Ballot ID</Text>
+      <Text style={styles.headerText}>Scan Encrypted Candidate ID's</Text>
       <QRCodeScanner
         onRead={async ({ data }) => {
           if (isValidQRCode(data)) {

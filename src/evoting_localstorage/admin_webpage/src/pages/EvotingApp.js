@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ReactSession } from 'react-client-session';
 import './EvotingApp.css';
 import Navigation from '../Navigation';
+import Loading from './Loading'; // Import the reusable Loading component
 import { useNavigate } from 'react-router-dom';
 
 ReactSession.setStoreType('sessionStorage');
 
 function EvotingApp() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // State to track loading status
 
   // Check for authentication when the page loads
   useEffect(() => {
@@ -18,6 +20,7 @@ function EvotingApp() {
   }, [navigate]);
 
   const handleEvoting = async () => {
+    setLoading(true); // Start loading
     try {
       const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
@@ -43,16 +46,26 @@ function EvotingApp() {
     } catch (err) {
       console.error('Error while generating the Evoting app:', err);
       alert(`Failed to generate the Evoting app: ${err.message}`);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
     <div className="evoting-container">
       <h2>Evoting App</h2>
-      <button onClick={handleEvoting}>Generate Evoting App</button>
+
+      {/* Show loading spinner if processing */}
+      {loading ? (
+        <Loading message="Generating the Evoting App, please wait..." />
+      ) : (
+        <button onClick={handleEvoting}>Generate Evoting App</button>
+      )}
+
       <Navigation />
     </div>
   );
 }
 
 export default EvotingApp;
+

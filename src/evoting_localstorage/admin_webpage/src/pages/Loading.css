@@ -1,0 +1,48 @@
+/* Loading Container */
+.loading-container {
+    display: flex; /* Enables flexbox */
+    flex-direction: column;
+    align-items: center; /* Centers content horizontally */
+    justify-content: center; /* Centers content vertically */
+    padding: 20px;
+    margin: 50px auto; /* Centers horizontally with top margin */
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+    max-width: 400px; /* Matches form width for consistency */
+    min-height: 50vh; /* Provides vertical space for the spinner and message */
+    text-align: center; /* Centers text content */
+  }
+  
+  /* Spinner Animation */
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1); /* Light grey for the spinner background */
+    border-left-color: #145cf7; /* Matches the button gradient color */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px; /* Adds spacing below the spinner */
+  }
+  
+  /* Loading Text */
+  .loading-message {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #555; /* Subtle dark grey */
+    margin-top: 10px;
+  }
+  
+  /* Keyframes for Spinner */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  

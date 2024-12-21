@@ -68,5 +68,9 @@
             "voter_id": "",
             "accessed": false
         }
-    ]
+    ],
+    "lastVerifiedVoter": {
+    "voter_id": "",
+    "voter_index": -1
+  }
 }

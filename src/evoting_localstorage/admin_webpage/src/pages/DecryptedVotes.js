@@ -4,12 +4,14 @@ import { ReactSession } from 'react-client-session';
 import './DecryptedVotes.css';
 import Navigation from '../Navigation';
 import FinalVotes from './FinalVotes';
+import Loading from './Loading'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 
 
 function DecryptedVotes() {
   const navigate = useNavigate();
   const [decryptedVotes, setDecryptedVotes] = useState([]); // State to store decrypted votes
+  const [loading, setLoading] = useState(false);
 
   // Check for authentication when the page loads
   useEffect(() => {
@@ -20,6 +22,7 @@ function DecryptedVotes() {
 
   // Decrypt votes on button click
   const handleDecryptVotes = async () => {
+    setLoading(true);
     try {
       const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
@@ -33,11 +36,14 @@ function DecryptedVotes() {
       alert('Votes decrypted successfully.');
     } catch (err) {
       alert(`Failed to decrypt votes: ${err.message}`);
+    }finally {
+      setLoading(false); // Stop loading
     }
   };
 
   // Fetch decrypted votes from backend and render them as a table
   const handleGetDcrpVotes = async () => {
+    setLoading(true)
     try {
       const response = await axios.get('http://localhost:5000/getVotes');
       const votesData = response.data;
@@ -46,14 +52,25 @@ function DecryptedVotes() {
       navigate("/final_votes");
     } catch (err) {
       alert(`Failed to fetch decrypted votes: ${err.message}`);
+    }finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
     <div className="decrypted-container">
       <h2>Decrypted Votes</h2>
-      <button onClick={handleDecryptVotes}>Decrypt Votes</button>
-      <button onClick={handleGetDcrpVotes}>Fetch Decrypted Votes</button>
+
+      {/* Show loading spinner if loading */}
+      {loading ? (
+        <Loading message="Please wait while we decrypt the votes..." />
+      ) : (
+        <>
+          <button onClick={handleDecryptVotes}>Decrypt Votes</button>
+          <button onClick={handleGetDcrpVotes}>Fetch Decrypted Votes</button>
+        </>
+      )}
+
       <Routes>
         <Route path="/final_votes" element={<FinalVotes />} />
       </Routes>

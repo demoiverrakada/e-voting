@@ -4,84 +4,89 @@ import React from 'react';
 // Define the path to the JSON file to read from (in DocumentDirectoryPath)
 const writeFilePath = `${RNFS.DocumentDirectoryPath}/data.json`;
 
+const storeLastVerifiedVoter = async (voterId, voterIndex) => {
+  try {
+    const fileContents = await RNFS.readFile(writeFilePath, 'utf8');
+    let myData = JSON.parse(fileContents);
+
+    // Update the lastVerifiedVoter field
+    myData.lastVerifiedVoter = { voter_id: voterId, voter_index: voterIndex };
+
+    // Write the updated data back to the file
+    await RNFS.writeFile(writeFilePath, JSON.stringify(myData), 'utf8');
+  } catch (error) {
+    console.error('Error storing the last verified voter:', error);
+  }
+};
+
+// Function to retrieve the last verified voter from the JSON file
+const getLastVerifiedVoter = async () => {
+  try {
+    const fileContents = await RNFS.readFile(writeFilePath, 'utf8');
+    let myData = JSON.parse(fileContents);
+
+    return myData.lastVerifiedVoter || null;
+  } catch (error) {
+    console.error('Error retrieving the last verified voter:', error);
+    return null;
+  }
+};
 
 const checkReceipt2 = async (commitments) => {
   if (!commitments) {
     return { error: "Must provide ballot commitment value" };
   }
+
   try {
-    // Read myData from the existing JSON file
+    // Retrieve the last verified voter
+    const lastVerifiedVoter = await getLastVerifiedVoter();
+    if (!lastVerifiedVoter) {
+      return { error: "No voter has been verified yet." };
+    }
+
     const fileContents = await RNFS.readFile(writeFilePath, 'utf8');
     let myData = JSON.parse(fileContents);
-    // alert("Read file contents:" + fileContents);
-    // Parse commitments and create hashedCommitmentS
+
+    // Process the commitments as you were doing earlier...
     const cleanedString = commitments.slice(1, -1); // Remove '[' and ']'
     const comms = cleanedString.split("', '"); // Split by "', '"
-    // alert("Commitments: " + comms);
+    let password = comms.join('').replace(/[,'"]/g, '');
 
-    // Join the array into a string and remove unwanted characters
-    let password = comms.join('').replace(/[,'"]/g, ''); // Join the array into a string, then remove quotes and commas
-    // alert("password: " + password); // Now you should get the correct password
     let hashedCommitments;
-    const countQuotes = (str) => {
-      const quotes = str.match(/['"]/g); // Matches both " and '
-      return quotes ? quotes.length : 0;
-    };
-    // alert("test1");
-    const n = countQuotes(commitments);  // Count number of " and '
-    // alert("Number of quotes (n): " + n);  // Debug: Show n
-    
-    const k = n/2;
-    // alert("k: " + k);
+    const countQuotes = (str) => (str.match(/['"]/g) || []).length;
+    const n = countQuotes(commitments);
+    const k = n / 2;
     const l = password.length;
-    // alert("l: "+l);
-    const t = l/k;
-    // alert("t: "+t);
-    // const passwords = [];
+    const t = l / k;
+
     let existingReceiptIndex = -1;
     for (let i = 0; i < k; i++) {
       const s1 = password.slice(0, t);
-      // alert("s1: "+s1);
       const s2 = password.slice(t, l);
-      // alert("s2: "+s2);
       const result = s2 + s1;
       password = result;
-      // alert("result: "+result);
-      const hashResult = await sha256(result);
-      hashedCommitments = hashResult;
-      // alert("hashResult: "+hashResult);
-      const index = myData.receipt.findIndex(receipt => receipt.ballot_id === hashResult);
-      // alert("index: "+index);
-      if (index !== -1) {
-        existingReceiptIndex = index;
-        break;
-      }
+      hashedCommitments = await sha256(result);
+      existingReceiptIndex = myData.receipt.findIndex(
+        (receipt) => receipt.ballot_id === hashedCommitments
+      );
+      if (existingReceiptIndex !== -1) break;
     }
-    // alert("test1");
 
-    // const hashedCommitments = await sha256(password);
-    // console.log("Commitments:", hashedCommitments);
-    // Find the existing receipt
-    // const existingReceiptIndex = myData.receipt.findIndex(receipt => receipt.ballot_id === hashedCommitments);
-   // Find the existing receipt and voter
-    const existingReceipt = myData.receipt.find(receipt => receipt.ballot_id === hashedCommitments);
-    const existingVoter = myData.voter.find(voter => voter.voter_id === existingReceipt.voter_id);
-
-    // Check conditions and return appropriate messages
-    if (!existingReceipt) {
+    if (existingReceiptIndex === -1) {
       return { error: "Ballot not found." };
     }
-    if (existingReceipt.accessed === true) {
-      return { error: "Current ballot has already been used." };
-    }
-    if (hashedCommitments !== existingVoter.ballot_id) {
-      return { error: "Ballot does not match with the ballot assigned to the voter." };
+
+    const existingReceipt = myData.receipt[existingReceiptIndex];
+    if(myData.receipt[existingReceiptIndex].accessed===true){
+      return { error: "Ballot has already been used." };
     }
 
-    return { message: "Ballot exists and verified successfully. Go inside the booth.", ok: true };
+    myData[existingReceiptIndex].voter_id=lastVerifiedVoter.voter_id
+    await RNFS.writeFile(writeFilePath, JSON.stringify(myData), 'utf8');
+    return { message: "Ballot exists and verified successfully.", ok: true };
   } catch (err) {
     console.error(err);
-    return { error: "Error in ballot verification" };
+    return { error: "Error in ballot verification." };
   }
 };
 

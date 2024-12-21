@@ -2,15 +2,25 @@ import React, { useState } from 'react';
 import { View, TextInput, Text,Alert,StyleSheet } from 'react-native';
 import {Button} from 'react-native-paper';
 import RNFS from 'react-native-fs';
-
+import checkReceipt from '../func/checkReceipt.js';
 const VoterVoted = (props) => {
     const [entryNum, setEntryNum] = useState('');
-    const [verificationResult, setVerificationResult] = useState('');
     const checkVoterExistence = async () => {
-      Alert.alert('Success', 'Scan the ballot.', [
-        { text: 'OK', onPress: () => props.navigation.navigate('scanner1',{entryNum:entryNum}) },
-      ]);
-    };
+      try {
+        const data=await checkReceipt(entryNum);
+          if (data.message === "Voter verified successfully. Go inside the booth.") {
+            Alert.alert('Proceed to vote', "Go inside the booth to vote", [{ text: 'OK' }], { cancelable: false });
+            props.navigation.navigate("homePO");
+          }
+         else {
+          Alert.alert('Error', data.error, [{ text: 'OK' }], { cancelable: false });
+          props.navigation.navigate("homePO");
+        }
+      } catch (err) {
+        Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
+        props.navigation.navigate("homePO");
+      }
+}
   return (
     <View style={styles.container}>
         <Text style={styles.heading}>Enter Voter Credentials</Text>

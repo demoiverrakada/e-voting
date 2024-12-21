@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./FormPage.css";
+import Loading from './Loading';  // Import the Loading component
 
 const VerifySetMembership = () => {
   const navigate = useNavigate();
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);  // Track loading state
 
   const handleVerify = async () => {
-    try {
-      setError(null); // Clear previous errors
-      setResult(null); // Clear previous results
+    setIsLoading(true); // Set loading to true when the request starts
+    setError(null); // Clear previous errors
+    setResult(null); // Clear previous results
 
+    try {
       // Make a POST request to the server
       const response = await axios.post("http://localhost:7000/pf_zksm_verf", {}, {
         headers: {
@@ -23,6 +26,8 @@ const VerifySetMembership = () => {
       setResult(response.data); // Display the response data
     } catch (err) {
       setError(err.response?.data?.error || "An error occurred"); // Handle errors
+    } finally {
+      setIsLoading(false); // Set loading to false when the request completes
     }
   };
 
@@ -41,6 +46,9 @@ const VerifySetMembership = () => {
       >
         Back to Home
       </button>
+
+      {/* Display Loading spinner if isLoading is true */}
+      {isLoading && <Loading message="Verifying votes..." />}
 
       {/* Display the Forward Set Membership Status */}
       {result && result.status_forward_set_membership && (
@@ -79,4 +87,5 @@ const VerifySetMembership = () => {
 };
 
 export default VerifySetMembership;
+
 

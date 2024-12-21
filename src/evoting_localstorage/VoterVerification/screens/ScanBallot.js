@@ -30,7 +30,7 @@ export default function Scanner(props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Scan ballot</Text>
+      <Text style={styles.headerText}>Scan Encrypted Candidate ID's</Text>
       <QRCodeScanner
         onRead={async ({ data }) => {
           if (isValidQRCode(data)) {

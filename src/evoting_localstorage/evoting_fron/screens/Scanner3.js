@@ -7,8 +7,8 @@ export default function Scanner3(props) {
   const [inputValue, setInputValue] = useState(''); // Initialize state for input value
 
   // Safely access route params with default values
-  const commitments = props.route?.params?.commitments || [];
-  const booth_num = props.route?.params?.booth_num || 'default_booth';
+  const commitments = props.route?.params?.commitments[0] || [];
+  const booth_num = props.route?.params?.commitments[1]|| 'default_booth';
 
   // Check for missing params and handle gracefully
   if (!commitments.length || !booth_num) {

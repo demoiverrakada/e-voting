@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './PublicKeys.css';
 import Navigation from '../Navigation';
+import Loading from './Loading'; // Import the reusable Loading component
 import { useNavigate } from 'react-router-dom';
 
 function PublicKeys() {
   const navigate = useNavigate();
   const [keys, setKeys] = useState(null); // State to store public keys
   const [error, setError] = useState(null); // State to store error messages
+  const [loading, setLoading] = useState(false); // State to track loading status
 
   // Check for authentication when the page loads
   useEffect(() => {
@@ -18,6 +20,7 @@ function PublicKeys() {
 
   // Fetch public keys from the backend
   const handleGetPublicKeys = async () => {
+    setLoading(true); // Start loading
     try {
       const response = await axios.get('http://localhost:5000/pk');
       setKeys(response.data); // Set the response data to the keys state
@@ -31,43 +34,53 @@ function PublicKeys() {
         setError("Failed to fetch public keys. Please try again later.");
       }
       setKeys(null); // Clear any previously fetched keys
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
     <div className="public-keys-container">
       <h2>Get Public Keys</h2>
-      <button onClick={handleGetPublicKeys}>Fetch Public Keys</button>
 
-      {/* Error Message */}
-      {error && <p className="error-message">{error}</p>}
+      {/* Show loading spinner if processing */}
+      {loading ? (
+        <Loading message="Fetching public keys, please wait..." />
+      ) : (
+        <>
+          <button onClick={handleGetPublicKeys}>Fetch Public Keys</button>
 
-      {/* Display Public Keys */}
-      {keys && (
-        <div className="keys-display">
-          <table className="keys-table">
-            <thead>
-              <tr>
-                <th>Key Type</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Paillier Public Key</td>
-                <td>{keys.pai_pk}</td>
-              </tr>
-              <tr>
-                <td>Paillier Public Key List (Single)</td>
-                <td>{JSON.stringify(keys.pai_pklist_single)}</td>
-              </tr>
-              <tr>
-                <td>ElGamal Public Key</td>
-                <td>{keys.elg_pk}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          {/* Error Message */}
+          {error && <p className="error-message">{error}</p>}
+
+          {/* Display Public Keys */}
+          {keys && (
+            <div className="keys-display">
+              <table className="keys-table">
+                <thead>
+                  <tr>
+                    <th>Key Type</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Paillier Public Key</td>
+                    <td>{keys.pai_pk}</td>
+                  </tr>
+                  <tr>
+                    <td>Paillier Public Key List (Single)</td>
+                    <td>{JSON.stringify(keys.pai_pklist_single)}</td>
+                  </tr>
+                  <tr>
+                    <td>ElGamal Public Key</td>
+                    <td>{keys.elg_pk}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
       <Navigation />
@@ -76,4 +89,5 @@ function PublicKeys() {
 }
 
 export default PublicKeys;
+
 

@@ -14,8 +14,8 @@ export default function BallotAudit(props) {
   };
 
   const checkSend = async () => {
-    const commitments = parseStringToArray(props.route.params.commitments);
-    const booth_num = parseStringToArray(props.route.params.booth_num);
+    const commitments = parseStringToArray(props.route.params.commitments[0]);
+    const booth_num = parseStringToArray(props.route.params.booth_num[1]);
     const bid = parseStringToArray(props.route.params.bid);
 
     setLoading(true);
