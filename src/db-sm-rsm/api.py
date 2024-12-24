@@ -19,6 +19,7 @@ from optpaillier import pai_decrypt as pai_decrypt_single
 import ast
 from misc import serialize_wrapper, deserialize_wrapper
 from bbsig import bbbatchverify
+import pymongo
 
 
 #g = group.init(ZR, 5564993445756101503206304700110936918638328897597942591925129910965597995003)
@@ -83,6 +84,16 @@ def mixer():
     
     Produces a permuted list of decrypted votes in the database.
     """
+    # Connect to the database
+    client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
+    db = client["test"]
+    collection = db["decs"]
+    
+    # Check if the collection is empty
+    if collection.count_documents({}) > 0:
+        print("Decryption has already been done. No further action is required.")
+        return
+
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
         process_bulletins()
