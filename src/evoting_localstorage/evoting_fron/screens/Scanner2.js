@@ -10,8 +10,21 @@ export default function Scanner(props) {
 
   const checkSend = async (qrcodedata) => {
     try {
-        const data=await checkReceipt2(qrcodedata[0]);     
-      console.log(data);
+      // Alert.alert(qrcodedata[0]);
+      let firstArray = '';
+
+      // Start the loop from index 1
+      for (let i = 1; i < qrcodedata.length; i++) {
+        const char = qrcodedata[i];
+        if (char === ']') {
+          firstArray += char;
+          break; // End of the first array
+        }
+        firstArray += char; // Append characters to the firstArray
+      }
+      // Alert.alert(firstArray);
+        const data=await checkReceipt2(firstArray);     
+        
     
         if (data.message === 'Ballot exists and verified successfully.') {
           console.log("successfully submitted voter receipt");
@@ -47,6 +60,7 @@ export default function Scanner(props) {
       <QRCodeScanner
         onRead={async ({ data }) => {
           if (isValidQRCode(data)) {
+            // Alert.alert(data);
             await checkSend(data);
             console.log('Valid QR code detected:', data);
           } else {

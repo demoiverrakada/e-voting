@@ -151,7 +151,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     draw.text((center_x + int(0.2 * bh), 0.07 * bh + 100), "(Bring back for scanning)", font=subtitlefont, fill='black')
 
     # QR code containing encrypted votes
-    qr_code2 = "qr_code2.png"
+    qr_code2 = "qr_updated.png"
     qr_encvotes = Image.open(qr_code2)
     qr_encvotes = qr_encvotes.resize((600, 600))  # Resize if necessary
     encvotes_x = center_x + (bw // 4) - (qr_encvotes.width // 2) 
@@ -201,13 +201,13 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     image.paste(qr_bid, (bid_x, bid_y))
     print("testing7")
     # QR code containing the booth num
-    qr_code3 = "qr_code3.png"
-    qr_ballot_num = Image.open(qr_code3)
-    qr_ballot_num = qr_ballot_num.resize((300, 300))  # Resize if necessary
-    ballot_num_x = center_x + (bw // 4) - (qr_encvotes.width // 2) + 280 
-    ballot_num_y = text_y + 150
-    draw.text((ballot_num_x + 60, ballot_num_y - 50), "Booth Num", font=boldfont, fill='black')
-    image.paste(qr_ballot_num, (ballot_num_x, ballot_num_y))
+    # qr_code3 = "qr_code3.png"
+    # qr_ballot_num = Image.open(qr_code3)
+    # qr_ballot_num = qr_ballot_num.resize((300, 300))  # Resize if necessary
+    # ballot_num_x = center_x + (bw // 4) - (qr_encvotes.width // 2) + 280 
+    # ballot_num_y = text_y + 150
+    # draw.text((ballot_num_x + 60, ballot_num_y - 50), "Booth Num", font=boldfont, fill='black')
+    # image.paste(qr_ballot_num, (ballot_num_x, ballot_num_y))
 
     # Save the image
     print("testing1")
@@ -448,6 +448,11 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
     qr_data3 = []
     qr_data3.append(j)
     qr_data3.append(sigma_c)
+    qr_data_updated = []
+    qr_data_updated.append(qr_data)
+    qr_data_updated.append(qr_data3)
+    qr_data_updated_filename="qr_updated.png"
+    generate_qr_code(qr_data_updated, qr_data_updated_filename)
     qr_filename3 = "qr_code3.png"
     generate_qr_code(qr_data3, qr_filename3)
     qr_image3 = ImageReader(qr_filename3)

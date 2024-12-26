@@ -6,24 +6,52 @@ import postVote from '../func/postVote.js';
 export default function Scanner3(props) {
   const [inputValue, setInputValue] = useState(''); // Initialize state for input value
 
-  // Safely access route params with default values
-  const commitments = props.route?.params?.commitments[0] || [];
-  const booth_num = props.route?.params?.commitments[1]|| 'default_booth';
+  // // Safely access route params with default values
+  // const commitments = props.route?.params?.commitments[0] || [];
+  // const booth_num = props.route?.params?.commitments[1]|| 'default_booth';
 
-  // Check for missing params and handle gracefully
-  if (!commitments.length || !booth_num) {
-    console.error("Missing route parameters: commitments or booth_num.");
-    Alert.alert(
-      "Error",
-      "Required data is missing. Returning to home.",
-      [{ text: 'OK', onPress: () => props.navigation.navigate('homePO') }]
-    );
-    return null; // Prevent component rendering
-  }
+  // // Check for missing params and handle gracefully
+  // if (!commitments.length || !booth_num) {
+  //   console.error("Missing route parameters: commitments or booth_num.");
+  //   Alert.alert(
+  //     "Error",
+  //     "Required data is missing. Returning to home.",
+  //     [{ text: 'OK', onPress: () => props.navigation.navigate('homePO') }]
+  //   );
+  //   return null; // Prevent component rendering
+  // }
+  const { commitments: incomingCommitments } = props.route.params; // This line gets the 'commitments'
+  let firstArray = '';
+  let z = 0;
+      // Start the loop from index 1
+      for (let i = 1; i < incomingCommitments.length; i++) {
+        const char = incomingCommitments[i];
+        if (char === ']') {
+          firstArray += char;
+          z = i;
+          break; // End of the first array
+        }
+        firstArray += char; // Append characters to the firstArray
+      }
+      // Alert.alert(firstArray);
+    let booth_num = '';
+    for(let i = z+3; i < incomingCommitments.length; i++){
+      const char = incomingCommitments[i];
+      if(char === '['){
+        continue;
+      }
+      if(char === ','){
+        break;
+      }
+      booth_num += char;
+    }
+
 
   const checkSend = async (enteredData) => {
     try {
-      const data = await postVote(enteredData, commitments, booth_num);
+      // Alert.alert('C', `The C is: ${firstArray}`);
+      // Alert.alert('Booth Number', `The booth number is: ${booth_num}`);
+      const data = await postVote(enteredData, firstArray, booth_num);
       if (data.message) {
         Alert.alert('Successful', 'Your vote has been uploaded', [{ text: 'OK' }], { cancelable: false });
         props.navigation.navigate("homePO");

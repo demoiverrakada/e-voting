@@ -8,6 +8,7 @@ const readFilePath = `${RNFS.DocumentDirectoryPath}/data.json`;
 
 const postVote = async (preference, commitments, booth_num) => {
   try {
+    Alert.alert('Booth Number', `The booth number is: ${booth_num}`);
     // Alert.alert("Debug", "Starting postVote function...");
 
     // Step 1: Read the data file
@@ -32,58 +33,57 @@ const postVote = async (preference, commitments, booth_num) => {
       comms2 = cleanedString.split("', '");
       // Alert.alert("Debug", `Commitments parsed successfully: ${JSON.stringify(comms2)}`);
     } catch (parseError) {
-      // Alert.alert("Error", `Error parsing commitments: ${parseError.message}`);
+      Alert.alert("Error", `Error parsing commitments: ${parseError.message}`);
       return { error: 'Error parsing commitments' };
     }
 
     // Step 3: Generate ballot_id
     // Alert.alert("Debug", "Generating ballot_id...");
-    // const password = comms.join('');
-    // const ballot_id = await sha256(password);
     const cleanedString = commitments.slice(1, -1); // Remove '[' and ']'
     const comms = cleanedString.split("', '"); // Split by "', '"
-    // alert("Commitments: " + comms);
+    // Alert.alert("Debug", `Commitments: ${JSON.stringify(comms)}`);
 
     // Join the array into a string and remove unwanted characters
     let password = comms.join('').replace(/[,'"]/g, ''); // Join the array into a string, then remove quotes and commas
-    // alert("password: " + password); // Now you should get the correct password
+    // Alert.alert("Debug", `password: ${password}`); // Now you should get the correct password
     let hashedCommitments;
     const countQuotes = (str) => {
       const quotes = str.match(/['"]/g); // Matches both " and '
       return quotes ? quotes.length : 0;
     };
-    // alert("test1");
+    // Alert.alert("Debug", "Counting quotes...");
     const n = countQuotes(commitments);  // Count number of " and '
-    // alert("Number of quotes (n): " + n);  // Debug: Show n
+    // Alert.alert("Debug", `Number of quotes (n): ${n}`);  // Debug: Show n
     
-    const k = n/2;
-    // alert("k: " + k);
+    const k = n / 2;
+    // Alert.alert("Debug", `k: ${k}`);
     const l = password.length;
-    // alert("l: "+l);
-    const t = l/k;
-    // alert("t: "+t);
-    // const passwords = [];
+    // Alert.alert("Debug", `l: ${l}`);
+    const t = l / k;
+    // Alert.alert("Debug", `t: ${t}`);
+
     let existingReceiptIndex = -1;
-    let ballot_id
+    let ballot_id;
     for (let i = 0; i < k; i++) {
       const s1 = password.slice(0, t);
-      // alert("s1: "+s1);
+      // Alert.alert("Debug", `s1: ${s1}`);
       const s2 = password.slice(t, l);
-      // alert("s2: "+s2);
+      // Alert.alert("Debug", `s2: ${s2}`);
       const result = s2 + s1;
       password = result;
-      // alert("result: "+result);
+      // Alert.alert("Debug", `result: ${result}`);
       const hashResult = await sha256(result);
       hashedCommitments = hashResult;
       ballot_id = hashedCommitments;
-      // alert("hashResult: "+hashResult);
+      // Alert.alert("Debug", `hashResult: ${hashResult}`);
       const index = myData.receipt.findIndex(receipt => receipt.ballot_id === hashResult);
-      // alert("index: "+index);
+      // Alert.alert("Debug", `index: ${index}`);
       if (index !== -1) {
         existingReceiptIndex = index;
         break;
       }
     }
+
     // Alert.alert("Debug", `Ballot ID generated: ${ballot_id}`);
 
     // Step 4: Parse preference
@@ -110,7 +110,7 @@ const postVote = async (preference, commitments, booth_num) => {
     // Alert.alert("Debug", "Preparing new vote...");
     const cleaned = booth_num.slice(1, -1); // Remove '[' and ']'
     const booth = cleaned.split("");
-    const newVote = { voter_id: voter_id, booth_num: parseInt(booth[0], 10), commitment: comms[num].replace(/^'|'$/g, ''), pref_id: num };
+    const newVote = { voter_id: voter_id, booth_num: booth_num, commitment: comms[num].replace(/^'|'$/g, ''), pref_id: num, hash_value: ballot_id };
     // Alert.alert("Debug", `New vote created: ${JSON.stringify(newVote)}`);
 
     // Step 7: Update voter and receipt data
@@ -130,6 +130,7 @@ const postVote = async (preference, commitments, booth_num) => {
 
     // Step 8: Write updated data
     // Alert.alert("Debug", `Writing updated data to: ${readFilePath}`);
+    // Alert.alert('Debug', `Writing updated data: ${myData}`);
     await RNFS.writeFile(readFilePath, JSON.stringify(myData), 'utf8');
 
     // Step 9: Append new vote
