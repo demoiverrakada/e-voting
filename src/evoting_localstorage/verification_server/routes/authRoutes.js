@@ -449,10 +449,7 @@ router.post('/fetch', async (req, res) => {
     console.log(req.body);
       try {
         const { commitment, voter_id, preference } = req.body;
-        console.log("got request");
-        const formattedcommitment= commitment.replace(/'/g, '"');
-        let comms = JSON.parse(formattedcommitment);
-        console.log(comms);
+        console.log(commitment);
         const checkVoter = await Voter.findOne({ voter_id });
         if (!checkVoter) {
           return res.status(422).send({ error: "This voter_id is not in the voter list" });
@@ -468,8 +465,8 @@ router.post('/fetch', async (req, res) => {
     
         // Check if Bullet.commitment matches the specified commitment
         console.log(Bullet.commitment)
-        console.log(comms[num])
-        if (Bullet.commitment === comms[num]) {
+        console.log(commitment[num])
+        if (Bullet.commitment === commitment[num]) {
     console.log("here I am ")      
     return res.send({message:"Voter details verified"});
         } else {

@@ -7,12 +7,12 @@ export default function Scanner(props) {
   const checkSend = async (qrcodedata) => {
     try {
       console.log(qrcodedata);
-      Alert.alert(
-        "Encrypted candidate ID's scanned successfully",
-        "Scan Ballot ID next",
-        [{ text: 'OK', onPress: () => props.navigation.navigate("bid", { commitments: qrcodedata }) }],
-        { cancelable: false }
-      );
+     Alert.alert(
+      "Encrypted candidate ID's scanned successfully",
+      "Scan Ballot ID next",
+      [{ text: 'OK', onPress: () => props.navigation.navigate("bid", { commitments: qrcodedata }) }],
+      { cancelable: false }
+    );
     } catch (err) {
       console.log("some problem in posting", err);
       Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });

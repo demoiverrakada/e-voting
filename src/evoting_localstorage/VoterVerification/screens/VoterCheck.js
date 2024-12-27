@@ -26,6 +26,7 @@ const VoterVoted = (props) => {
       <TextInput
         placeholder="Enter Voter Entry Number"
         value={entryNum}
+        placeholderTextColor="#000"
         mode="outlined"
         style={styles.textInput}
         theme={{ colors: { primary: "#1995AD" } }}
@@ -60,6 +61,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,  // Padding inside the input for a more comfortable feel
     height: 50,  // Increased height for easier typing and visibility
     fontSize: 16,  // Larger font for better readability
+    color:'#333'
   },
   button: {
     marginTop: 20,  // Space from input field
@@ -80,6 +82,3 @@ const styles = StyleSheet.create({
 });
 
 export default VoterVoted;
-
-
-

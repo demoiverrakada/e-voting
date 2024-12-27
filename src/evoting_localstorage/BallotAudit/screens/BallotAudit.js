@@ -13,35 +13,35 @@ export default function BallotAudit(props) {
       .map((item) => item.trim().replace(/^['"]|['"]$/g, '')); // Trim whitespace and remove surrounding quotes
   };
 
-  let firstArray = '';
-  let z = 0;
-        // Start the loop from index 1
-        for (let i = 1; i < props.route.params.commitments.length; i++) {
-          const char = props.route.params.commitments[i];
-          if (char === ']') {
-            firstArray += char;
-            z = i;
-            break; // End of the first array
-          }
-          firstArray += char; // Append characters to the firstArray
-        }
-        firstArray=parseStringToArray(firstArray);
-      let booth_num = '';
-      for(let i = z+3; i < props.route.params.commitments.length; i++){
+let firstArray = '';
+let z = 0;
+      // Start the loop from index 1
+      for (let i = 1; i < props.route.params.commitments.length; i++) {
         const char = props.route.params.commitments[i];
-        if(char === '['){
-          continue;
+        if (char === ']') {
+          firstArray += char;
+          z = i;
+          break; // End of the first array
         }
-        if(char === ','){
-          break;
-        }
-        booth_num += char;
+        firstArray += char; // Append characters to the firstArray
       }
-  
-    const checkSend = async () => {
-      const commitment=firstArray;
-      const boothNum=booth_num;
-      const bid = parseStringToArray(props.route.params.bid);
+      firstArray=parseStringToArray(firstArray);
+    let booth_num = '';
+    for(let i = z+3; i < props.route.params.commitments.length; i++){
+      const char = props.route.params.commitments[i];
+      if(char === '['){
+        continue;
+      }
+      if(char === ','){
+        break;
+      }
+      booth_num += char;
+    }
+
+  const checkSend = async () => {
+    const commitment=firstArray;
+    const boothNum=booth_num;
+    const bid = parseStringToArray(props.route.params.bid);
 
     setLoading(true);
 
@@ -73,7 +73,7 @@ export default function BallotAudit(props) {
         Alert.alert("Ballot Audit Failed", "Redo the election process.", [{ text: "OK" }]);
       }
     } catch (err) {
-      Alert.alert("Error", "An error occurred while auditing the ballot. Please try again.", [{ text: "OK" }]);
+      Alert.alert("Error", err, [{ text: "OK" }]);
     } finally {
       setLoading(false);
     }
