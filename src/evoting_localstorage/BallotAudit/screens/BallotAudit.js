@@ -13,22 +13,47 @@ export default function BallotAudit(props) {
       .map((item) => item.trim().replace(/^['"]|['"]$/g, '')); // Trim whitespace and remove surrounding quotes
   };
 
-  const checkSend = async () => {
-    const commitments = parseStringToArray(props.route.params.commitments[0]);
-    const booth_num = parseStringToArray(props.route.params.booth_num[1]);
-    const bid = parseStringToArray(props.route.params.bid);
+  let firstArray = '';
+  let z = 0;
+        // Start the loop from index 1
+        for (let i = 1; i < props.route.params.commitments.length; i++) {
+          const char = props.route.params.commitments[i];
+          if (char === ']') {
+            firstArray += char;
+            z = i;
+            break; // End of the first array
+          }
+          firstArray += char; // Append characters to the firstArray
+        }
+        firstArray=parseStringToArray(firstArray);
+      let booth_num = '';
+      for(let i = z+3; i < props.route.params.commitments.length; i++){
+        const char = props.route.params.commitments[i];
+        if(char === '['){
+          continue;
+        }
+        if(char === ','){
+          break;
+        }
+        booth_num += char;
+      }
+  
+    const checkSend = async () => {
+      const commitment=firstArray;
+      const boothNum=booth_num;
+      const bid = parseStringToArray(props.route.params.bid);
 
     setLoading(true);
 
     try {
       const requestBody = {
-        commitment: commitments,
-        booth_num: parseInt(booth_num[0], 10),
+        commitment: commitment,
+        booth_num: boothNum,
         bid: bid[0],
       };
 
       const response = await fetch(
-        "https://7637-35-247-136-128.ngrok-free.app/audit",
+        "http://192.168.1.8:7000/audit",
         {
           method: "POST",
           headers: {

@@ -9,8 +9,8 @@ export default function Scanner(props) {
       console.log(qrcodedata);
       Alert.alert(
         "Encrypted candidate ID's scanned successfully",
-        "Scan Ballot ID next"
-        [{ text: 'OK', onPress: () => props.navigation.navigate('bid', { commitments: qrcodedata }) }],
+        "Scan Ballot ID next",
+        [{ text: 'OK', onPress: () => props.navigation.navigate("bid", { commitments: qrcodedata }) }],
         { cancelable: false }
       );
     } catch (err) {

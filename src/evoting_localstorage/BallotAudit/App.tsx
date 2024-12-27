@@ -17,7 +17,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BallotDetails from './screens/BallotDetails.js';
 import BallotAudit from './screens/BallotAudit.js';
-// import ScanBooth from './screens/ScanBooth.js';
 import ScanBid from './screens/ScanBid.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack =createNativeStackNavigator();
@@ -44,9 +43,8 @@ function App(){
     <NavigationContainer>
       <Stack.Navigator>
             <Stack.Screen name="scanner" component={BallotDetails} options={{ headerShown: false }} />
-            {/* <Stack.Screen name="booth" component={ScanBooth} options={{ headerShown: false }} /> */}
-            <Stack.Screen name="audit" component ={BallotAudit} options={{ headerShown: false }} />
             <Stack.Screen name="bid" component ={ScanBid} options={{ headerShown: false }} />
+            <Stack.Screen name="audit" component ={BallotAudit} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
     </>

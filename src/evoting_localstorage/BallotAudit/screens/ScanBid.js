@@ -4,15 +4,15 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 
 export default function Scanner(props) {
   const commitments = props.route.params.commitments;
-  const booth_num = props.route.params.booth_num;
 
   const checkSend = async (qrcodedata) => {
     try {
       console.log(qrcodedata);
       console.log("successfully submitted ballot_id login");
       Alert.alert(
-        'Ballot ID successfully identified',
-        [{ text: 'OK', onPress: () => props.navigation.navigate('audit', { commitments: commitments, bid: qrcodedata }) }],
+        "Ballot ID successfully identified",
+        "Audit ballot next",
+        [{ text: 'OK', onPress: () => props.navigation.navigate("audit", { commitments: commitments, bid: qrcodedata }) }],
         { cancelable: false }
       );
     } catch (err) {
