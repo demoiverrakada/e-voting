@@ -17,29 +17,33 @@ function VoterVerificationApp() {
     setResult(null); // Clear previous results
 
     try {
-      // Make a POST request to the server
+      const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
         'http://localhost:7000/runBuild3',
         {},
         {
-          responseType: 'blob',
+          headers: { authorization: `Bearer ${token}` },
+          responseType: 'blob', // Receive binary data
         }
       );
 
-      // Handle the downloaded blob and trigger file download
-      const blob = new Blob([response.data], { type: 'application/octet-stream' });
+      // Create a blob and trigger the download
+      const blob = new Blob([response.data], { type: 'application/vnd.android.package-archive' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'app_file';
-      link.click();
+      link.download = 'VoterVerification.apk'; // Specify the file name
+      link.style.display = 'none'; // Hide the link element
+      document.body.appendChild(link);
+      link.click(); // Simulate click to trigger download
+      document.body.removeChild(link); // Clean up the DOM
 
-      alert('Voter Verification app setup completed and file downloaded.');
+      alert('Evoting app setup completed. APK file is downloading.');
     } catch (err) {
-      setError(`Failed to set up Voter Verification app: ${err.message}`);
+      console.error('Error while generating the Evoting app:', err);
+      alert(`Failed to generate the Evoting app: ${err.message}`);
     } finally {
-      setIsLoading(false); // Set loading to false after the request completes
+      setLoading(false); // Stop loading
     }
-  };
 
   return (
     <div className="form-page">

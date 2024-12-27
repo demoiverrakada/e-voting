@@ -16,26 +16,32 @@ function BallotAudit() {
     setError(null);      // Clear any previous errors
 
     try {
+      const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
         'http://localhost:7000/runBuild2',
         {},
         {
-          responseType: 'blob',
+          headers: { authorization: `Bearer ${token}` },
+          responseType: 'blob', // Receive binary data
         }
       );
 
-      const blob = new Blob([response.data], { type: 'application/octet-stream' });
+      // Create a blob and trigger the download
+      const blob = new Blob([response.data], { type: 'application/vnd.android.package-archive' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'app_file';
-      link.click();
+      link.download = 'BallotAudit.apk'; // Specify the file name
+      link.style.display = 'none'; // Hide the link element
+      document.body.appendChild(link);
+      link.click(); // Simulate click to trigger download
+      document.body.removeChild(link); // Clean up the DOM
 
-      alert('Ballot Audit app setup completed and file downloaded.');
+      alert('Evoting app setup completed. APK file is downloading.');
     } catch (err) {
-      alert(`Failed to set up BallotAudit app: ${err.message}`);
-      setError(err.message);  // Set error message if the request fails
+      console.error('Error while generating the Evoting app:', err);
+      alert(`Failed to generate the Evoting app: ${err.message}`);
     } finally {
-      setIsLoading(false);  // Set loading to false when the request is complete (either success or failure)
+      setLoading(false); // Stop loading
     }
   };
 

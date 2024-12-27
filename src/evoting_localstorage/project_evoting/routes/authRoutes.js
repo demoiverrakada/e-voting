@@ -416,23 +416,16 @@ router.post('/signin/Admin', async (req, res) => {
     }
 });
 
-router.post('/runBuild1', async (req, res) => {
+router.post('/runBuild1', (req, res) => {
     try {
-        // Call the Python function to start the build process
-        console.log('Calling Python function to start the build process');
-        const result = await callPythonFunction3("runBuild1");
-
-        // Log the result
-        console.log('Build process result:', result);
-
-        // Path to the generated app (adjust to match your build script's output location)
-        const appPath = path.join(__dirname, '../../evoting_fron/android/app/build/outputs/apk/release/app-release.apk');
+        // Path to the pre-existing app file
+        const appPath = path.join('/app/evoting_localstorage/evoting_fron/android/app/build/outputs/apk/release', 'app-release.apk');
 
         // Check if the file exists
         if (!fs.existsSync(appPath)) {
             return res.status(404).json({
                 success: false,
-                message: 'Build process completed, but the app file was not found.'
+                message: 'The app file was not found.'
             });
         }
 
@@ -446,10 +439,12 @@ router.post('/runBuild1', async (req, res) => {
         });
     } catch (err) {
         // Handle any errors that occur
-        console.error('Error during build process:', err.message);
+        console.error('Error while trying to send the file:', err.message);
         res.status(500).json({ error: err.message });
     }
 });
+
+
 
 
 
