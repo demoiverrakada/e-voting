@@ -185,7 +185,11 @@ def audit(commitment,booth_num,bid):
             receipts_collection=db['receipts']
             votes_collection=db['votes']
             receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[i])})
-            receipt['accessed']=True
+            if receipt:
+                receipts_collection.update_one(
+                    {'_id': receipt['_id']},  # Identify the document by its unique ID
+                    {'$set': {'accessed': True}}  # Update the 'accessed' field to True
+                )
             result.append([True, v_w_nbar, name, str(gamma_w), str(comm[i])])
         else:
             result.append([False,None,None,None,None])

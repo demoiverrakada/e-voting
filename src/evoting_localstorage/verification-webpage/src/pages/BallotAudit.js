@@ -36,7 +36,7 @@ function BallotAudit() {
       link.click(); // Simulate click to trigger download
       document.body.removeChild(link); // Clean up the DOM
 
-      alert('Evoting app setup completed. APK file is downloading.');
+      alert('Ballot Audit app setup completed. APK file is downloading.');
     } catch (err) {
       console.error('Error while generating the Evoting app:', err);
       alert(`Failed to generate the Evoting app: ${err.message}`);

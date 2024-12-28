@@ -37,7 +37,7 @@ function VoterVerificationApp() {
       link.click(); // Simulate click to trigger download
       document.body.removeChild(link); // Clean up the DOM
 
-      alert('Evoting app setup completed. APK file is downloading.');
+      alert('VoterVerification app setup completed. APK file is downloading.');
     } catch (err) {
       console.error('Error while generating the Evoting app:', err);
       alert(`Failed to generate the Evoting app: ${err.message}`);
@@ -45,28 +45,26 @@ function VoterVerificationApp() {
       setIsLoading(false); // Stop loading
     }
 
-  return (
-    <div className="form-page">
-      <h2>Voter Verification App</h2>
-      {/* Verify Button */}
-      <button className="btn" onClick={handleVoterVerification} disabled={isLoading}>
-        {isLoading ? 'Generating...' : 'Generate Voter Verification App'}
-      </button>
-      <button
-        type="button"
-        onClick={() => navigate('/')}
-        className="btn btn-secondary"
-      >
-        Back to Home
-      </button>
-
-      {/* Display Loading spinner if isLoading is true */}
-      {isLoading && <Loading message="Setting up Voter Verification app..." />}
-
-      {/* Display errors */}
-      {error && <div className="error">{error}</div>}
-    </div>
-  );
+    return (
+      <div className="form-page">
+        <h2>Voter Verification App</h2>
+        <button className="btn" onClick={handleVoterVerification} disabled={isLoading}>
+          {isLoading ? 'Generating...' : 'Generate Voter Verification App'}
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="btn btn-secondary"
+        >
+          Back to Home
+        </button>
+    
+        {isLoading && <Loading message="Setting up Voter Verification app..." />} {/* Show loading spinner when the request is in progress */}
+    
+        {error && <div className="error">{error}</div>} {/* Display any error */}
+      </div>
+    );
+    
 }
 }
 export default VoterVerificationApp;

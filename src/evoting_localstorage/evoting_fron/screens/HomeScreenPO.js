@@ -32,24 +32,18 @@ const extractVotesToExternalStorage = async () => {
       return;
     }
 
-    // First, compute all the hashes and the final hash
-    let currentHash = initialHash;
-    const updatedVotesData = [];
-
-    // Iterate through all votes and update the hash iteratively
+    // Change 1: Iteratively compute the final hash over all votes
+    let currentHash = initialHash; // Initialize with the initial hash
     for (const vote of votesData) {
-      const voteHash = await sha256(JSON.stringify(vote)); // Compute hash of the vote
-      currentHash = await sha256(currentHash + voteHash); // Update hash using h(i-1) + hash(vote)
-      updatedVotesData.push(vote); // Just store the original votes first, without the final hash
+      const voteHash = await sha256(JSON.stringify(vote)); // Compute hash of the current vote
+      currentHash = await sha256(currentHash + voteHash); // Update current hash with hn-1 + hash(vote)
     }
 
-    // Now that we have iterated through all the votes, append the final hash to each vote
-    const finalHash = currentHash;
-
-    // Add the final hash to each vote
-    const finalUpdatedVotesData = updatedVotesData.map(vote => ({
+    // Change 2: Assign the final computed hash to all votes
+    const finalHash = currentHash; // The computed final hash
+    const finalUpdatedVotesData = votesData.map(vote => ({
       ...vote,
-      hash_value: finalHash // Append the same final hash to all votes
+      hash_value: finalHash // Assign the same final hash to every vote
     }));
 
     // Write the updated data to the external storage file
@@ -62,10 +56,8 @@ const extractVotesToExternalStorage = async () => {
   }
 
   try {
-    // Source file path in the app's internal storage
+    // Change 3: Ensure the file is copied to Downloads with the correct final hash
     const sourcePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
-
-    // Destination file path in the Downloads folder
     const destPath = `${RNFS.DownloadDirectoryPath}/updated_data.json`;
 
     // Check if the source file exists
@@ -80,10 +72,10 @@ const extractVotesToExternalStorage = async () => {
 
     Alert.alert('Success', 'File has been saved to your Downloads folder.');
   } catch (err) {
-    // Handle errors
     Alert.alert('Error', `An error occurred: ${err.message}`);
   }
 };
+
 
 function HomeScreenPO(props) {
   const check = () => {
