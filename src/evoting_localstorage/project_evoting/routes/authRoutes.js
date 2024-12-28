@@ -10,7 +10,7 @@ const fs = require('fs');
 const { join } = require('path');
 const path = require('path');
 const { spawn } = require('child_process');
-
+const archiver = require('archiver');
 router.use(cors());
 // function for running api.py python script
 function callPythonFunction(functionName, ...params) {
@@ -44,65 +44,35 @@ function callPythonFunction(functionName, ...params) {
     }
 }
 
-//function for running evoting_fron app generation script
-function callPythonFunction3(functionName, ...params) {
-    // Use the correct relative path
-    const path2 = '/app/db-sm-rsm/data_generation.py'
-
-    const scriptPath = '/app/evoting_localstorage/evoting_fron/android/automation.py'; // Adjust as needed
+function callPythonFunction2(functionName, ...params){
+    const scriptPath = join(__dirname, '../../../db-sm-rsm/data_generation.py');
     const pythonExecutable = 'python3';
+    const args = [scriptPath, functionName, JSON.stringify(params)];
 
-    const pythonProcess1 = spawnSync(pythonExecutable, [path2], {
-        env: {
-            ...process.env,
-            PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Add Node path if necessary
-            precomputing: '0' // Set custom environment variable if needed
-        },
-        cwd: '/app/db-sm-rsm/', // Ensure the working directory is correct
-        encoding: 'utf-8', // Use UTF-8 encoding for consistent output
-    });
-    if (pythonProcess1.error) {
-        console.error('Error spawning Python process:', pythonProcess1.error);
-        throw pythonProcess1.error;
-    }
-
-    console.log("Resolved script path:", scriptPath);
-
-    const formattedParams = params.map(param =>
-        typeof param === 'string' ? `'${param}'` : param
-    ).join(' ');
-
-    console.log(`Formatted params: ${formattedParams}`);
-
-    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
-        env: {
-            ...process.env,
-            PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Explicitly add Node path
-            precomputing: '0'
-        },
-        cwd: '/app/evoting_localstorage/evoting_fron/android/', // Make sure the working directory is correct
-        encoding: 'utf-8',
+    console.log(`Running: ${pythonExecutable} ${args.join(' ')}`);
+    const pythonProcess = spawnSync(pythonExecutable, args, {
+        env: { ...process.env, precomputing: '0' },
     });
 
     if (pythonProcess.error) {
-        console.error('Error spawning Python process:', pythonProcess.error);
         throw pythonProcess.error;
     }
 
-    const stdout = pythonProcess.stdout.trim();
-    const stderr = pythonProcess.stderr.trim();
+    const stdout = pythonProcess.stdout.toString().trim();
+    const stderr = pythonProcess.stderr.toString().trim();
 
     if (stderr) {
         console.error('Python stderr:', stderr);
     }
 
-    console.log('Python stdout:', stdout);
-
-    if (pythonProcess.status !== 0) {
-        throw new Error(`Python script failed with exit code ${pythonProcess.status}: ${stderr}`);
+    try {
+        const result = stdout;
+        console.log(result)
+        return (result);
+    } catch (error) {
+        console.error('Error reading or parsing result from file:', error);
+        throw error;
     }
-
-    return stdout || stderr;
 }
 
 // endpoint for generating the keys for the election
@@ -141,7 +111,6 @@ router.post('/generate',requireAuth, async (req, res) => {
 
         // Create a zip archive of the generated PDFs
         const zipFilePath = path.join(outputDirectory, 'ballots.zip');
-        const archiver = require('archiver');
         const output = fs.createWriteStream(zipFilePath);
         const archive = archiver('zip', { zlib: { level: 9 } });
 
@@ -416,36 +385,77 @@ router.post('/signin/Admin', async (req, res) => {
     }
 });
 
-router.post('/runBuild1', (req, res) => {
+router.post('/runBuild1', async (req, res) => {
     try {
-        // Path to the pre-existing app file
+        // Paths to the APK and JSON files
         const appPath = path.join('/app/evoting_localstorage/evoting_fron/android/app/build/outputs/apk/release', 'app-release.apk');
+        const outputDirectory = '/output'; // Path to the JSON files
+        const zipFilePath = path.join(outputDirectory, 'evoting.zip'); // Temporary zip file path
 
-        // Check if the file exists
+        // Check if the APK file exists
         if (!fs.existsSync(appPath)) {
             return res.status(404).json({
                 success: false,
-                message: 'The app file was not found.'
+                message: 'The APK file was not found.'
             });
         }
 
-        // Send the app file as a download
-        console.log('Sending the generated app file to the client');
-        res.download(appPath, 'app-release.apk', (err) => {
-            if (err) {
-                console.error('Error sending the app file:', err);
-                res.status(500).json({ error: 'Failed to send the app file.' });
-            }
+        // Call the Python function to generate the JSON file
+        const result = await callPythonFunction2('');
+        console.log('Python function executed successfully:', result);
+
+        // Check for JSON files in the output directory
+        const jsonFiles = fs.readdirSync(outputDirectory).filter(file => file.endsWith('.json'));
+        if (jsonFiles.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No JSON files found in the output directory.'
+            });
+        }
+
+        // Create a ZIP archive
+        const archive = archiver('zip', { zlib: { level: 9 } });
+        const output = fs.createWriteStream(zipFilePath);
+
+        output.on('close', () => {
+            console.log(`ZIP file created successfully. Total size: ${archive.pointer()} bytes`);
+
+            // Send the ZIP file as a download
+            res.download(zipFilePath, 'download.zip', (err) => {
+                if (err) {
+                    console.error('Error sending the ZIP file:', err);
+                    res.status(500).json({ error: 'Failed to send the ZIP file.' });
+                }
+
+                // Cleanup: delete the temporary ZIP file after sending
+                fs.unlinkSync(zipFilePath);
+            });
         });
+
+        archive.on('error', (err) => {
+            console.error('Error while creating ZIP archive:', err);
+            res.status(500).json({ error: 'Failed to create ZIP archive.' });
+        });
+
+        // Pipe the archive to the output stream
+        archive.pipe(output);
+
+        // Add the APK file to the archive
+        archive.file(appPath, { name: 'app-release.apk' });
+
+        // Add all JSON files to the archive
+        jsonFiles.forEach(file => {
+            archive.file(path.join(outputDirectory, file), { name: file });
+        });
+
+        // Finalize the archive
+        archive.finalize();
     } catch (err) {
         // Handle any errors that occur
-        console.error('Error while trying to send the file:', err.message);
+        console.error('Error while processing the request:', err.message);
         res.status(500).json({ error: err.message });
     }
 });
-
-
-
 
 
 module.exports = router;

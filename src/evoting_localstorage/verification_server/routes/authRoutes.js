@@ -490,7 +490,9 @@ router.post('/audit', async (req, res) => {
             console.log(bid)
             // Call the Python function
             const result = await callPythonFunction("audit", commitment, booth_num, bid);
-    
+            if(result==="The ballot has already been audited or the ballot has been used to cast a vote."){
+                return res.json({results:"The ballot has already been audited or the ballot has been used to cast a vote."})
+            }
             const parsedResult = typeof result === "string" ? JSON.parse(result) : result;
     
         // Check if any result has success === false

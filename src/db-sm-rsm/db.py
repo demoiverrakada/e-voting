@@ -97,8 +97,10 @@ def load(funcs,params):
         del params[0]
         if document:
             for key in params:
-                #if(key!="enc_hash"):
-                deserialized_item = deserialize_wrapper(document[key])
-                res[key] = deserialized_item
+                if(key!="accessed"):
+                    deserialized_item = deserialize_wrapper(document[key])
+                    res[key] = deserialized_item
+                elif(key=="accessed"):
+                    res[key]=document[key]
             res["enc_hash"] = param_value
             return res

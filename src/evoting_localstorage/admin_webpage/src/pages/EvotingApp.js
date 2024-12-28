@@ -33,14 +33,12 @@ function EvotingApp() {
       );
 
       // Create a blob and trigger the download
-      const blob = new Blob([response.data], { type: 'application/vnd.android.package-archive' });
+      const zipBlob = new Blob([response.data], { type: 'application/zip' });
+      const url = URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'evoting_app.apk'; // Specify the file name
-      link.style.display = 'none'; // Hide the link element
-      document.body.appendChild(link);
-      link.click(); // Simulate click to trigger download
-      document.body.removeChild(link); // Clean up the DOM
+      link.href = url;
+      link.download = 'evoting.zip';
+      link.click();
 
       alert('Evoting app setup completed. APK file is downloading.');
     } catch (err) {

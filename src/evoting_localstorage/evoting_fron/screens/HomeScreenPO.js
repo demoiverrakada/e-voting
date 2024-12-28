@@ -43,13 +43,13 @@ const extractVotesToExternalStorage = async () => {
       updatedVotesData.push(vote); // Just store the original votes first, without the final hash
     }
 
-    // Now that we have iterated through all the votes, append the final hash to all of them
+    // Now that we have iterated through all the votes, append the final hash to each vote
     const finalHash = currentHash;
 
     // Add the final hash to each vote
     const finalUpdatedVotesData = updatedVotesData.map(vote => ({
       ...vote,
-      hash_value: finalHash // Append the final hash to each vote
+      hash_value: finalHash // Append the same final hash to all votes
     }));
 
     // Write the updated data to the external storage file
@@ -60,6 +60,7 @@ const extractVotesToExternalStorage = async () => {
   } catch (err) {
     console.error('Error copying file with final hash:', err);
   }
+
   try {
     // Source file path in the app's internal storage
     const sourcePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;

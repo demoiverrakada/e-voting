@@ -64,9 +64,16 @@ let z = 0;
       );
 
       const data = await response.json();
-
+      if(data.results==="The ballot has already been audited or the ballot has been used to cast a vote."){
+        Alert.alert(
+          "The ballot has already been audited or the ballot has been used to cast a vote.",
+          "Scan a new ballot",
+          [{ text: 'OK', onPress: () => props.navigation.navigate("scanner")}],
+          {cancelable:false}
+        );
+      }
       // Check overall success
-      if (data.success) {
+      else if (data.success) {
         setResults(data.results); // Store results in state
         Alert.alert("Ballot Audit Passed", "The ballot audit was successful.", [{ text: "OK" }]);
       } else {

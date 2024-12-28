@@ -41,7 +41,7 @@ function BallotAudit() {
       console.error('Error while generating the Evoting app:', err);
       alert(`Failed to generate the Evoting app: ${err.message}`);
     } finally {
-      setLoading(false); // Stop loading
+      setIsLoading(false); // Stop loading
     }
   };
 

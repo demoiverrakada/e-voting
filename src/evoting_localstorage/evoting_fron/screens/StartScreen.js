@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'react-native-paper';
 import {
   StatusBar,
@@ -6,13 +6,31 @@ import {
   View,
   KeyboardAvoidingView,
   StyleSheet,
+  Alert,
+  Platform, // Added Platform import
 } from 'react-native';
-
-// If using Expo, you can load custom fonts like this:
-// import { useFonts } from 'expo-font';
-// import AppLoading from 'expo-app-loading';
+import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function StartScreen(props) {
+  const [fileUploaded, setFileUploaded] = useState(false);
+
+  useEffect(() => {
+    const checkAppInitialization = async () => {
+      try {
+        const uploaded = await AsyncStorage.getItem('fileUploaded');
+        if (uploaded === 'true') {
+          setFileUploaded(true);
+        }
+      } catch (err) {
+        console.error("Error checking app initialization: ", err);
+      }
+    };
+
+    checkAppInitialization();
+  }, []);
+
   const Admin = async () => {
     props.navigation.replace("loginAdmin");
   };
@@ -21,14 +39,74 @@ function StartScreen(props) {
     props.navigation.replace("loginPO");
   };
 
-  // If using Expo, you can load custom fonts like this:
-  // let [fontsLoaded] = useFonts({
-  //   'Montserrat-Bold': require('./assets/fonts/Montserrat-Bold.ttf'),
-  // });
+  const uploadFile = async () => {
+    if (fileUploaded) {
+      Alert.alert("File already uploaded", "You can upload the file only once.");
+      return;
+    }
 
-  // if (!fontsLoaded) {
-  //   return <AppLoading />;
-  // }
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.json],
+      });
+
+      // Handle array result from newer versions of document picker
+      const file = Array.isArray(res) ? res[0] : res;
+
+      if (!file || !file.uri) {
+        Alert.alert("Error", "Invalid file selection.");
+        return;
+      }
+
+      console.log('Document selected:', file);
+
+      try {
+        // Fix URI for different platforms
+        const sourceUri = Platform.select({
+          ios: file.uri.replace('file://', ''),
+          android: file.uri,
+        });
+
+        const destinationPath = `${RNFS.DocumentDirectoryPath}/data.json`;
+
+        // Read and validate JSON before copying
+        const fileContent = await RNFS.readFile(sourceUri, 'utf8');
+        
+        try {
+          JSON.parse(fileContent); // Validate JSON format
+        } catch (jsonError) {
+          Alert.alert("Error", "The selected file is not a valid JSON file.");
+          return;
+        }
+
+        // Check if file exists and delete it
+        const fileExists = await RNFS.exists(destinationPath);
+        if (fileExists) {
+          await RNFS.unlink(destinationPath);
+        }
+
+        // Copy the validated file to destination
+        await RNFS.copyFile(sourceUri, destinationPath);
+        
+        console.log('File copied to:', destinationPath);
+
+        await AsyncStorage.setItem('fileUploaded', 'true');
+        setFileUploaded(true);
+        Alert.alert("Success", "File uploaded and validated successfully!");
+      } catch (fileError) {
+        console.error("File operation error:", fileError);
+        Alert.alert("Error", "Failed to process the file. Please try again.");
+      }
+
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        Alert.alert("Cancelled", "File upload was cancelled.");
+      } else {
+        console.error("Document picker error:", err);
+        Alert.alert("Error", "Failed to pick the document. Please try again.");
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -41,8 +119,19 @@ function StartScreen(props) {
           style={styles.button}
           labelStyle={styles.buttonLabel}
           contentStyle={styles.buttonContent}
+          disabled={!fileUploaded}
         >
           Polling Officer Login
+        </Button>
+        <Button
+          mode="contained"
+          onPress={uploadFile}
+          style={styles.uploadButton}
+          labelStyle={styles.buttonLabel}
+          contentStyle={styles.buttonContent}
+          disabled={fileUploaded}
+        >
+          {fileUploaded ? "File Uploaded" : "Upload Data File"}
         </Button>
       </KeyboardAvoidingView>
     </View>
@@ -52,42 +141,49 @@ function StartScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2', // Soft blue background for a calming effect
-    justifyContent: 'center', // Centers content vertically
-    paddingHorizontal: 16, // Added horizontal padding for better responsiveness
-    paddingVertical: 20, // Added vertical padding for layout consistency
+    backgroundColor: '#A1D6E2',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 20,
   },
   keyboardAvoidingView: {
     flex: 1,
-    justifyContent: 'center', // Keeps UI aligned when the keyboard appears
+    justifyContent: 'center',
   },
   heading: {
-    color: '#1995AD', // Distinct blue-green shade for the heading
+    color: '#1995AD',
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 32, // Slightly larger font size for better emphasis
-    marginBottom: 40, // Keeps spacing consistent
-    // fontFamily: 'Montserrat-Bold', // Uncomment if a custom font is in use
-    letterSpacing: 1.2, // Adds spacing between letters for a polished look
+    fontSize: 32,
+    marginBottom: 40,
+    letterSpacing: 1.2,
   },
   button: {
-    marginHorizontal: 20, // Slightly increased margin for a balanced layout
+    marginHorizontal: 20,
     marginTop: 20,
-    backgroundColor: '#1995AD', // Rich color for visual prominence
-    borderRadius: 30, // Increased rounding for a modern aesthetic
-    elevation: 5, // Enhanced shadow for better depth
-    paddingVertical: 12, // Added vertical padding for a larger tap target
+    backgroundColor: '#1995AD',
+    borderRadius: 30,
+    elevation: 5,
+    paddingVertical: 12,
+  },
+  uploadButton: {
+    marginHorizontal: 20,
+    marginTop: 20,
+    backgroundColor: '#FFD700',
+    borderRadius: 30,
+    elevation: 5,
+    paddingVertical: 12,
   },
   buttonLabel: {
-    color: '#FFFFFF', // White color for contrast with the button background
-    fontSize: 18, // Larger font size for better accessibility
-    fontWeight: '600', // Slightly lighter font weight for a modern feel
-    textAlign: 'center', // Ensures proper alignment
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   buttonContent: {
-    height: 55, // Slightly increased height for better tap area
-    justifyContent: 'center', // Centers content within the button
-    alignItems: 'center', // Ensures label stays aligned
+    height: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
