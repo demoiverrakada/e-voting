@@ -35,8 +35,8 @@ const extractVotesToExternalStorage = async () => {
     // Change 1: Iteratively compute the final hash over all votes
     let currentHash = initialHash; // Initialize with the initial hash
     for (const vote of votesData) {
-      const voteHash = await sha256(JSON.stringify(vote)); // Compute hash of the current vote
-      currentHash = await sha256(currentHash + voteHash); // Update current hash with hn-1 + hash(vote)
+      const voteHash = sha256(JSON.stringify(vote)); // Compute hash of the current vote
+      currentHash = sha256(currentHash + voteHash); // Update current hash with hn-1 + hash(vote)
     }
 
     // Change 2: Assign the final computed hash to all votes

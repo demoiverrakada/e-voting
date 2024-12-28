@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { ReactSession } from 'react-client-session';
 import { useNavigate } from 'react-router-dom';
 import './FormPage.css';
 import Loading from './Loading'; // Import the Loading component
@@ -37,34 +36,35 @@ function VoterVerificationApp() {
       link.click(); // Simulate click to trigger download
       document.body.removeChild(link); // Clean up the DOM
 
-      alert('VoterVerification app setup completed. APK file is downloading.');
+      alert('Voter Verification app setup completed. APK file is downloading.');
     } catch (err) {
       console.error('Error while generating the Evoting app:', err);
       alert(`Failed to generate the Evoting app: ${err.message}`);
     } finally {
       setIsLoading(false); // Stop loading
     }
+  };
 
-    return (
-      <div className="form-page">
-        <h2>Voter Verification App</h2>
-        <button className="btn" onClick={handleVoterVerification} disabled={isLoading}>
-          {isLoading ? 'Generating...' : 'Generate Voter Verification App'}
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          className="btn btn-secondary"
-        >
-          Back to Home
-        </button>
-    
-        {isLoading && <Loading message="Setting up Voter Verification app..." />} {/* Show loading spinner when the request is in progress */}
-    
-        {error && <div className="error">{error}</div>} {/* Display any error */}
-      </div>
-    );
-    
+  // Render the UI
+  return (
+    <div className="form-page">
+      <h2>Voter Verification App</h2>
+      <button className="btn" onClick={handleVoterVerification} disabled={isLoading}>
+        {isLoading ? 'Generating...' : 'Generate Voter Verification App'}
+      </button>
+      <button
+        type="button"
+        onClick={() => navigate("/")}
+        className="btn btn-secondary"
+      >
+        Back to Home
+      </button>
+
+      {isLoading && <Loading message="Setting up Voter Verification app..." />} {/* Show loading spinner when the request is in progress */}
+
+      {error && <div className="error">{error}</div>} {/* Display any error */}
+    </div>
+  );
 }
-}
+
 export default VoterVerificationApp;
