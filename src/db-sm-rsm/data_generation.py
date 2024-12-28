@@ -55,7 +55,7 @@ def main():
     # group = []
     i = 0
     for receipt in receipts_cursor:
-        if(receipt['accessed']==True):
+        if(receipt['accessed'] is True):
             continue
         
         enc_hash = receipt['enc_hash'].strip()
