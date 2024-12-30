@@ -52,10 +52,3 @@ services:
       ports:
         - "7001:3000" 
   
-
-  
-  # interactive:
-  #   build: .
-  #   command: /bin/bash -c "cd core; python rename.py &> /output/rename.log"
-  #   volumes:
-  #   - ./output:/output

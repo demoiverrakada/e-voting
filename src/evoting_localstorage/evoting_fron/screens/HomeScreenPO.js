@@ -4,6 +4,15 @@ import { Button } from 'react-native-paper';
 import RNFS from 'react-native-fs';
 
 const writeFilePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
+const makeFileReadOnly = async (filePath) => {
+  try {
+    // Change the file permissions to read-only (444)
+    await RNFS.setAttributes(filePath, { mode: 0o444 });
+    console.log(`File permissions updated to read-only for: ${filePath}`);
+  } catch (err) {
+    console.error(`Error setting file to read-only: ${err.message}`);
+  }
+};
 
 const extractVotesToExternalStorage = async () => {
   try {
@@ -32,18 +41,26 @@ const extractVotesToExternalStorage = async () => {
       return;
     }
 
-    // Change 1: Iteratively compute the final hash over all votes
-    let currentHash = initialHash; // Initialize with the initial hash
+    let currentHash = initialHash;
     for (const vote of votesData) {
-      const voteHash = sha256(JSON.stringify(vote)); // Compute hash of the current vote
-      currentHash = sha256(currentHash + voteHash); // Update current hash with hn-1 + hash(vote)
+      // Create a copy of vote without hash_value
+      const voteWithoutHash = {
+        voter_id: vote.voter_id,
+        booth_num: vote.booth_num,
+        commitment: vote.commitment,
+        pref_id: vote.pref_id
+      };
+      const voteHash = sha256(JSON.stringify(voteWithoutHash));
+      currentHash = sha256(currentHash + voteHash);
     }
 
-    // Change 2: Assign the final computed hash to all votes
-    const finalHash = currentHash; // The computed final hash
+    // Apply the final hash to all votes
     const finalUpdatedVotesData = votesData.map(vote => ({
-      ...vote,
-      hash_value: finalHash // Assign the same final hash to every vote
+      voter_id: vote.voter_id,
+      booth_num: vote.booth_num,
+      commitment: vote.commitment,
+      pref_id: vote.pref_id,
+      hash_value: currentHash  // Assign the same final hash to all votes
     }));
 
     // Write the updated data to the external storage file
@@ -69,7 +86,7 @@ const extractVotesToExternalStorage = async () => {
 
     // Copy the file to the Downloads folder
     await RNFS.copyFile(sourcePath, destPath);
-
+    await makeFileReadOnly(destPath);
     Alert.alert('Success', 'File has been saved to your Downloads folder.');
   } catch (err) {
     Alert.alert('Error', `An error occurred: ${err.message}`);
@@ -84,10 +101,6 @@ function HomeScreenPO(props) {
 
   const upload = () => {
     props.navigation.navigate('scanner2');
-  };
-
-  const audit = () => {
-    props.navigation.navigate('Audit');
   };
 
   const logout = async () => {

@@ -264,94 +264,7 @@ function handleParsedResult(result, res) {
     return formattedResult;
 }
 
-function callPythonFunction4(functionName, ...params) {
-    const scriptPath = '/app/evoting_localstorage/BallotAudit/android/automation.py';
-    const pythonExecutable = 'python3';
 
-    console.log("Resolved script path:", scriptPath);
-
-    const formattedParams = params.map(param =>
-        typeof param === 'string' ? `'${param}'` : param
-    ).join(' ');
-
-    console.log(`Formatted params: ${formattedParams}`);
-
-    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
-        env: {
-            ...process.env,
-            PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Explicitly add Node path
-            precomputing: '0'
-        },
-        cwd: '/app/evoting_localstorage/BallotAudit/android/', // Make sure the working directory is correct
-        encoding: 'utf-8',
-    });
-
-    if (pythonProcess.error) {
-        console.error('Error spawning Python process:', pythonProcess.error);
-        throw pythonProcess.error;
-    }
-
-    const stdout = pythonProcess.stdout.trim();
-    const stderr = pythonProcess.stderr.trim();
-
-    if (stderr) {
-        console.error('Python stderr:', stderr);
-    }
-
-    console.log('Python stdout:', stdout);
-
-    if (pythonProcess.status !== 0) {
-        throw new Error(`Python script failed with exit code ${pythonProcess.status}: ${stderr}`);
-    }
-
-    return stdout || stderr;
-}
-
-function callPythonFunction5(functionName, ...params) {
-    // Use the correct relative path
-    const scriptPath = '/app/evoting_localstorage/VoterVerification/android/automation.py'; // Adjust as needed
-    const pythonExecutable = 'python3';
-
-    console.log("Resolved script path:", scriptPath);
-
-    console.log("Resolved script path:", scriptPath);
-
-    const formattedParams = params.map(param =>
-        typeof param === 'string' ? `'${param}'` : param
-    ).join(' ');
-
-    console.log(`Formatted params: ${formattedParams}`);
-
-    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, functionName, ...params], {
-        env: {
-            ...process.env,
-            PATH: process.env.PATH + ':/root/.nvm/versions/node/v22.3.0/bin', // Explicitly add Node path
-            precomputing: '0'
-        },
-        cwd: '/app/evoting_localstorage/VoterVerification/android/', // Make sure the working directory is correct
-        encoding: 'utf-8',
-    });
-
-    if (pythonProcess.error) {
-        console.error('Error spawning Python process:', pythonProcess.error);
-        throw pythonProcess.error;
-    }
-
-    const stdout = pythonProcess.stdout.trim();
-    const stderr = pythonProcess.stderr.trim();
-
-    if (stderr) {
-        console.error('Python stderr:', stderr);
-    }
-
-    console.log('Python stdout:', stdout);
-
-    if (pythonProcess.status !== 0) {
-        throw new Error(`Python script failed with exit code ${pythonProcess.status}: ${stderr}`);
-    }
-
-    return stdout || stderr;
-}
 
 router.post('/pf_zksm_verf', async (req, res) => {
     try {
@@ -528,29 +441,34 @@ router.post('/audit', async (req, res) => {
         }
     });
 
-
-router.get('/pk', async (req, res) => {
-    try {
-        const existingKey = await Keys.findOne();
-        if (!existingKey) {
-            return res.status(422).send({ error: "Setup has not been done yet." });
+    router.post('/vvpat', async (req, res) => {
+        try {
+            const { bid } = req.body;
+    
+            // Validate input
+            if (!bid) {
+                return res.status(400).json({ error: "Ballot id is required." });
+            }
+    
+            // Call the Python function with the bid
+            const result = await callPythonFunction("vvpat", bid);
+    
+            // Handle the result
+            if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
+                return res.json({ results: result });
+            } else if (typeof result === "object" && result.cand_name &&result.extended_vote) {
+                return res.json({ cand_name: result.cand_name ,extended_vote:result.extended_vote});
+            } else {
+                // Handle unexpected response from Python function
+                return res.status(500).json({ error: "Unexpected response from verification process." });
+            }
+        } catch (err) {
+            console.error("Error during VVPAT verification:", err.message);
+            return res.status(500).json({ error: "Internal server error." });
         }
-        console.log("here")
-        // Sending the response in correct JSON format
-        console.log(existingKey)
-        res.status(200).send({
-            pai_pk: JSON.stringify(existingKey.pai_pk),
-            pai_pklist_single: JSON.stringify(existingKey.pai_pklist_single),
-            elg_pk: JSON.stringify(existingKey.elg_pk)
-        });
-        console.log(res);
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
+    });
 
-
-router.post('/runBuild2', (req, res) => {
+router.post('/runBuild2', async(req, res) => {
     try {
         // Path to the pre-existing app file
         const appPath = path.join('/app/evoting_localstorage/BallotAudit/android/app/build/outputs/apk/release', 'app-release.apk');
@@ -578,10 +496,38 @@ router.post('/runBuild2', (req, res) => {
     }
 });
 
-router.post('/runBuild3', (req, res) => {
+router.post('/runBuild3', async(req, res) => {
     try {
         // Path to the pre-existing app file
         const appPath = path.join('/app/evoting_localstorage/VoterVerification/android/app/build/outputs/apk/release', 'app-release.apk');
+
+        // Check if the file exists
+        if (!fs.existsSync(appPath)) {
+            return res.status(404).json({
+                success: false,
+                message: 'The app file was not found.'
+            });
+        }
+
+        // Send the app file as a download
+        console.log('Sending the generated app file to the client');
+        res.download(appPath, 'app-release.apk', (err) => {
+            if (err) {
+                console.error('Error sending the app file:', err);
+                res.status(500).json({ error: 'Failed to send the app file.' });
+            }
+        });
+    } catch (err) {
+        // Handle any errors that occur
+        console.error('Error while trying to send the file:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.post('/runBuild4', async(req, res) => {
+    try {
+        // Path to the pre-existing app file
+        const appPath = path.join('/app/evoting_localstorage/VVPATverification/android/app/build/outputs/apk/release', 'app-release.apk');
 
         // Check if the file exists
         if (!fs.existsSync(appPath)) {

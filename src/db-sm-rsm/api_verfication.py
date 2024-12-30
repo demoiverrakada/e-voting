@@ -180,7 +180,7 @@ def audit(commitment,booth_num,bid):
         #print(name,"name")
         #print(commitment[i])
         #print(commitment)
-        if(gamma_w==comm[i]):
+        if(gamma_w==comm[i] and v_w==int(bid)+i):
             db=init()
             receipts_collection=db['receipts']
             votes_collection=db['votes']
@@ -196,13 +196,24 @@ def audit(commitment,booth_num,bid):
     print(json.dumps(result))
 
 
+def VVPATverif(bid):
+    data=load("mix",["msgs_out"])
+    candidates=load("load",[])
+    length=len(data['msgs_out'])
+    for ext_vote in range(length):
+        if(abs(int(data['msgs_out'][ext_vote])-int(bid))<=len(candidates)):
+            print(json.dumps({'cand_name':candidates[abs(int(data['msgs_out'][ext_vote])-int(bid))],'extended_vote':int(data['msgs_out'][ext_vote])}))
+            return
+    print("This VVPAT doesn't correspond to a decrypted vote.")
+
 if __name__ == "__main__":
     function_map = {
         "verfsmproof":pf_zksm_verif,
         "verfrsmproof":pf_zkrsm_verif,
         "verfsigsm":verifier_signature_zksm,
         "verfsigrsm":verifier_signature_zkrsm,
-        "audit":audit
+        "audit":audit,
+        "vvpat":VVPATverif
     }
 
     func_name = sys.argv[1]
@@ -213,4 +224,3 @@ if __name__ == "__main__":
         params = sys.argv[2]
         params=json.loads(params)
         function_map[func_name](*params)
-    #print("result: done")

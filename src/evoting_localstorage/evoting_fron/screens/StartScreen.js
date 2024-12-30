@@ -131,7 +131,7 @@ function StartScreen(props) {
           contentStyle={styles.buttonContent}
           disabled={fileUploaded}
         >
-          {fileUploaded ? "File Uploaded" : "Upload Data File"}
+          {fileUploaded ? "File loaded" : "Load data file to the app"}
         </Button>
       </KeyboardAvoidingView>
     </View>

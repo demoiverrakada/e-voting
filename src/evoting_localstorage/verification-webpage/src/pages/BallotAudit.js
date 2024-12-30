@@ -38,8 +38,8 @@ function BallotAudit() {
 
       alert('Ballot Audit app setup completed. APK file is downloading.');
     } catch (err) {
-      console.error('Error while generating the Evoting app:', err);
-      alert(`Failed to generate the Evoting app: ${err.message}`);
+      console.error('Error while generating the Ballot Audit app:', err);
+      alert(`Failed to generate the Ballot Audit app: ${err.message}`);
     } finally {
       setIsLoading(false); // Stop loading
     }
