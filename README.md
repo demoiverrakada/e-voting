@@ -23,12 +23,12 @@ Requirements:
     ipconfig #(Windows)
     ```
     Now go in the following files and update the IP address there:
-       - src/evoting_localstorage/BallotAudit/screens/BallotAudit.js
-       - src/evoting_localstorage/BallotAudit/android/app/src/main/res/xml/network_security_config.xml
-       - src/evoting_localstorage/VoterVerification/screens/ScanPref.js
-       - src/evoting_localstorage/VoterVerification/android/app/src/main/res/xml/network_security_config.xml
-       - src/evoting_localstorage/VVPATverification/screens/VVPATverify.js
-       - src/evoting_localstorage/VVPATverification/android/app/src/main/res/xml/network_security_config.xml
+       - [src/evoting_localstorage/BallotAudit/screens/BallotAudit.js]
+       - [src/evoting_localstorage/BallotAudit/android/app/src/main/res/xml/network_security_config.xml]
+       - [src/evoting_localstorage/VoterVerification/screens/ScanPref.js]
+       - [src/evoting_localstorage/VoterVerification/android/app/src/main/res/xml/network_security_config.xml]
+       - [src/evoting_localstorage/VVPATverification/screens/VVPATverify.js]
+       - [src/evoting_localstorage/VVPATverification/android/app/src/main/res/xml/network_security_config.xml]
      Run the following commands to build the system: (recommended to use a HPC or cloud shell to run this command in)
     ```bash
     docker-compose build
