@@ -1,6 +1,6 @@
-# Voting System Demo
+# Open Voting Demo
 
-A web-based voting system to streamline the election process securely and efficiently.
+An E2E Verifiable voting system based on [OpenVoting: Recoverability from Failures in Dual Voting](https://arxiv.org/abs/1908.09557)to streamline the election process securely and efficiently while providing security guarantees and recoverability protocol.
 
 ## Table of Contents
 - [Installation](#installation)
@@ -62,7 +62,7 @@ A web-based voting system to streamline the election process securely and effici
 Once the system is up and running, you can access the following services:
 - **Election Server**: Access the voting system at [http://localhost:5000](http://localhost:5000).
 - **Verification Server**: Access the voter verification at [http://localhost:7000](http://localhost:7000).
-- **Admin Webpage**: Access the admin panel at [http://localhost:3000](http://localhost:3000).
+- **Admin Webpage**: Access the admin webpage at [http://localhost:3000](http://localhost:3000).
 - **Verification Webpage**: Access the verification webpage at [http://localhost:7001](http://localhost:7001).
 - **Public Bulletin Board**: Access the public bulletin board at [http://localhost:5001](http://localhost:5001).
 
