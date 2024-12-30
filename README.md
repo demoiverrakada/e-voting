@@ -1,6 +1,6 @@
 # Open Voting Demo
 
-An E2E Verifiable voting system based on [OpenVoting: Recoverability from Failures in Dual Voting ](https://arxiv.org/abs/1908.09557)to streamline the election process securely and efficiently while providing security guarantees and recoverability protocol.
+An E2E Verifiable voting system based on [OpenVoting: Recoverability from Failures in Dual Voting ](https://arxiv.org/abs/1908.09557)to streamline the election process securely and efficiently while providing security guarantees and recoverability protocol. This system conducts a single election in a single booth. For conducting multiple elections 
 
 ## Table of Contents
 - [Installation](#installation)
