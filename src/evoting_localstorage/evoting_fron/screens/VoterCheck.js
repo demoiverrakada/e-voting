@@ -5,22 +5,37 @@ import RNFS from 'react-native-fs';
 import checkReceipt from '../func/checkReceipt.js';
 const VoterVoted = (props) => {
     const [entryNum, setEntryNum] = useState('');
-    const checkVoterExistence = async () => {
-      try {
-        const data=await checkReceipt(entryNum);
-          if (data.message === "Voter verified successfully. Go inside the booth.") {
-            Alert.alert('Proceed to vote', "Go inside the booth to vote", [{ text: 'OK' }], { cancelable: false });
-            props.navigation.navigate("homePO");
-          }
-         else {
-          Alert.alert('Error', data.error, [{ text: 'OK' }], { cancelable: false });
-          props.navigation.navigate("homePO");
-        }
-      } catch (err) {
-        Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
-        props.navigation.navigate("homePO");
-      }
-}
+    // VoterCheck.js
+const checkVoterExistence = async () => {
+  try {
+    const data = await checkReceipt(entryNum);
+    
+    if (data.error) {
+      Alert.alert('Error', data.error);
+      return;
+    }
+
+    // Get elections where voter hasn't voted yet
+    const eligibleElections = data.election_ids.filter(eid => 
+      !data.votes?.some(v => v.election_id === eid)
+    );
+
+    if (eligibleElections.length === 0) {
+      Alert.alert('Info', 'No remaining eligible elections');
+      return;
+    }
+
+    props.navigation.navigate('ElectionLoop', {
+      voter_id: entryNum,
+      elections: eligibleElections,
+      currentIndex: 0
+    });
+    Alert.alert("Voter is eligible for the following elections:")
+  } catch (err) {
+    Alert.alert('Error', err.message);
+  }
+};
+
   return (
     <View style={styles.container}>
         <Text style={styles.heading}>Enter Voter Credentials</Text>

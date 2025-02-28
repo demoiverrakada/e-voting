@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ReactSession } from 'react-client-session';
+import { useNavigate } from "react-router-dom";
 import './DecryptedVotes.css';
 import Navigation from '../Navigation';
 import FinalVotes from './FinalVotes';
 import Loading from './Loading'
-import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
-
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function DecryptedVotes() {
   const navigate = useNavigate();
-  const [decryptedVotes, setDecryptedVotes] = useState([]); // State to store decrypted votes
+  const [decryptedVotes, setDecryptedVotes] = useState({});
   const [loading, setLoading] = useState(false);
+  const [selectedElection, setSelectedElection] = useState('');
+  const [electionIds, setElectionIds] = useState([]);
 
-  // Check for authentication when the page loads
   useEffect(() => {
     if (!sessionStorage.getItem('access_token')) {
-      navigate('/'); // Redirect to login page if no token
+      navigate('/');
     }
   }, [navigate]);
 
-  // Decrypt votes on button click
   const handleDecryptVotes = async () => {
     setLoading(true);
     try {
@@ -36,34 +35,38 @@ function DecryptedVotes() {
       alert('Votes decrypted successfully.');
     } catch (err) {
       alert(`Failed to decrypt votes: ${err.message}`);
-    }finally {
-      setLoading(false); // Stop loading
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Fetch decrypted votes from backend and render them as a table
   const handleGetDcrpVotes = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await axios.get('http://localhost:5000/getVotes');
       const votesData = response.data;
+      setDecryptedVotes(votesData);
+      setElectionIds(Object.keys(votesData));
+      setSelectedElection(Object.keys(votesData)[0]);
       localStorage.setItem("decryptedVotes", JSON.stringify(votesData));
       alert("Decrypted votes fetched successfully.");
-      navigate("/final_votes");
     } catch (err) {
       alert(`Failed to fetch decrypted votes: ${err.message}`);
-    }finally {
-      setLoading(false); // Stop loading
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleElectionChange = (event) => {
+    setSelectedElection(event.target.value);
   };
 
   return (
     <div className="decrypted-container">
       <h2>Decrypted Votes</h2>
 
-      {/* Show loading spinner if loading */}
       {loading ? (
-        <Loading message="Please wait while we decrypt the votes..." />
+        <Loading message="Please wait while we process the votes..." />
       ) : (
         <>
           <button onClick={handleDecryptVotes}>Decrypt Votes</button>
@@ -71,29 +74,39 @@ function DecryptedVotes() {
         </>
       )}
 
-      <Routes>
-        <Route path="/final_votes" element={<FinalVotes />} />
-      </Routes>
+      {electionIds.length > 0 && (
+        <div>
+          <label htmlFor="election-select">Select Election: </label>
+          <select id="election-select" value={selectedElection} onChange={handleElectionChange}>
+            {electionIds.map((id) => (
+              <option key={id} value={id}>Election {id}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
-      {/* Render table if decrypted votes are available */}
-      {decryptedVotes.length > 0 && (
+      {selectedElection && decryptedVotes[selectedElection] && (
         <table className="votes-table">
           <thead>
             <tr>
-              <th>Candidate Name</th>
-              <th>Votes</th>
+              <th>Candidate Index</th>
+              <th>Vote Count</th>
             </tr>
           </thead>
           <tbody>
-            {decryptedVotes.map((vote, index) => (
+            {decryptedVotes[selectedElection].msgs_out_dec.map((vote, index) => (
               <tr key={index}>
-                <td>{vote.name}</td>
-                <td>{vote.votes}</td>
+                <td>{vote[0]}</td>
+                <td>{vote[1]}</td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+
+      <Routes>
+        <Route path="/final_votes" element={<FinalVotes />} />
+      </Routes>
 
       <Navigation />
     </div>

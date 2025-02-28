@@ -20,7 +20,7 @@ export default function Scanner3(props) {
   //   );
   //   return null; // Prevent component rendering
   // }
-  const { commitments: incomingCommitments } = props.route.params; // This line gets the 'commitments'
+  const { commitments: incomingCommitments,election_id,voter_id,remainingElections, currentIndex} = props.route.params; // This line gets the 'commitments'
   let firstArray = '';
   let z = 0;
       // Start the loop from index 1
@@ -51,23 +51,33 @@ export default function Scanner3(props) {
     try {
       // Alert.alert('C', `The C is: ${firstArray}`);
       // Alert.alert('Booth Number', `The booth number is: ${booth_num}`);
-      const data = await postVote(enteredData, firstArray, booth_num);
-      if (data.message) {
-        Alert.alert('Successful', 'Your vote has been uploaded', [{ text: 'OK' }], { cancelable: false });
-        props.navigation.navigate("homePO");
-      } else {
-        Alert.alert("Vote was not recorded", data.err || "Unknown error", [{ text: 'OK' }], { cancelable: false });
-        props.navigation.navigate("homePO");
+      const result = await postVote(
+        enteredData, 
+        firstArray,
+        booth_num,
+        election_id
+      );
+      
+      if (result.message) {
+        // Move to next election
+        const nextIndex = currentIndex + 1;
+        
+        if (nextIndex < remainingElections.length) {
+          props.navigation.navigate('ElectionLoop', {
+            voter_id,
+            elections: remainingElections,
+            currentIndex: nextIndex
+          });
+        } else {
+          Alert.alert('Complete', 'All elections processed!');
+          props.navigation.navigate('homePO');
+        }
       }
     } catch (err) {
       console.error("Error during vote submission:", err);
       Alert.alert('Error', 'Data upload unsuccessful, try again.', [{ text: 'OK' }], { cancelable: false });
       props.navigation.navigate("homePO");
     }
-  };
-
-  const logout = () => {
-    props.navigation.navigate('homePO');
   };
 
   const handleInputSubmit = async () => {
@@ -107,14 +117,6 @@ export default function Scanner3(props) {
         labelStyle={styles.buttonLabel}
       >
         Submit
-      </Button>
-      <Button
-        mode="contained"
-        onPress={logout}
-        style={[styles.button, styles.logoutButton]}
-        labelStyle={styles.buttonLabel}
-      >
-        Home
       </Button>
     </View>
   );

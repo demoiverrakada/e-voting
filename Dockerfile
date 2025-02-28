@@ -30,7 +30,7 @@ RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification && npm insta
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && sed -i 's/\r$//' gradlew"
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && ./gradlew clean"
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && nice -n 19 ./gradlew assembleRelease"
-RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification && npm install"
+RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification && npm install --force"
 RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && sed -i 's/\r$//' gradlew"
 RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && ./gradlew clean"
 RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && nice -n 19 ./gradlew assembleRelease"

@@ -1,66 +1,56 @@
-import RNFS, { DocumentDirectoryPath, writeFile} from 'react-native-fs';
-import {sha256} from 'react-native-sha256';
-import React from 'react';
+import RNFS from 'react-native-fs';
+import { sha256 } from 'react-native-sha256';
 
-// Define the path to the JSON file to read from (in DocumentDirectoryPath)
 const writeFilePath = `${RNFS.DocumentDirectoryPath}/data.json`;
-
-// Function to copy the file from assets to the document directory if it does not exist
 
 const storeLastVerifiedVoter = async (voterId, voterIndex) => {
   try {
     const fileContents = await RNFS.readFile(writeFilePath, 'utf8');
     let myData = JSON.parse(fileContents);
-
-    // Update the lastVerifiedVoter field
-    myData.lastVerifiedVoter = { voter_id: voterId, voter_index: voterIndex };
-
-    // Write the updated data back to the file
+    myData.lastVerifiedVoter = { 
+      voter_id: voterId, 
+      voter_index: voterIndex,
+      elections: myData.voter[voterIndex]?.election_ids || []
+    };
     await RNFS.writeFile(writeFilePath, JSON.stringify(myData), 'utf8');
   } catch (error) {
-    console.error('Error storing the last verified voter:', error);
+    console.error('Error storing voter:', error);
   }
 };
 
-// Function to retrieve the last verified voter from the JSON file
-const getLastVerifiedVoter = async () => {
-  try {
-    const fileContents = await RNFS.readFile(writeFilePath, 'utf8');
-    let myData = JSON.parse(fileContents);
-
-    return myData.lastVerifiedVoter || null;
-  } catch (error) {
-    console.error('Error retrieving the last verified voter:', error);
-    return null;
-  }
-};
-
-// Example checkReceipt function (when voter enters)
 const checkReceipt = async (entryNum) => {
-  if (!entryNum) {
-    return { error: "Must provide a valid voter ID" };
-  }
+  if (!entryNum) return { error: "Invalid voter ID" };
 
   try {
     const fileContents = await RNFS.readFile(writeFilePath, 'utf8');
     let myData = JSON.parse(fileContents);
+    
+    const voterIndex = myData.voter.findIndex(v => v.voter_id === entryNum);
+    if (voterIndex === -1) return { error: "Voter not found" };
 
-    // Find the voter index
-    const updatedVoterIndex = myData.voter.findIndex((voter) => voter.voter_id === entryNum);
-    if (updatedVoterIndex === -1) {
-      return { error: "Voter not found." };
+    const voter = myData.voter[voterIndex];
+    
+    // Get elections where voter hasn't voted yet
+    const votedElections = voter.votes?.map(v => v.election_id) || [];
+    const eligibleElections = voter.election_ids?.filter(eid => 
+      !votedElections.includes(eid)
+    ) || [];
+
+    if (eligibleElections.length === 0) {
+      return { error: "No eligible elections remaining" };
     }
-    if (myData.voter[updatedVoterIndex].vote === true) {
-      return { error: "Voter has already voted." };
-    }
 
-    // Store the last verified voter
-    await storeLastVerifiedVoter(entryNum, updatedVoterIndex);
+    await storeLastVerifiedVoter(entryNum, voterIndex);
+    
+    return {
+      message: "Voter verified",
+      eligibleElections,
+      votedElections
+    };
 
-    return { message: "Voter verified successfully. Go inside the booth.", ok: true };
   } catch (err) {
     console.error(err);
-    return { error: "Error in voter verification." };
+    return { error: "Verification failed" };
   }
 };
 

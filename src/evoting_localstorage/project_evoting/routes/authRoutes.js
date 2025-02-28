@@ -77,13 +77,13 @@ function callPythonFunction2(functionName, ...params){
 
 // endpoint for generating the keys for the election
 router.post('/setup',requireAuth, async (req, res) => {
-    const {alpha} = req.body;
+    const {alpha,electionId} = req.body;
     const alp = Number(JSON.parse(alpha));
-
+    const elect_id=Number(JSON.parse(electionId));
     try {
-        document= await Keys.find();
-        if(document.length==1) return res.status(400).send("Setup has already been done.")
-        const result= await callPythonFunction('setup',alp);
+        document= await Keys.findOne({ election_id: elect_id });
+        if(document.length!=0) return res.status(400).send("Setup has already been done.")
+        const result= await callPythonFunction('setup',alp,elect_id);
         console.log(result); // Log the result or handle it internally
         res.send('Setup was successful.'); // Custom response
     } catch (error) {
@@ -92,25 +92,28 @@ router.post('/setup',requireAuth, async (req, res) => {
     }
 });
 
-router.post('/generate',requireAuth, async (req, res) => {
-    const { n } = req.body;
-    const num = Number(JSON.parse(n));
+router.post('/generate', requireAuth, async (req, res) => {
+    const { n, electionId } = req.body;
+    const num = Number(n);
+    const elect_id = Number(electionId);
     const outputDirectory = '/output';
 
     try {
         // Call the Python function to generate ballots
-        const result = await callPythonFunction("generate", num);
+        const result = await callPythonFunction("generate", num, elect_id);
         console.log(result);
 
-        // Read the generated PDF files from the output directory
-        const files = fs.readdirSync(outputDirectory).filter(file => file.endsWith('.pdf'));
+        // Read the generated PDF files from the output directory for this election
+        const files = fs.readdirSync(outputDirectory)
+            .filter(file => file.startsWith(`election_id_${elect_id}_`) && file.endsWith('.pdf'));
 
         if (files.length === 0) {
-            return res.status(404).send('No ballots generated.');
+            return res.status(404).send('No ballots generated for this election.');
         }
 
         // Create a zip archive of the generated PDFs
-        const zipFilePath = path.join(outputDirectory, 'ballots.zip');
+        const zipFileName = `election_id_${elect_id}_ballots.zip`;
+        const zipFilePath = path.join(outputDirectory, zipFileName);
         const output = fs.createWriteStream(zipFilePath);
         const archive = archiver('zip', { zlib: { level: 9 } });
 
@@ -122,7 +125,7 @@ router.post('/generate',requireAuth, async (req, res) => {
 
         // When the zip is ready, send it to the client
         output.on('close', () => {
-            res.download(zipFilePath, 'ballots.zip', err => {
+            res.download(zipFilePath, zipFileName, err => {
                 if (err) {
                     console.error('Error sending zip file:', err);
                     res.status(500).send('Error downloading the ballots.');
@@ -135,6 +138,7 @@ router.post('/generate',requireAuth, async (req, res) => {
         res.status(500).send(error.message);
     }
 });
+
 
 
 
@@ -279,7 +283,7 @@ router.get('/pk', async (req, res) => {
 // endpoint to 
 router.post('/mix', requireAuth, async (req, res) => {
     try {
-        const existingKey = await Keys.findOne(); // Assuming you want to fetch the first document
+        const existingKey = await Keys.find(); // Assuming you want to fetch the first document
         if (!existingKey) {
             return res.status(422).send({ error: "Setup has not been done" });
         }
@@ -297,50 +301,52 @@ router.post('/mix', requireAuth, async (req, res) => {
 
 // Example route to call the decvotes function
 router.get('/bulletin', async (req, res) => {
-    await Bulletin.find()
-        .then(users => res.json(users))
-        .catch(err => res.status(400).json({ error: err.message }))
+    try {
+        const users = await Bulletin.find().sort({ election_id: 1 });
+        res.json(users);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 });
 
 
 
-router.get('/getVotes',async (req, res) => {
+router.get('/getVotes', async (req, res) => {
     try {
-      // Fetch all Decs documents with .lean() to simplify the result
-      const decs = await Dec.find().lean();
-  
-      // Log the documents to see the full data (optional)
-      console.log('Fetched Decs:', decs);
-  
-      // Assuming the votes are stored in the msgs_out_dec array like [2, 3, 2, 2, 3]
-      const msgs_out_dec = decs.map(dec => dec.msgs_out_dec[1].map(item => item[1])).flat();  // Flatten to get the vote array
-  
-      console.log('Votes:', msgs_out_dec);  // Logs: [2, 3, 2, 2, 3]
-  
-      // Fetch all candidates
-      const candidates = await Candidate.find().lean();
-  
-      // Initialize a vote counts array based on the number of candidates
-      const voteCounts = new Array(candidates.length).fill(0);
-  
-      // Increment the vote count for each candidate
-      msgs_out_dec.forEach(vote => {
-        voteCounts[vote] += 1;
-      });
-  
-      const response = candidates.map((candidate, index) => ({
-        name: candidate.name,
-        votes: voteCounts[index]
-      }));
-  
-      // Return the response as an array of candidate names and votes
-      res.json(response);
-  
+        // Group Decs by election_id and process nested structure
+        const decs = await Dec.aggregate([
+            {
+                $group: {
+                    _id: "$election_id",
+                    documents: { $push: "$$ROOT" }
+                }
+            }
+        ]);
+
+        // Process data for frontend compatibility
+        const response = decs.reduce((acc, election) => {
+            const electionId = election._id;
+            
+            acc[electionId] = {
+                msgs_out_dec: election.documents.flatMap(doc => 
+                    doc.msgs_out_dec.map(entry => 
+                        // Extract candidate index and vote count from nested arrays
+                        [entry[0][0], entry[0][1][0]] // [String, Number]
+                    )
+                )
+            };
+            
+            return acc;
+        }, {});
+
+        res.json(response);
+
     } catch (err) {
-      console.error('Error fetching data:', err);
-      res.status(500).json({ error: err.message });
+        console.error('Error fetching data:', err);
+        res.status(500).json({ error: err.message });
     }
-  });
+});
+
       
 
 // for signing in Polling Officer

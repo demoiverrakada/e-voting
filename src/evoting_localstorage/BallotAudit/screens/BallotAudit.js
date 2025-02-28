@@ -42,7 +42,7 @@ let z = 0;
     const commitment=firstArray;
     const boothNum=booth_num;
     const bid = parseStringToArray(props.route.params.bid);
-
+    const election_id=props.route.params.election_id
     setLoading(true);
 
     try {
@@ -50,6 +50,7 @@ let z = 0;
         commitment: commitment,
         booth_num: boothNum,
         bid: bid[0],
+        election_id: election_id
       };
 
       const response = await fetch(

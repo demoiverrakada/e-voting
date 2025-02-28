@@ -114,9 +114,9 @@ AdminSchema.methods.comparePassword = function (candidatePassword) {
 
 // Schema to store votes on server
 const VotesSchema = new mongoose.Schema({
+    election_id:{type:Number,unique:true,required:true},
     voter_id: {
         type: String,
-        unique: true,
         required: true,
     },
     ov_hash:{type: String,required: true},
@@ -135,6 +135,11 @@ const VotesSchema = new mongoose.Schema({
 
 // Schema for candidate
 const CandidateSchema = new mongoose.Schema({
+    election_id:{
+        type:Number,
+        unique:true,
+        required:true
+    },
     name: {
         type: String,
         required: true          
@@ -159,11 +164,16 @@ const VoterSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
         required: true
+    },
+    election_id:{
+        type:Number,
+        required:true
     }
 });
 
 // Schema for receipts
 const ReceiptSchema = new mongoose.Schema({
+    election_id:{type:Number,required:true,unique:true},
     ov_hash:{type:String,required: true},
     enc_hash: {type:String,required: true},
     enc_msg:{type:String,required: true}, 
@@ -180,10 +190,14 @@ const ReceiptSchema = new mongoose.Schema({
 });
 
 const BulletinSchema=new mongoose.Schema({
-    voter_id:{
-        type:String,
+    election_id:{
+        type:Number,
         required:true,
         unique:true
+    },
+    voter_id:{
+        type:String,
+        required:true
     },
     booth_num:{
         type:Number,
@@ -206,6 +220,7 @@ const BulletinSchema=new mongoose.Schema({
 });
 
 const keysSchema=new mongoose.Schema({
+    election_id:{type:Number,unique:true,required:true},
     alpha:{type:String,required:true},
     pai_pk:{type:[mongoose.Schema.Types.Mixed],required:true},
     _pai_sklist:{type:[mongoose.Schema.Types.Mixed],required:true},
@@ -225,6 +240,7 @@ const keysSchema=new mongoose.Schema({
 });
 
 const generatorSchema=new mongoose.Schema({
+    election_id:{type:Number,unique:true,required:true},
     g1:{type:String,required:true},
     f2:{type:String,required:true},
     eg1f2:{type:String,required:true},
@@ -250,6 +266,7 @@ const pairingElementSchema = new mongoose.Schema({
   });
   
   const decSchema = new mongoose.Schema({
+    election_id:{type:Number,unique:true,required:true},
     msgs_out_dec: {
       type: [ [ [String, Array] ] ], // Nested arrays with type [ "builtins.list", [ [type, value], ...] ]
       required: true

@@ -1,28 +1,53 @@
 from pymongo import MongoClient
+import json
 
 def process_bulletins():
-    # Connect to MongoDB
     client = MongoClient('mongodb://root:pass@eadb:27017')
     db = client['test']
 
-    # Collections
     bulletins_collection = db['bulletins']
     receipts_collection = db['receipts']
     votes_collection = db['votes']
 
-    bulletins_cursor = bulletins_collection.find()
+    for bulletin in bulletins_collection.find():
+        try:
+            # Find receipt with election_id match
+            receipt = receipts_collection.find_one({
+                'enc_hash': bulletin['commitment'],
+                'election_id': bulletin['election_id']
+            })
 
-    # Process each bulletin
-    for bulletin in bulletins_cursor:
-        commitment = bulletin['commitment']
+            if not receipt:
+                print(f"No receipt found for commitment {bulletin['commitment']} in election {bulletin['election_id']}")
+                continue
 
-        receipt = receipts_collection.find_one({'enc_hash': commitment})
+            # Convert string fields to arrays using JSON parsing
+            vote_doc = {
+                "election_id": bulletin['election_id'],
+                "voter_id": bulletin['voter_id'],
+                "ov_hash": receipt['ov_hash'],
+                "enc_hash": receipt['enc_hash'],
+                "enc_msg": json.loads(receipt['enc_msg']),
+                "comm": json.loads(receipt['comm']),
+                "enc_msg_share": json.loads(receipt['enc_msg_shares']),
+                "enc_rand_share": json.loads(receipt['enc_rand_shares']),
+                "pfcomm": receipt['pfcomm'],
+                "enc_rand": json.loads(receipt['enc_rand']),
+                "pf_encmsg": receipt['pf_encmsg'],
+                "pf_encrand": receipt['pf_encrand'],
+                "pfs_enc_msg_share": receipt['pf_enc_msg_shares'],
+                "pfs_enc_rand_share": receipt['pf_enc_rand_shares']
+            }
 
-        if receipt:
-            receipt['voter_id'] = bulletin['voter_id']
-            votes_collection.insert_one(receipt)
-            print(f"Processed commitment: {commitment}")
-        else:
-            print(f"No matching receipt found for commitment: {commitment}")
-    
-    print("Data transfer completed.")
+            # Insert into votes collection
+            votes_collection.insert_one(vote_doc)
+            print(f"Processed voter {bulletin['voter_id']} in election {bulletin['election_id']}")
+
+        except KeyError as e:
+            print(f"Missing field {str(e)} in bulletin {bulletin.get('_id')}")
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error in bulletin {bulletin.get('_id')}: {str(e)}")
+        except Exception as e:
+            print(f"Error processing bulletin {bulletin.get('_id')}: {str(e)}")
+
+    print("Bulletin processing completed")

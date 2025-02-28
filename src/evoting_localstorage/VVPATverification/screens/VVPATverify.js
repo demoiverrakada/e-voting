@@ -1,113 +1,112 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { Button } from 'react-native-paper';
 
 const parseStringToArray = (str) => {
   return str
-    .slice(1, -1) // Remove the square brackets at the start and end
-    .split(",") // Split by commas
-    .map((item) => item.trim().replace(/^['"]|['"]$/g, '')); // Trim whitespace and remove surrounding quotes
+    .slice(1, -1) // Remove the square brackets
+    .split(",")
+    .map(item => item.trim().replace(/^['"]|['"]$/g, ''));
 };
 
 export default function VVPATVerify(props) {
-  // State to store the result
+  const [scannedBid, setScannedBid] = useState(null);
+  const [electionId, setElectionId] = useState('');
   const [verificationResult, setVerificationResult] = useState(null);
 
-  const checkSend = async (qrcodedata) => {
-    const ballot_id = parseStringToArray(qrcodedata);
-    const bid = ballot_id[0];
-    const requestBody = {
-      bid: bid,
-    };
+  const handleQRScan = ({ data }) => {
+    try {
+      const bidArray = parseStringToArray(data);
+      if (bidArray.length > 0) {
+        setScannedBid(bidArray[0]);
+        Alert.alert("QR Scanned Successfully", "Ballot ID captured. Now enter Election ID.");
+      }
+    } catch (error) {
+      Alert.alert("Invalid QR Code", "Please scan a valid ballot ID QR code");
+    }
+  };
+
+  const verifyVVPAT = async () => {
+    if (!scannedBid || !electionId) {
+      Alert.alert("Missing Information", "Please scan a ballot ID and enter election ID");
+      return;
+    }
 
     try {
       const response = await fetch("http://192.168.1.8:7000/vvpat", {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bid: scannedBid,
+          election_id: electionId
+        }),
       });
 
       const data = await response.json();
-
+      
       if (response.ok) {
         if (data.results) {
-          // Case 1: Verification failure
           setVerificationResult({ type: 'failure', message: data.results });
-        } else if (data.cand_name && data.extended_vote) {
-          // Case 2: Successful verification
+        } else {
           setVerificationResult({
             type: 'success',
-            message: `Candidate Name: ${data.cand_name}\nExtended Vote: ${data.extended_vote}`,
+            message: `Candidate: ${data.cand_name}\nVote ID: ${data.extended_vote}`
           });
-        } else {
-          // Case 3: Unexpected server response
-          setVerificationResult({ type: 'error', message: 'Unexpected server response received.' });
         }
       } else {
-        // Handle server-reported errors
-        setVerificationResult({
-          type: 'error',
-          message: data.error || 'An unknown error occurred.',
-        });
+        throw new Error(data.error || 'Verification failed');
       }
     } catch (error) {
-      console.error("Fetch error:", error);
-      setVerificationResult({ type: 'error', message: 'Unable to connect to the server.' });
+      setVerificationResult({ type: 'error', message: error.message });
     }
-  };
-
-  const logout = () => {
-    props.navigation.navigate("scanner");
-  };
-
-  const isValidQRCode = (data) => {
-    return data !== undefined;
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Scan Ballot ID on the VVPAT</Text>
+      <Text style={styles.headerText}>VVPAT Verification</Text>
+      
       <QRCodeScanner
-        onRead={async ({ data }) => {
-          if (isValidQRCode(data)) {
-            await checkSend(data);
-            console.log("Valid QR code detected:", data);
-          } else {
-            console.log("Invalid QR code detected:", data);
-          }
-        }}
+        onRead={handleQRScan}
         showMarker={true}
         markerStyle={styles.marker}
+        containerStyle={styles.scannerContainer}
       />
       
-      {/* Displaying verification result on the screen */}
-      {verificationResult && (
-        <View style={styles.resultContainer}>
-          <Text style={styles.resultText}>
-            {verificationResult.type === 'failure' && (
-              <Text style={styles.failureText}>{verificationResult.message}</Text>
-            )}
-            {verificationResult.type === 'success' && (
-              <Text style={styles.successText}>{verificationResult.message}</Text>
-            )}
-            {verificationResult.type === 'error' && (
-              <Text style={styles.errorText}>{verificationResult.message}</Text>
-            )}
-          </Text>
-        </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter Election ID"
+        placeholderTextColor="#666"
+        keyboardType="numeric"
+        value={electionId}
+        onChangeText={setElectionId}
+      />
+
+      {scannedBid && (
+        <Text style={styles.scannedText}>Scanned Ballot ID: {scannedBid}</Text>
       )}
 
       <Button
         mode="contained"
-        onPress={logout}
-        style={styles.button}
+        onPress={verifyVVPAT}
+        style={styles.verifyButton}
         labelStyle={styles.buttonLabel}
+        disabled={!scannedBid || !electionId}
       >
-        Scan a new VVPAT
+        Verify Vote
       </Button>
+
+      {verificationResult && (
+        <View style={[
+          styles.resultContainer,
+          verificationResult.type === 'success' && styles.successContainer,
+          verificationResult.type === 'error' && styles.errorContainer
+        ]}>
+          <Text style={styles.resultText}>
+            {verificationResult.message}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -116,66 +115,59 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F3F7FA',
-    justifyContent: 'center',
     padding: 20,
   },
   headerText: {
-    fontSize: 36,
-    marginLeft: 20,
-    marginTop: 15,
+    fontSize: 24,
     color: '#333',
     fontWeight: '600',
     textAlign: 'center',
+    marginVertical: 20,
   },
-  marker: {
-    borderColor: '#4A90E2',
-    borderWidth: 3,
-    borderRadius: 12,
+  scannerContainer: {
+    height: 300,
+    marginBottom: 20,
   },
-  button: {
-    marginTop: 25,
-    marginHorizontal: 20,
-    backgroundColor: '#D9534F',
-    borderRadius: 30,
-    paddingVertical: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
+  input: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 15,
+  },
+  scannedText: {
+    color: '#4A90E2',
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  verifyButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
+    paddingVertical: 12,
+    marginBottom: 20,
   },
   buttonLabel: {
-    color: '#FFFFFF',
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-    textTransform: 'uppercase',
   },
   resultContainer: {
-    marginTop: 20,
     padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  successContainer: {
+    backgroundColor: '#e8f5e9',
+    borderColor: '#4CAF50',
+  },
+  errorContainer: {
+    backgroundColor: '#ffebee',
+    borderColor: '#f44336',
   },
   resultText: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
-  },
-  successText: {
-    color: 'green',
-    fontWeight: 'bold',
-  },
-  failureText: {
-    color: 'red',
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'orange',
-    fontWeight: 'bold',
   },
 });
 

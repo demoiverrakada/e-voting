@@ -10,8 +10,8 @@ export default function Scanner(props) {
       console.log("successfully submitted ballot_id login");
       Alert.alert(
         "Ballot ID successfully identified",
-	"Audit ballot next",
-        [{ text: 'OK', onPress: () => props.navigation.navigate("audit", { commitments: commitments, bid: qrcodedata }) }],
+	"Enter Election ID next",
+        [{ text: 'OK', onPress: () => props.navigation.navigate("elect", { commitments: commitments, bid: qrcodedata }) }],
         { cancelable: false }
       );
     } catch (err) {

@@ -28,12 +28,12 @@ import pymongo
 import io
 import contextlib
 
-def update_keys_with_n(ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares):
+def update_keys_with_n(ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares,election_id):
     db=init()
     collection=db['keys']
-    document=collection.find_one()
+    document=collection.find_one({"election_id":election_id})
     if not document:
-        raise ValueError("No existing setup found. Please run setup first.")
+        raise ValueError(f"No existing setup found for election_id {election_id}. Please run setup first.")
     collection.update_one(
         {"_id": document["_id"]},
         {"$set": {
@@ -48,7 +48,7 @@ def update_keys_with_n(ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shar
             "beaver_c_shares": serialize_wrapper(beaver_c_shares)
         }})
 
-def setup(alpha):
+def setup(alpha,election_id):
     """ Setup keys and other performance-enhancing artefacts. Accessible only to an administrator. 
     
     Stores a public key, a set of secret keys, and other globals in the database.
@@ -61,7 +61,7 @@ def setup(alpha):
     f = io.StringIO()
     #if(True):
     with contextlib.redirect_stdout(f):
-        store("generators",[g1,f2,eg1f2,ef1f2,f1,h1,eh1f2,idenT,inveh1f2,inveg1f2,fT])
+        store("generators",[g1,f2,eg1f2,ef1f2,f1,h1,eh1f2,idenT,inveh1f2,inveg1f2,fT,election_id])
         _pai_sklist, pai_pk = pai_th_keygen(alpha)
         _pai_sklist_single, pai_pklist_single = [], []
         for a in range(alpha):
@@ -71,170 +71,253 @@ def setup(alpha):
 
         _elg_sklist, elg_pk = elgamal_th_keygen(alpha)
         
-        store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist])
+        store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,election_id])
     print("Setup was done successful")
 
-def generate_ballots(num):
-    ballot_draft(num)
+def generate_ballots(num,election_id):
+    ballot_draft(num,election_id)
 
 
 
 def mixer():
-    """ Begin the process of mixing the encrypted votes and decrypting them. Accessible only to an administrator.  
+    """Begin the process of mixing the encrypted votes and decrypting them for all elections"""
+    db=init()
+    # Get all distinct election IDs from keys collection
+    election_ids = db.keys.distinct("election_id")
     
-    Produces a permuted list of decrypted votes in the database.
-    """
-    # Connect to the database
-    client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
-    db = client["test"]
-    collection = db["decs"]
-    
-    # Check if the collection is empty
-    if collection.count_documents({}) > 0:
-        print("Decryption has already been done. No further action is required.")
-        return
+    for election_id in election_ids:
+        dec_collection = db.decs
+        if dec_collection.find_one({"election_id": election_id}):
+            print(f"Decryption already done for election {election_id}")
+            continue
 
-    f = io.StringIO()
-    with contextlib.redirect_stdout(f):
-        process_bulletins()
-        alpha,pai_pk,pai_pklist_single,_pai_sklist,_pai_sklist_single=load("setup",["alpha","pai_pk","pai_pklist_single","_pai_sklist","_pai_sklist_single"]).values()
-        
-        enc_msgs, enc_msg_shares, enc_rand_shares=load("enc",["enc_msg", "enc_msg_share", "enc_rand_share"]).values()
-        n=len(enc_msgs)
-        beaver_a_shares,beaver_b_shares,beaver_c_shares = gen_beaver_triples(n, alpha)
-        # Generate a commitment to the permutation and prove knowledge of its opening
-        ck = commkey(n)
-        ck_fo = commkey_fo(n, N=pai_pk[0])
-        _pi, _re_pi = genperms(n, alpha)
-        _svecperm = [[group.random(ZR) for i in range(n)] for a in range(alpha)]
-        permcomm = [commit_perm(ck, _re_pi[a], _svecperm[a]) for a in range(alpha)]
-        evec = [[group.init(ZR, random.getrandbits(kappa_e)) for i in range(n)] for a in range(alpha)]
-        pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a]) for a in range(alpha)]
-        status_permcomm = True
-        for a in range(alpha):
-            status_permcomm = status_permcomm and perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a])
-        assert status_permcomm
+        print(f"Processing election {election_id}")
+        f = io.StringIO()
+        with contextlib.redirect_stdout(f):
+            try:
+                # Process bulletins for this election
+                process_bulletins()  # Ensure process_bulletins handles election_id
 
-        update_keys_with_n(ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,beaver_a_shares,beaver_b_shares,beaver_c_shares)
-        # Check validity of stored encryptions
-        #status_encs = check_encs(pai_pk, pai_pklist_single, enc_msgs, enc_rands, enc_msg_shares, enc_rand_shares, pf_encmsgs, pf_encrands, pfs_enc_msg_shares, pfs_enc_rand_shares)
-        #assert status_encs
-        res=load("load",[])
-        # Mix
-        msgs_out, _msg_shares, _rand_shares = mix(ck, ck_fo, permcomm, enc_msgs, enc_msg_shares, enc_rand_shares, alpha, pai_pk, pai_pklist_single, _pai_sklist, _pai_sklist_single, _pi, _svecperm)
-        msgs_out_dec=[]
-        for j in range(len(msgs_out)):
-            i=int(str(msgs_out[j]))
-            i=i%(len(res))
-            msgs_out_dec.append(i)
-        # Store the results
-    existing_mix_data = load("mix", ["msgs_out","_msgs_shares","_rand_shares"])
-    if existing_mix_data: 
-        print("Decryption has already been done. No further action is required.")
-        return
-    store("mix",[msgs_out_dec,msgs_out, _msg_shares, _rand_shares])
+                # Load election-specific parameters
+                keys_data = load("keys", ["alpha", "pai_pk", "pai_pklist_single", 
+                                        "_pai_sklist", "_pai_sklist_single"], election_id)
+                alpha = keys_data["alpha"]
+                pai_pk = keys_data["pai_pk"]
+                pai_pklist_single = keys_data["pai_pklist_single"]
+                _pai_sklist = keys_data["_pai_sklist"]
+                _pai_sklist_single = keys_data["_pai_sklist_single"]
+
+                # Load encrypted data for this election
+                votes_data = load("votes", ["enc_msg", "enc_msg_share", "enc_rand_share"], election_id)
+                enc_msgs = votes_data["enc_msg"]
+                enc_msg_shares = votes_data["enc_msg_share"]
+                enc_rand_shares = votes_data["enc_rand_share"]
+                
+                n = len(enc_msgs)
+                if n == 0:
+                    print(f"No votes found for election {election_id}")
+                    continue
+
+                # Generate Beaver triples
+                beaver_a_shares, beaver_b_shares, beaver_c_shares = gen_beaver_triples(n, alpha)
+
+                # Generate permutation commitment
+                ck = commkey(n)
+                ck_fo = commkey_fo(n, N=pai_pk[0])
+                _pi, _re_pi = genperms(n, alpha)
+                _svecperm = [[group.random(ZR) for _ in range(n)] for _ in range(alpha)]
+                permcomm = [commit_perm(ck, _re_pi[a], _svecperm[a]) for a in range(alpha)]
+
+                # Generate permutation proofs
+                evec = [[group.init(ZR, random.getrandbits(kappa_e)) for _ in range(n)] for _ in range(alpha)]
+                pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a]) for a in range(alpha)]
+                
+                # Verify permutation proofs
+                status_permcomm = all(
+                    perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a])
+                    for a in range(alpha)
+                )
+                assert status_permcomm, f"Permutation proof verification failed for election {election_id}"
+
+                # Update keys with new parameters
+                update_keys_with_n(
+                    ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,
+                    beaver_a_shares, beaver_b_shares, beaver_c_shares, election_id
+                )
+
+                # Perform mixing
+                msgs_out, _msg_shares, _rand_shares = mix(
+                    ck, ck_fo, permcomm, enc_msgs, enc_msg_shares, enc_rand_shares,
+                    alpha, pai_pk, pai_pklist_single, _pai_sklist, _pai_sklist_single,
+                    _pi, _svecperm
+                )
+
+                # Decrypt messages
+                res = load("load", [], election_id)  # Ensure proper election ID handling
+                msgs_out_dec = []
+                for j in range(len(msgs_out)):
+                    i = int(str(msgs_out[j])) % len(res)
+                    msgs_out_dec.append(i)
+
+                # Store results with election ID
+                store("decs", [election_id, msgs_out_dec, msgs_out, _msg_shares, _rand_shares])
+                
+            except Exception as e:
+                print(f"Error processing election {election_id}: {str(e)}")
+                continue
     print("Mixing and decryption was successful")
-
-#done
-#def pfcomms():
-    """ Get proof of knowledge of all commitments in the uploaded encrypted votes. """
- #   proofs=load("pf_zksm",[])
- #   print(proofs)
 
 
 def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
-    """ Get the list of proofs (dummy or real) for encrypted votes identified by index set I, proving or 
-    disproving (in zero-knowledge) whether they encrypt a plaintext identified by index set J. The additional 
-    parameters verfpk and verfsigs are because of the way our scheme works - it requires the verifier to 
-    compute BB signatures on plaintexts in set J. 
+    """ZK proofs for encrypted votes across all elections"""
+    db=init()
+    election_ids = db.keys.distinct("election_id")
     
-    The verifier code should take the output of this function --- the proofs --- and verify them.
-    """
-    #print(type(verfpk),"type of verfpk")
-    #print(type(sigs),"type of sigs")
-    f = io.StringIO()
-    #if(True):
-    with contextlib.redirect_stdout(f):
-        verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
-        sigs= deserialize_wrapper(ast.literal_eval(sigs))
-        enc_sigs= deserialize_wrapper(ast.literal_eval(enc_sigs))
-        enc_sigs_rands= deserialize_wrapper(ast.literal_eval(enc_sigs_rands))
-    #print(type(verfpk),type(sigs),type(enc_sigs),type(enc_sigs_rands))
-        dict=load("mix",["msgs_out","_msg_shares","_rand_shares"])
-    #print(dict['msgs_out'] , "checking if messages remain the same")
-    #print(verfpk,"verfpk")
-    #print(sigs,"sigs")
-        alpha,ck,permcomm,elg_pk,_svecperm,_pi,_re_pi,_elg_sklist=load("setup",["alpha","ck","permcomm","elg_pk","_svecperm","_pi","_re_pi","_elg_sklist"]).values()
-        comms=list(load("enc",["comm"]).values())[0]
-        print(comms,"comms")
-    #print(type(comms),"type of comms")
-    # Check verifier signatures
-        #from bbsig import bbbatchverify
-        #print(bbbatchverify(sigs,dict['msgs_out'],verfpk),"checking bbbatch outside the assert statement") 
-        status_verfsigs = check_verfsigs(dict['msgs_out'], sigs, verfpk, enc_sigs, enc_sigs_rands, elg_pk,alpha)
-        #print(status_verfsigs)
-        assert status_verfsigs
+    all_results = {}
+    
+    for election_id in election_ids:
+        try:
+            # Skip elections without decrypted data
+            if not db.decs.find_one({"election_id": election_id}):
+                print(f"Skipping election {election_id} - no decrypted data")
+                continue
 
-    # Get blinded signatures against comms
-        blsigs, _blshares = get_blsigs(enc_sigs, ck, permcomm, alpha, elg_pk, _svecperm, _pi, _re_pi, _elg_sklist)
+            f = io.StringIO()
+            with contextlib.redirect_stdout(f):
+                # Load election-specific parameters
+                mix_data = load("mix", ["msgs_out", "_msg_shares", "_rand_shares"], election_id)
+                setup_data = load("setup", ["alpha", "ck", "permcomm", "elg_pk", "_svecperm", "_pi", "_re_pi", "_elg_sklist"], election_id)
+                
+                # Deserialize parameters
+                verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
+                sigs = deserialize_wrapper(ast.literal_eval(sigs))
+                enc_sigs = deserialize_wrapper(ast.literal_eval(enc_sigs))
+                enc_sigs_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rands))
+                
+                # Get encryption commitments
+                enc_data = load("enc", ["comm"], election_id)
+                comms = enc_data.get("comm", [])
+                # Verify signatures
+                status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"])
+                assert status_verfsigs, f"Signature verification failed for election {election_id}"
 
-    # Proofs
-        dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms, blsigs, verfpk, alpha,dict["_msg_shares"],dict["_rand_shares"], _blshares)
-        #status_dpk_bbsig = dpk_bbsig_nizkverifs(comms, blsigs, verfpk, dpk_bbsig_pfs)
-    #print("status_dpk_bbsig:",status_dpk_bbsig)  
-    result= [str(serialize_wrapper(dpk_bbsig_pfs)),str(serialize_wrapper(blsigs))]  
-    print(json.dumps(result))
+                # Generate BLS signatures
+                blsigs, _blshares = get_blsigs(enc_sigs,setup_data["ck"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["_svecperm"],setup_data["_pi"], 
+                    setup_data["_re_pi"], 
+                    setup_data["_elg_sklist"])
+
+                # Generate ZK proofs
+                dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms,blsigs,verfpk,setup_data["alpha"],mix_data["_msg_shares"],mix_data["_rand_shares"],_blshares)
+                # Store results per election
+                all_results[election_id] = {
+                    "proofs": serialize_wrapper(dpk_bbsig_pfs),
+                    "blsigs": serialize_wrapper(blsigs)
+                }
+
+        except Exception as e:
+            print(f"Error processing election {election_id}: {str(e)}")
+            continue
+
+    print(json.dumps(all_results))
+
+
+
 def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
-    """ Get the list of proofs (dummy or real) for plaintext votes identified by index set J, proving or 
-    disproving (in zero-knowledge) whether they are encrypted by some ciphertext identified by index set I.
-    The additional parameters verfpk and verfsigs are because of the way our scheme works - it requires the 
-    verifier to compute quasi-BBS+ signatures on ciphertexts (commitments) in set I (note that this requires 
-    the provers to demonstrate proof of knowledge of all the commitment openings, which they do using the 
-    pkcomms endpoint).
+    """ZK proofs for plaintext votes across all elections"""
+    db=init()
+    election_ids = db.keys.distinct("election_id")
     
-    The verifier code should take the output of this function --- the proofs --- and verify them.
-    """
-    f = io.StringIO()
-    #if(True):
-    with contextlib.redirect_stdout(f):
-        verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
-        sigs_rev= deserialize_wrapper(ast.literal_eval(sigs_rev))
-        print(enc_sigs_rev)
-        enc_sigs_rev= deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
-        enc_sigs_rev_rands= deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
-        msgs_out,_rand_shares=load("mix",["msgs_out","_rand_shares"]).values()
-        alpha, pai_pk, _pai_sklist,elg_pk, _elg_sklist,ck, ck_fo, _pi, _svecperm, permcomm=load("setup",['alpha','pai_pk','_pai_sklist','elg_pk','_elg_sklist','ck','ck_fo','_pi','_svecperm','permcomm']).values()
-        comms=list(load("enc",["comm"]).values())[0]
-        enc_rands=list(load("enc",["enc_rand"]).values())[0]
-        print(enc_rands,"enc_rands")
-    # Check verifier signatures
-        status_verfsigs_rev = check_verfsigs_rev(sigs_rev, comms, verfpk, enc_sigs_rev, enc_sigs_rev_rands, elg_pk, pai_pk,alpha)
-        assert status_verfsigs_rev
-        print("status_verfsigs_rev: ", status_verfsigs_rev)
-    # Get blinded signatures against msg_outs
-        blsigs_rev, _blshares_rev = get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, elg_pk, pai_pk, _svecperm, _rand_shares, _pi, _elg_sklist, _pai_sklist)
+    all_results = {}
 
-    # Proofs
-        blsigs_S, blsigs_c, blsigs_r = blsigs_rev
-        _blshares_S, _blshares_c, _blshares_r = _blshares_rev
-        
-        # from bbsplussig import bbsplusverify
-        # g1,h1=load("generators",["g1","h1"]).values()
-        # _blshare_S = _blshares_S[0][0] + _blshares_S[1][0]
-        # _blshare_c =  _blshares_c[0][0] + _blshares_c[1][0]
-        # _blshare_r =  _blshares_r[0][0] + _blshares_r[1][0]
-        # sig_S = blsigs_S[0] * (g1 ** (-_blshare_S))
-        # sig_c = blsigs_c[0] - _blshare_c 
-        # sig_r = blsigs_r[0] - _blshare_r
-        # sigma = (sig_S, sig_c, sig_r)
-        # tmp_status_verif = bbsplusverify(sigma, msgs_out[0], verfpk)
-        # print("tmp_status_verif:", tmp_status_verif)
+    for election_id in election_ids:
+        try:
+            # Skip elections without decrypted data
+            if not db.decs.find_one({"election_id": election_id}):
+                print(f"Skipping election {election_id} - no decrypted data")
+                continue
 
-        dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha, _blshares_S, _blshares_c, _blshares_r)
-        #status_dpk_bbsplussig = dpk_bbsplussig_nizkverifs(msgs_out, blsigs_S, blsigs_c, blsigs_r, verfpk, dpk_bbsplussig_pfs)
-    #print(status_dpk_bbsplussig,"verification is true i.e. system is correct")
-    result= [str(serialize_wrapper(dpk_bbsplussig_pfs)),str(serialize_wrapper(blsigs_rev))]
-    print(json.dumps(result))
+            f = io.StringIO()
+            with contextlib.redirect_stdout(f):
+                # Load election-specific data using updated load function
+                mix_data = load("mix", ["msgs_out", "_rand_shares"], election_id)
+                setup_data = load("setup", [
+                    'alpha', 'pai_pk', '_pai_sklist', 'elg_pk',
+                    '_elg_sklist', 'ck', 'ck_fo', '_pi',
+                    '_svecperm', 'permcomm'
+                ], election_id)
+                
+                enc_data = load("enc", ["comm", "enc_rand"], election_id)
+                comms = enc_data.get("comm", [])
+                enc_rands = enc_data.get("enc_rand", [])
+
+                # Deserialize global parameters
+                verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
+                sigs_rev = deserialize_wrapper(ast.literal_eval(sigs_rev))
+                enc_sigs_rev = deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
+                enc_sigs_rev_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
+
+                # Verify signatures for this election
+                status_verfsigs_rev = check_verfsigs_rev(
+                    sigs_rev, 
+                    comms, 
+                    verfpk, 
+                    enc_sigs_rev, 
+                    enc_sigs_rev_rands, 
+                    setup_data["elg_pk"],
+                    setup_data["pai_pk"],
+                    setup_data["alpha"]
+                )
+                assert status_verfsigs_rev, f"Signature verification failed for election {election_id}"
+
+                # Generate blinded signatures for this election
+                blsigs_rev, _blshares_rev = get_blsigs_rev(
+                    enc_sigs_rev,
+                    enc_rands,
+                    setup_data["ck"],
+                    setup_data["ck_fo"],
+                    setup_data["permcomm"],
+                    setup_data["alpha"],
+                    setup_data["elg_pk"],
+                    setup_data["pai_pk"],
+                    setup_data["_svecperm"],
+                    mix_data["_rand_shares"],
+                    setup_data["_pi"],
+                    setup_data["_elg_sklist"],
+                    setup_data["_pai_sklist"]
+                )
+
+                # Generate ZK proofs for this election
+                blsigs_S, blsigs_c, blsigs_r = blsigs_rev
+                _blshares_S, _blshares_c, _blshares_r = _blshares_rev
+                
+                dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(
+                    mix_data["msgs_out"],
+                    blsigs_S,
+                    blsigs_c,
+                    blsigs_r,
+                    verfpk,
+                    setup_data["alpha"],
+                    _blshares_S,
+                    _blshares_c,
+                    _blshares_r
+                )
+
+                # Store results per election
+                all_results[election_id] = {
+                    "proofs": serialize_wrapper(dpk_bbsplussig_pfs),
+                    "blsigs_rev": serialize_wrapper(blsigs_rev),
+                    "election_data": {
+                        "msgs_out": serialize_wrapper(mix_data["msgs_out"]),
+                        "comms": serialize_wrapper(comms)
+                    }
+                }
+
+        except Exception as e:
+            print(f"Error processing election {election_id}: {str(e)}")
+            continue
+
+    print(json.dumps(all_results, indent=2))
+
 
 
 

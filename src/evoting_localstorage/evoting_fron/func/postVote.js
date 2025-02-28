@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 const writeFilePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
 const readFilePath = `${RNFS.DocumentDirectoryPath}/data.json`;
 
-const postVote = async (preference, commitments, booth_num) => {
+const postVote = async (preference, commitments, booth_num,election_id) => {
   try {
     Alert.alert('Booth Number', `The booth number is: ${booth_num}`);
     // Alert.alert("Debug", "Starting postVote function...");
@@ -110,7 +110,7 @@ const postVote = async (preference, commitments, booth_num) => {
     // Alert.alert("Debug", "Preparing new vote...");
     const cleaned = booth_num.slice(1, -1); // Remove '[' and ']'
     const booth = cleaned.split("");
-    const newVote = { voter_id: voter_id, booth_num: booth_num, commitment: comms[num].replace(/^'|'$/g, ''), pref_id: num, hash_value: ballot_id };
+    const newVote = {election_id:election_id,voter_id: voter_id, booth_num: booth_num, commitment: comms[num].replace(/^'|'$/g, ''), pref_id: num, hash_value: ballot_id };
     // Alert.alert("Debug", `New vote created: ${JSON.stringify(newVote)}`);
 
     // Step 7: Update voter and receipt data

@@ -11,6 +11,7 @@ export default function Scanner(props) {
   const checkSend = async (qrcodedata) => {
     try {
       // Alert.alert(qrcodedata[0]);
+      const { voter_id, election_id, remainingElections, currentIndex } = props.route.params;
       let firstArray = '';
 
       // Start the loop from index 1
@@ -31,7 +32,11 @@ export default function Scanner(props) {
           Alert.alert(
             'Encrypted candidate ID successfully verified',
             'Enter the voter preference number',
-            [{ text: 'OK', onPress: () => props.navigation.navigate('scanner3', { commitments: qrcodedata }) }],
+            [{ text: 'OK', onPress: () => props.navigation.navigate('scanner3', { commitments: qrcodedata,
+              election_id,
+              voter_id,
+              remainingElections,
+              currentIndex}) }],
             { cancelable: false }
           );
         }
@@ -46,9 +51,6 @@ export default function Scanner(props) {
     }
   };
 
-  const logout = async () => {
-    props.navigation.navigate('homePO');
-  };
 
   const isValidQRCode = (data) => {
     return data !== undefined;
@@ -70,14 +72,6 @@ export default function Scanner(props) {
         showMarker={true}
         markerStyle={styles.marker}
       />
-      <Button
-        mode="contained"
-        onPress={logout}
-        style={styles.button}
-        labelStyle={styles.buttonLabel}
-      >
-        Go to Home
-      </Button>
     </View>
   );
 }

@@ -16,8 +16,6 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import VoterVerify from './screens/VoterCheck.js';
-import ScanBallot from './screens/ScanBallot.js';
-import ScanPref from './screens/ScanPref.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack =createNativeStackNavigator();
 function App(){
@@ -43,8 +41,6 @@ function App(){
     <NavigationContainer>
       <Stack.Navigator>
             <Stack.Screen name="scanner" component={VoterVerify} options={{ headerShown: false }}/>
-            <Stack.Screen name="scanner2" component={ScanBallot} options={{ headerShown: false }}/>
-            <Stack.Screen name="scanner3" component={ScanPref} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
     </>

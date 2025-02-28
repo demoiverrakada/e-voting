@@ -45,6 +45,7 @@ const extractVotesToExternalStorage = async () => {
     for (const vote of votesData) {
       // Create a copy of vote without hash_value
       const voteWithoutHash = {
+        election_id: vote.election_id,
         voter_id: vote.voter_id,
         booth_num: vote.booth_num,
         commitment: vote.commitment,
@@ -56,6 +57,7 @@ const extractVotesToExternalStorage = async () => {
 
     // Apply the final hash to all votes
     const finalUpdatedVotesData = votesData.map(vote => ({
+      election_id:vote.election_id,
       voter_id: vote.voter_id,
       booth_num: vote.booth_num,
       commitment: vote.commitment,

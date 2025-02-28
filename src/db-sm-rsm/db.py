@@ -31,7 +31,8 @@ def store(funcs,params):
             "idenT":(serialize_wrapper(params[7])),
             "inveh1f2":(serialize_wrapper(params[8])),
             "inveg1f2":(serialize_wrapper(params[9])),
-            "fT":(serialize_wrapper(params[10]))
+            "fT":(serialize_wrapper(params[10])),
+            "election_id":(params[11])
         })
     elif(function_map[funcs]=='keys'):
         collection.insert_one({
@@ -41,66 +42,71 @@ def store(funcs,params):
             "pai_pklist_single":(serialize_wrapper(params[3])),
             "_pai_sklist_single":(serialize_wrapper(params[4])),
             "elg_pk":(serialize_wrapper(params[5])),
-            "_elg_sklist":(serialize_wrapper(params[6]))
+            "_elg_sklist":(serialize_wrapper(params[6])),
+            "election_id":(params[7])
         })
     elif(function_map[funcs]=='decs'):
         collection.insert_one({
-            "msgs_out_dec":(serialize_wrapper(params[0])),
-            "msgs_out":(serialize_wrapper(params[1])), 
-            "_msg_shares":(serialize_wrapper(params[2])),
-            "_rand_shares":(serialize_wrapper(params[3]))
+        "election_id": params[0],  # First parameter is election_id
+        "msgs_out_dec": serialize_wrapper(params[1]),
+        "msgs_out": serialize_wrapper(params[2]),
+        "_msg_shares": serialize_wrapper(params[3]),
+        "_rand_shares": serialize_wrapper(params[4])
         })
 
 
-def load(funcs,params):
-    db=init()
-    collection=db[function_map[funcs]]
-    result={}
-    if(function_map[funcs]=='keys'):
-        document=collection.find_one()
-        for param in params:
-            result[param] = deserialize_wrapper(document[param])
-        return result
-    elif(function_map[funcs]=='generators'):
-        document=collection.find_one()
-        for param in params:
-            result[param] = deserialize_wrapper(document[param])
-        return result
-    elif(function_map[funcs]=='decs'):
-        document=collection.find_one()
-        if not (document):
-           return result
-        for param in params:
-            result[param] = deserialize_wrapper(document[param])
-        return result
-    elif function_map[funcs] == 'votes':
-        for param in params:
-            result[param] = []
-        documents = collection.find()
-        for document in documents:
-            for param in params:
-                deserialized_item = deserialize_wrapper(document[param])
-                result[param].append(deserialized_item)
-                print(f"Document: {document[param]}, Deserialized: {deserialized_item}")
+def load(funcs, params, election_id=None):
+    db = init()
+    collection_name = function_map.get(funcs)
+    if not collection_name:
+        raise ValueError(f"Invalid function name: {funcs}")
+    collection = db[collection_name]
+    result = {}
+    try:
+        if collection_name == 'keys':
+            document = collection.find_one({"election_id": params[0]})
+            if document:
+                for param in params:
+                    result[param] = deserialize_wrapper(document.get(param))
         
-        return result
-    elif function_map[funcs] == 'candidates':
-        res=[]
-        documents=collection.find()
-        for document in documents:
-            res.append(document["name"])
-        return res
-    elif function_map[funcs] == 'receipts':
-        res = {}
-        param_value = params[0]
-        document = collection.find_one({"enc_hash": param_value})
-        del params[0]
-        if document:
-            for key in params:
-                if(key!="accessed"):
-                    deserialized_item = deserialize_wrapper(document[key])
-                    res[key] = deserialized_item
-                elif(key=="accessed"):
-                    res[key]=document[key]
-            res["enc_hash"] = param_value
-            return res
+        elif collection_name == 'generators':
+            document = collection.find_one({"election_id": params[0]})
+            if document:
+                for param in params:
+                    result[param] = deserialize_wrapper(document.get(param))
+        
+        elif collection_name == 'decs':
+            document = collection.find_one({"election_id": params[0]})
+            if document:
+                for param in params:
+                    result[param] = deserialize_wrapper(document.get(param))
+        
+        elif collection_name == 'votes':
+            documents = collection.find({"election_id": params[0]})
+            for param in params[1:]:  # params[0] is election_id
+                result[param] = []
+            
+            for doc in documents:
+                for param in params[1:]:
+                    deserialized = deserialize_wrapper(doc.get(param))
+                    result[param].append(deserialized)
+        
+        elif collection_name == 'candidates':
+            documents = collection.find({"election_id": params[0]})
+            result = [doc["name"] for doc in documents]
+        
+        elif collection_name == 'receipts':
+            document = collection.find_one({
+                "election_id": params[0],
+                "enc_hash": params[1]
+            })
+            if document:
+                result = {k: deserialize_wrapper(v) for k, v in document.items() 
+                         if k not in ['_id', 'election_id', 'accessed']}
+                result["enc_hash"] = params[1]
+
+    except Exception as e:
+        print(f"Error loading data: {str(e)}")
+        return {}
+
+    return result

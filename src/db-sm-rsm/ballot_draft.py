@@ -20,6 +20,7 @@ import pymongo
 from misc import serialize_wrapper, deserialize_wrapper
 import sys
 from db import load,store
+import zipfile
 #import pyqrcode
 #from pyzbar.pyzbar import decode
 
@@ -78,11 +79,6 @@ def sha256_of_array2(array):
     
     return sha256_hash
 
-# Initialize the pairing group
-#group = PairingGroup('SS512')
-
-# Define g and h using the pairing group
-
 j = 1
 #m = 2
 
@@ -99,29 +95,30 @@ def generate_qr_code(data, filename):
     img.save(filename)
 
 
-def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk):
+def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk,election_id):
     # Call the functions to add content to both halves
-    gamma_booth = G2_part1()
+    gamma_booth = G2_part1(election_id)
     print(gamma_booth)
-    eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid = G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m)
+    eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid = G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m,election_id)
     print(eps_v_w_ls)
-    c_w_all,ov_hash = G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid)
+    c_w_all,ov_hash = G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid,election_id)
     print(ov_hash)
     for i in range(len(candidates)):
         collection.insert_one({
-            'ov_hash': ov_hash,
-            'enc_hash': c_w_all[i],
-            'enc_msg': serialize_wrapper(eps_v_w_ls[i]),
-            'comm': serialize_wrapper(gamma_w_ls[i]),
-            'enc_msg_share': serialize_wrapper(evr_kw_ls[i]),
-            'enc_rand_share': serialize_wrapper(evr_rw_ls[i]),
-            'pfcomm': None,
-            'enc_rand': serialize_wrapper(eps_r_w_ls[i]),
-            'pf_encmsg': None,
-            'pf_encrand': None,
-            'pfs_enc_msg_share': None,
-            'pfs_enc_rand_share': None,
-            'accessed':False
+            "election_id":election_id,
+            "ov_hash": ov_hash,
+            "enc_hash": c_w_all[i],
+            "enc_msg": serialize_wrapper(eps_v_w_ls[i]),
+            "comm": serialize_wrapper(gamma_w_ls[i]),
+            "enc_msg_share": serialize_wrapper(evr_kw_ls[i]),
+            "enc_rand_share": serialize_wrapper(evr_rw_ls[i]),
+            "pfcomm": None,
+            "enc_rand": serialize_wrapper(eps_r_w_ls[i]),
+            "pf_encmsg": None,
+            "pf_encrand": None,
+            "pfs_enc_msg_share": None,
+            "pfs_enc_rand_share": None,
+            "accessed":False
         })
     
     # Constants for A5 size in pixels (300 DPI)
@@ -145,6 +142,15 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     draw.line((center_x, 0, center_x, bh), fill='gray', width=10)
 
     # Headings
+    election_text = f"Election ID: {election_id}"
+    # Left side (VVPAT side)
+    election_id_x_left = int(0.2 * bw)  # Position near the start of the VVPAT side
+    election_id_y = int(0.03 * bh)  # Slightly below the top margin
+    draw.text((election_id_x_left, election_id_y), election_text, font=subtitlefont, fill='black')
+
+    # Right side (Receipt side)
+    election_id_x_right = center_x + int(0.2 * bw)  # Position near the start of the Receipt side
+    draw.text((election_id_x_right, election_id_y), election_text, font=subtitlefont, fill='black')
     draw.text((int(0.2 * bh), 0.07 * bh), "VVPAT side", font=titlefont, fill='black')
     draw.text((int(0.2 * bh), 0.07 * bh + 100), "(Drop into the ballot box)", font=subtitlefont, fill='black')
     draw.text((center_x + int(0.2 * bh), 0.07 * bh), "Receipt side", font=titlefont, fill='black')
@@ -238,10 +244,10 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     # Save the PDF
     #c.save()
 
-def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m):
+def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m,election_id):
     # bid
     bid = group.random(ZR)
-    g1,h1=load("generators",["g1","h1"]).values()
+    g1,h1=load("generators",[election_id,"g1","h1"]).values()
     # sigma_bid generation
     _sk = group.random(ZR)
     sigma_bid = g1**(1/(bid+_sk))
@@ -348,13 +354,13 @@ def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m):
     
     return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid
     
-def G2_part1():
-    g1,h1=load("generators",["g1","h1"]).values()
+def G2_part1(election_id):
+    g1,h1=load("generators",[election_id,"g1","h1"]).values()
     r_booth = group.random(ZR)
     gamma_booth = (g1**j)*(h1**r_booth)
     return gamma_booth   
 
-def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid):
+def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid,election_id):
     # Set the font and size for the right half
     #c.setFont("Helvetica", 16)
     
@@ -372,7 +378,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
     #candidate_x_center = right_x + 180
     
     # Print each candidate's number and name on the right half
-    g1,h1=load("generators",["g1","h1"]).values()
+    g1,h1=load("generators",[election_id,"g1","h1"]).values()
     k = 0
     c_w_hash = []
     c_w_all = []
@@ -464,13 +470,13 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
     return c_w_all,ov_hash
 
 def create_pdf_worker(args):
-    index, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk = args
-    create_pdf(collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
+    index, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk,election_id = args
+    create_pdf(collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk,election_id)
     
-def load2():
+def load2(election_id):
     db = init()
     collection=db['keys']
-    document=collection.find_one()
+    document=collection.find_one({"election_id":election_id})
     params = ["alpha", "pai_pklist_single", "_pai_sklist_single", "_pai_sklist", "pai_pk"]
     result = {}
     params2 = ["m", "pai_pk", "pai_sk", "pai_sklist", "pai_pk_optthpaillier"]
@@ -478,20 +484,20 @@ def load2():
         result[params2[i]] = deserialize_wrapper(document[params[i]])
     return result
 
-def ballot_draft(num):
+def ballot_draft(num,election_id):
     num_ballots = num
 
     db=init()
     collect=db['candidates']
     # Get the candidate names
     candidates = []
-    documents=collect.find()
+    documents=collect.find({"election_id":election_id})
     for document in documents:
         candidates.append(document["name"])    
     #pai_sklist, pai_pk_optthpaillier = optthpaillier.pai_th_keygen(len(candidates))
     #pai_sk, pai_pk = optpaillier.pai_keygen()
     # Connect to MongoDB
-    m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2().values()
+    m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2(election_id).values()
     
     #print("a")
     #print(m)
@@ -503,15 +509,16 @@ def ballot_draft(num):
     #print(m)
     #print(pai_sklist)
     collection = connect_to_mongodb()
-
+    pdf_files=[]
+    output_dir="/output"
     for i in range(num_ballots):
-        print(f"Creating PDF for ballot {i+1}...")
-        create_pdf(m, collection, "/output/"+f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk)
-        print(f"PDF ballot_{i+1}.pdf created successfully!")
-        if os.path.exists("/output/"+f"ballot_{i+1}.pdf"): 
-            print(f"ballot_{i+1}.pdf saved successfully.")
-        else:
-            print(f"Failed to save ballot_{i+1}.pdf!")
+        pdf_filename = f"election_id_{election_id}_ballot_{i+1}.pdf"
+        pdf_path = os.path.join(output_dir, pdf_filename)
+        create_pdf(m, collection, pdf_path, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk, election_id)
+        if os.path.exists("/output/"+f"election_id_{election_id}_ballot_{i+1}.pdf"):
+            pdf_files.append(pdf_path)
+            print(f"PDF {pdf_filename} created successfully!")
+
 
     # Prepare arguments for threading
     #args_list = [(i, m, collection, f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk) for i in range(num_ballots)]

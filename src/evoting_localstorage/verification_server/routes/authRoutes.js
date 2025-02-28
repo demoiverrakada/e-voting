@@ -363,12 +363,12 @@ router.post('/fetch', async (req, res) => {
       try {
         const { commitment, voter_id, preference } = req.body;
         console.log(commitment);
-        const checkVoter = await Voter.findOne({ voter_id });
+        const checkVoter = await Voter.find({ voter_id });
         if (!checkVoter) {
           return res.status(422).send({ error: "This voter_id is not in the voter list" });
         }
     
-        const Bullet = await Bulletin.findOne({ voter_id });
+        const Bullet = await Bulletin.find({ voter_id });
         if (!Bullet) {
           return res.status(422).send({ error: "This voter_id has not voted in the election" });
         }
@@ -395,14 +395,15 @@ router.post('/fetch', async (req, res) => {
 router.post('/audit', async (req, res) => {
         try {
             // Corrected request body extraction
-            const { commitment, booth_num, bid } = req.body; 
+            const { commitment, booth_num, bid ,election_id} = req.body; 
     
             console.log("Received audit request");
             console.log(commitment)
             console.log(booth_num)
             console.log(bid)
+            console.log(election_id)
             // Call the Python function
-            const result = await callPythonFunction("audit", commitment, booth_num, bid);
+            const result = await callPythonFunction("audit", commitment, booth_num, bid,election_id);
             if(result==="The ballot has already been audited or the ballot has been used to cast a vote."){
                 return res.json({results:"The ballot has already been audited or the ballot has been used to cast a vote."})
             }
@@ -443,30 +444,54 @@ router.post('/audit', async (req, res) => {
 
     router.post('/vvpat', async (req, res) => {
         try {
-            const { bid } = req.body;
+            const { bid, election_id } = req.body;
     
-            // Validate input
-            if (!bid) {
-                return res.status(400).json({ error: "Ballot id is required." });
+            // Validate both parameters
+            if (!bid || !election_id) {
+                return res.status(400).json({ 
+                    error: "Both ballot ID and election ID are required." 
+                });
             }
     
-            // Call the Python function with the bid
-            const result = await callPythonFunction("vvpat", bid);
+            // Convert election_id to number for Python compatibility
+            const numericElectionId = Number(election_id);
+            if (isNaN(numericElectionId)) {
+                return res.status(400).json({ 
+                    error: "Invalid election ID format" 
+                });
+            }
     
-            // Handle the result
+            // Call Python with proper parameters
+            const result = await callPythonFunction(
+                "vvpat", 
+                bid,
+                numericElectionId.toString() // Ensure string conversion for Python input
+            );
+    
+            // Handle Python response
             if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
                 return res.json({ results: result });
-            } else if (typeof result === "object" && result.cand_name &&result.extended_vote) {
-                return res.json({ cand_name: result.cand_name ,extended_vote:result.extended_vote});
-            } else {
-                // Handle unexpected response from Python function
-                return res.status(500).json({ error: "Unexpected response from verification process." });
+            } 
+            
+            if (result?.cand_name && result?.extended_vote) {
+                return res.json({
+                    cand_name: result.cand_name,
+                    extended_vote: result.extended_vote.toString() // Ensure string type
+                });
             }
+    
+            return res.status(500).json({ 
+                error: "Unexpected verification response" 
+            });
+    
         } catch (err) {
-            console.error("Error during VVPAT verification:", err.message);
-            return res.status(500).json({ error: "Internal server error." });
+            console.error("Verification error:", err);
+            return res.status(500).json({ 
+                error: "Internal server error during verification" 
+            });
         }
     });
+    
 
 router.post('/runBuild2', async(req, res) => {
     try {

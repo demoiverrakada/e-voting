@@ -9,7 +9,11 @@ function App() {
   useEffect(() => {
     axios
       .get("http://localhost:5000/bulletin")
-      .then((response) => setUsers(response.data))
+      .then((response) => {
+        // Sort the users array by election_id
+        const sortedUsers = response.data.sort((a, b) => a.election_id - b.election_id);
+        setUsers(sortedUsers);
+      })
       .catch((err) => console.log(err));
   }, []);
 
@@ -30,6 +34,7 @@ function App() {
             <table className="table table-striped table-hover table-bordered">
               <thead className="table-dark">
                 <tr>
+                  <th>Election ID</th>
                   <th>Voter ID</th>
                   <th>Booth Number</th>
                   <th>Encrypted Vote</th>
@@ -40,6 +45,7 @@ function App() {
               <tbody>
                 {users.map((user) => (
                   <tr key={user._id} style={{ cursor: "pointer" }}>
+                    <td>{user.election_id}</td>
                     <td>{user.voter_id}</td>
                     <td>{user.booth_num}</td>
                     <td>{user.commitment}</td>
