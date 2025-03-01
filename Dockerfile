@@ -23,6 +23,8 @@ RUN /bin/bash --login -c "cd evoting_localstorage/BallotAudit/android && nice -n
 RUN /bin/bash --login -c "cd evoting_localstorage/bulletin && npm install"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron && npm install --legacy-peer-deps"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron && npm install react-native-bcrypt --legacy-peer-deps"
+RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron && npm install react-native-screens@3.29.0 --legacy-peer-deps"
+RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron &&  npm install react@18.2.0"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron/android && sed -i 's/\r$//' gradlew"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron/android && ./gradlew clean"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron/android && nice -n 19 ./gradlew assembleRelease"
