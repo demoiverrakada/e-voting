@@ -34,6 +34,7 @@ RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && .
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && nice -n 19 ./gradlew assembleRelease"
 RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification && npm install --force"
 RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && sed -i 's/\r$//' gradlew"
+RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && chmod +x gradlew"
 RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && ./gradlew clean"
 RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && nice -n 19 ./gradlew assembleRelease"
 RUN /bin/bash --login -c "cd evoting_localstorage/admin_webpage && npm install --force"
