@@ -22,7 +22,7 @@ import StartScreen from './screens/StartScreen.js';
 import VoterCheck from './screens/VoterCheck.js';
 import Scanner2 from './screens/Scanner2.js';
 import Scanner3 from  './screens/Scanner3.js';
-import ElectionLoop from './screens/ElectionLoop.js';
+import ElectionLoop from './screens/ElectionLoopHandler.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack =createNativeStackNavigator();
 function App(){
