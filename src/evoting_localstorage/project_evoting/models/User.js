@@ -137,7 +137,6 @@ const VotesSchema = new mongoose.Schema({
 const CandidateSchema = new mongoose.Schema({
     election_id:{
         type:Number,
-        unique:true,
         required:true
     },
     name: {
