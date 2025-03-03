@@ -7,7 +7,6 @@ COPY src/evoting_localstorage/BallotAudit /app/evoting_localstorage/BallotAudit
 COPY src/evoting_localstorage/bulletin/package.json /app/evoting_localstorage/bulletin/package.json
 COPY src/evoting_localstorage/evoting_fron /app/evoting_localstorage/evoting_fron
 COPY src/evoting_localstorage/VoterVerification /app/evoting_localstorage/VoterVerification
-COPY src/evoting_localstorage/VVPATverification /app/evoting_localstorage/VVPATverification
 COPY src/evoting_localstorage/admin_webpage/package.json /app/evoting_localstorage/admin_webpage/package.json
 COPY src/evoting_localstorage/verification-webpage/package.json /app/evoting_localstorage/verification-webpage/package.json
 COPY src /app
