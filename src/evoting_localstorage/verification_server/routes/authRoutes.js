@@ -471,55 +471,6 @@ router.post('/audit', async (req, res) => {
         }
     });
 
-    router.post('/vvpat', async (req, res) => {
-        try {
-            const { bid, election_id } = req.body;
-    
-            // Validate both parameters
-            if (!bid || !election_id) {
-                return res.status(400).json({ 
-                    error: "Both ballot ID and election ID are required." 
-                });
-            }
-    
-            // Convert election_id to number for Python compatibility
-            const numericElectionId = Number(election_id);
-            if (isNaN(numericElectionId)) {
-                return res.status(400).json({ 
-                    error: "Invalid election ID format" 
-                });
-            }
-    
-            // Call Python with proper parameters
-            const result = await callPythonFunction(
-                "vvpat", 
-                bid,
-                numericElectionId.toString() // Ensure string conversion for Python input
-            );
-    
-            // Handle Python response
-            if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
-                return res.json({ results: result });
-            } 
-            
-            if (result?.cand_name && result?.extended_vote) {
-                return res.json({
-                    cand_name: result.cand_name,
-                    extended_vote: result.extended_vote.toString() // Ensure string type
-                });
-            }
-    
-            return res.status(500).json({ 
-                error: "Unexpected verification response" 
-            });
-    
-        } catch (err) {
-            console.error("Verification error:", err);
-            return res.status(500).json({ 
-                error: "Internal server error during verification" 
-            });
-        }
-    });
     
 
 router.post('/runBuild2', async(req, res) => {

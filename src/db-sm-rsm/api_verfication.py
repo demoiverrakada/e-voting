@@ -213,24 +213,6 @@ def audit(commitment, booth_num, bid, election_id):
 
 
 
-def VVPATverif(bid, election_id):
-    data = load("mix", [election_id, "msgs_out"])
-    candidates = load("load", [election_id])
-    
-    if not data or 'msgs_out' not in data or not candidates:
-        print("Error: Unable to retrieve necessary data")
-        return
-
-    length = len(data['msgs_out'])
-    for ext_vote in range(length):
-        if abs(int(data['msgs_out'][ext_vote]) - int(bid)) < len(candidates):
-            print(json.dumps({
-                'cand_name': candidates[abs(int(data['msgs_out'][ext_vote]) - int(bid))],
-                'extended_vote': int(data['msgs_out'][ext_vote])
-            }))
-            return
-    print("This VVPAT doesn't correspond to a decrypted vote.")
-
 
 if __name__ == "__main__":
     function_map = {
@@ -238,8 +220,7 @@ if __name__ == "__main__":
         "verfrsmproof":pf_zkrsm_verif,
         "verfsigsm":verifier_signature_zksm,
         "verfsigrsm":verifier_signature_zkrsm,
-        "audit":audit,
-        "vvpat":VVPATverif
+        "audit":audit
     }
 
     func_name = sys.argv[1]

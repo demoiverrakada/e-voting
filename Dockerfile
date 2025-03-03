@@ -32,14 +32,6 @@ RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification && npm insta
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && sed -i 's/\r$//' gradlew"
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && ./gradlew clean"
 RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && nice -n 19 ./gradlew assembleRelease"
-RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification && npm install --force"
-RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && sed -i 's/\r$//' gradlew"
-RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && chmod +x gradlew"
-RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && \
-    ./gradlew clean && \
-    rm -rf ~/.gradle/caches/ && \
-    mkdir -p app/build/outputs/mapping/release"
-RUN /bin/bash --login -c "cd evoting_localstorage/VVPATverification/android && nice -n 19 ./gradlew assembleRelease"
 RUN /bin/bash --login -c "cd evoting_localstorage/admin_webpage && npm install --force"
 RUN /bin/bash --login -c "cd evoting_localstorage/verification-webpage && npm install --force"
 RUN ln -s /root/.nvm/versions/node/v22.3.0/bin/node /usr/bin/node && \
