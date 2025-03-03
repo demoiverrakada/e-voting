@@ -126,6 +126,14 @@ function reconstructOriginal(parsedInput) {
         throw new Error("Invalid JSON format: " + parsedInput);
     }
 
+    if (typeof parsedInput === 'object' && !Array.isArray(parsedInput)) {
+        return Object.fromEntries(
+            Object.entries(parsedInput).map(([key, value]) => [
+                key, 
+                reconstructOriginal(value) // Recurse through object entries
+            ])
+        );
+    }
     console.log("Processing parsedInput:", JSON.stringify(parsedInput, null, 2)); // Debug input
 
     if (
@@ -205,17 +213,14 @@ function reconstructOriginal(parsedInput) {
 function handleParsedResult(result, res) {
     let parsedResult;
 
-    // Try parsing the JSON result
     try {
         parsedResult = JSON.parse(result);
     } catch (error) {
         console.error("Error parsing JSON:", error);
         return res.status(500).send("Error parsing the result from Python");
     }
-
-    // Validate that the parsed result is an array
-    if (!Array.isArray(parsedResult)) {
-        return res.status(500).send("Parsed result is not an array as expected");
+    if (typeof parsedResult !== 'object' || parsedResult === null) {
+        return res.status(500).send("Expected object structure");
     }
 
     // Helper function to parse complex strings
@@ -258,7 +263,12 @@ function handleParsedResult(result, res) {
     }
 
     // Map the parsed result using the recursive function
-    const formattedResult = parsedResult.map(parseNested);
+    const formattedResult = Object.fromEntries(
+        Object.entries(parsedResult).map(([key, value]) => [
+            key,
+            parseNested(value) // Recursively process nested values
+        ])
+    );
 
     // Return formatted result for further usage
     return formattedResult;
@@ -272,45 +282,55 @@ router.post('/pf_zksm_verf', async (req, res) => {
         if (!result1) {
             return res.status(422).send({ error: "Error during generation of signatures" });
         }
-        console.log("Raw result1:", result1);
-        const formattedResult = handleParsedResult(result1,res)
-        console.log("formattedResult1",formattedResult)
-        const verfpk=formattedResult[0]
-        const sigs=formattedResult[1]
-        const enc_sigs=formattedResult[2]
-        const enc_sigs_rands=formattedResult[3]
 
-        const Verfpk = reconstructOriginal(verfpk);
-        const Sigs = reconstructOriginal(sigs);
-        const EncSigs = reconstructOriginal(enc_sigs);
-        const EncSigsRands = reconstructOriginal(enc_sigs_rands);
+        const formattedResult = handleParsedResult(result1, res);
+        console.log("formattedResult1", formattedResult);
+        
+        const allElectionResults = {};
 
-        console.log("Processed Verfpk:", Verfpk);
-        console.log("Processed Sigs:", Sigs);
-        console.log("Processed EncSigs:", EncSigs);
-        console.log("Processed EncSigsRands:", EncSigsRands);
+        // Loop through all election IDs in the result
+        for (const [electionId, electionData] of Object.entries(formattedResult)) {
+            console.log(`Processing election ${electionId}`);
+            
+            // Extract components for current election
+            const { verfpk, sigs, enc_sigs, enc_sigs_rands } = electionData;
 
-        const result2= await callPythonFunction2('pf_zksm',Verfpk,Sigs,EncSigs,EncSigsRands)
-        if(!result2){
-            return res.status(422).send({ error: "Error during set membership proof generation process" });
+            // Reconstruct original format for each component
+            const Verfpk = reconstructOriginal(verfpk);
+            const Sigs = reconstructOriginal(sigs);
+            const EncSigs = reconstructOriginal(enc_sigs);
+            const EncSigsRands = reconstructOriginal(enc_sigs_rands);
+
+            console.log(`Processed components for election ${electionId}:`);
+            console.log("Verfpk:", Verfpk);
+            console.log("Sigs:", Sigs);
+            console.log("EncSigs:", EncSigs);
+            console.log("EncSigsRands:", EncSigsRands);
+
+            // Call Python function with election ID parameter
+            const result2 = await callPythonFunction2('pf_zksm',Verfpk,Sigs,EncSigs,EncSigsRands,electionId);
+
+            if (!result2) {
+                return res.status(422).send({ 
+                    error: `Error during set membership proof generation for election ${electionId}`
+                });
+            }
+            const formattedResult2 = handleParsedResult(result2, res);
+            const [dpk_bbsig_pfs, blsigs] = formattedResult2;
+            const DpkBbsigPfs = reconstructOriginal(dpk_bbsig_pfs);
+            const Blsigs = reconstructOriginal(blsigs);
+            // Verify proof for current election
+            const result3 = await callPythonFunction('verfsmproof',Verfpk,Sigs,EncSigs,EncSigsRands,DpkBbsigPfs,Blsigs,electionId );
+            if (!result3) {
+                return res.status(422).send({ 
+                    error: `Verification failed for election ${electionId}`
+                });
+            }
+            const parsedResult = JSON.parse(result3);
+            allElectionResults[electionId] = {"encrypted_votes": parsedResult[0],"results": parsedResult[1],"status_forward_set_membership": parsedResult[2]};
         }
-        console.log("Raw result2:", result2);
-        const formattedResult2=handleParsedResult(result2,res)
-        console.log("formattedResult2",formattedResult2)
-        const dpk_bbsig_pfs=formattedResult2[0]
-        const blsigs=formattedResult2[1]
+        return res.send(allElectionResults);
 
-        const DpkBbsigPfs = reconstructOriginal(dpk_bbsig_pfs);
-        const Blsigs = reconstructOriginal(blsigs);
-
-        const result3 = await callPythonFunction('verfsmproof',Verfpk,Sigs,EncSigs,EncSigsRands,DpkBbsigPfs,Blsigs)
-
-        if (!result3) {
-            return res.status(422).send({ error: "Error during set membership proof verification process" });
-        }
-        console.log(result3)
-        let result=JSON.parse(result3)
-        return res.send({"encrypted_votes":result[0],"results":result[1],"status_forward_set_membership":result[2]});
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
@@ -320,42 +340,51 @@ router.post('/pf_zksm_verf', async (req, res) => {
 
 router.post('/pf_zkrsm_verf', async (req, res) => {
     try {
-        const result1 = await callPythonFunction('verfsigrsm');
-        if (!result1) {
-            return res.status(422).send({ error: "Error during generation of signatures" });
+            const result1 = await callPythonFunction('verfsigrsm');
+            if (!result1) {
+                return res.status(422).send({ error: "Error during generation of signatures" });
+            }
+            const formattedResult = handleParsedResult(result1, res);
+            console.log("formattedResult1", formattedResult);
+            const allElectionResults = {};
+            for (const [electionId, electionData] of Object.entries(formattedResult)) {
+                console.log(`Processing election ${electionId}`);
+                const { verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands } = electionData;
+                const Verfpk = reconstructOriginal(verfpk);
+                const SigsRev = reconstructOriginal(sigs_rev);
+                const EncSigsRev = reconstructOriginal(enc_sigs_rev);
+                const EncSigsRevRands = reconstructOriginal(enc_sigs_rev_rands);
+                console.log(`Processed components for election ${electionId}:`);
+                console.log("Verfpk:", Verfpk);
+                console.log("Sigs:", SigsRev);
+                console.log("EncSigs:", EncSigsRev);
+                console.log("EncSigsRands:", EncSigsRevRands);
+                const result2 = await callPythonFunction2('pf_zkrsm',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands,electionId);
+                if (!result2) {
+                    return res.status(422).send({ 
+                        error: `Error during set membership proof generation for election ${electionId}`
+                    });
+                }
+                const formattedResult2 = handleParsedResult(result2, res);
+                const [dpk_bbsplussig_pfs, blsigs_rev] = formattedResult2;
+                const DpkBbplussigPfs = reconstructOriginal(dpk_bbsplussig_pfs);
+                const BlsigsRev = reconstructOriginal(blsigs_rev);
+                const result3 = await callPythonFunction('verfrsmproof',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands,DpkBbplussigPfs,BlsigsRev,electionId );
+                if (!result3) {
+                    return res.status(422).send({ 
+                        error: `Verification failed for election ${electionId}`
+                    });
+                }
+                const parsedResult = JSON.parse(result3);
+                allElectionResults[electionId] = {"decrypted_votes": parsedResult[0],"results": parsedResult[1],"status_reverse_set_membership": parsedResult[2]};
+            }
+    
+            return res.send(allElectionResults);
+    
+        } catch (err) {
+            console.error(err);
+            res.status(500).send(err.message);
         }
-        const formattedResult = handleParsedResult(result1,res)
-        const verfpk=formattedResult[0]
-        const sigs_rev=formattedResult[1]
-        const enc_sigs_rev=formattedResult[2]
-        const enc_sigs_rev_rands=formattedResult[3]
-
-        const Verfpk = reconstructOriginal(verfpk);
-        const SigsRev = reconstructOriginal(sigs_rev);
-        const EncSigsRev = reconstructOriginal(enc_sigs_rev);
-        const EncSigsRevRands = reconstructOriginal(enc_sigs_rev_rands);
-
-        const result2= await callPythonFunction2('pf_zkrsm',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands)
-        if(!result2){
-            return res.status(422).send({ error: "Error during reverse set membership proof generation process" });
-        }
-        const formattedResult2=handleParsedResult(result2,res)
-        console.log(formattedResult2,"formattedResult2")
-        const dpk_bbsplussig_pfs=formattedResult2[0]
-        const blsigs_rev=formattedResult2[1]
-
-        const DpkBbplussigPfs = reconstructOriginal(dpk_bbsplussig_pfs);
-        const BlsigsRev = reconstructOriginal(blsigs_rev);
-        const result3 = await callPythonFunction('verfrsmproof',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands,DpkBbplussigPfs,BlsigsRev)
-        if (!result3) {
-            return res.status(422).send({ error: "Error during reverse set membership proof verification process" });
-        }
-        let result = JSON.parse(result3)
-        return res.send({"decrypted_votes":result[0],"results":result[1],"status_reverse_set_membership":result[2]});
-    } catch (err) {
-        console.error(err);
-        res.status(500).send(err.message);
-    }
 });
 
 router.post('/fetch', async (req, res) => {

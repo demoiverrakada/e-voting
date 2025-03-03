@@ -145,7 +145,6 @@ def mixer():
                     beaver_a_shares, beaver_b_shares, beaver_c_shares, election_id
                 )
 
-                # Perform mixing
                 msgs_out, _msg_shares, _rand_shares = mix(
                     ck, ck_fo, permcomm, enc_msgs, enc_msg_shares, enc_rand_shares,
                     alpha, pai_pk, pai_pklist_single, _pai_sklist, _pai_sklist_single,
@@ -168,155 +167,50 @@ def mixer():
     print("Mixing and decryption was successful")
 
 
-def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands):
+def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
     """ZK proofs for encrypted votes across all elections"""
-    db=init()
-    election_ids = db.keys.distinct("election_id")
-    
-    all_results = {}
-    
-    for election_id in election_ids:
-        try:
-            # Skip elections without decrypted data
-            if not db.decs.find_one({"election_id": election_id}):
-                print(f"Skipping election {election_id} - no decrypted data")
-                continue
-
-            f = io.StringIO()
-            with contextlib.redirect_stdout(f):
-                # Load election-specific parameters
-                mix_data = load("mix", ["msgs_out", "_msg_shares", "_rand_shares"], election_id)
-                setup_data = load("setup", ["alpha", "ck", "permcomm", "elg_pk", "_svecperm", "_pi", "_re_pi", "_elg_sklist"], election_id)
-                
-                # Deserialize parameters
-                verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
-                sigs = deserialize_wrapper(ast.literal_eval(sigs))
-                enc_sigs = deserialize_wrapper(ast.literal_eval(enc_sigs))
-                enc_sigs_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rands))
-                
-                # Get encryption commitments
-                enc_data = load("enc", ["comm"], election_id)
-                comms = enc_data.get("comm", [])
-                # Verify signatures
-                status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"])
-                assert status_verfsigs, f"Signature verification failed for election {election_id}"
-
-                # Generate BLS signatures
-                blsigs, _blshares = get_blsigs(enc_sigs,setup_data["ck"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["_svecperm"],setup_data["_pi"], 
-                    setup_data["_re_pi"], 
-                    setup_data["_elg_sklist"])
-
-                # Generate ZK proofs
-                dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms,blsigs,verfpk,setup_data["alpha"],mix_data["_msg_shares"],mix_data["_rand_shares"],_blshares)
-                # Store results per election
-                all_results[election_id] = {
-                    "proofs": serialize_wrapper(dpk_bbsig_pfs),
-                    "blsigs": serialize_wrapper(blsigs)
-                }
-
-        except Exception as e:
-            print(f"Error processing election {election_id}: {str(e)}")
-            continue
-
-    print(json.dumps(all_results))
+    f = io.StringIO()
+    with contextlib.redirect_stdout(f):
+        mix_data = load("mix", ["msgs_out", "_msg_shares", "_rand_shares"], election_id)
+        setup_data = load("setup", ["alpha", "ck", "permcomm", "elg_pk", "_svecperm", "_pi", "_re_pi", "_elg_sklist"], election_id)
+        verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
+        sigs = deserialize_wrapper(ast.literal_eval(sigs))
+        enc_sigs = deserialize_wrapper(ast.literal_eval(enc_sigs))
+        enc_sigs_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rands))   
+        # Get encryption commitments
+        enc_data = load("enc", ["comm"], election_id)
+        comms = enc_data.get("comm", [])
+        status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"])
+        assert status_verfsigs, f"Signature verification failed for election {election_id}"
+        blsigs, _blshares = get_blsigs(enc_sigs,setup_data["ck"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["_svecperm"],setup_data["_pi"], 
+        setup_data["_re_pi"],setup_data["_elg_sklist"])
+        dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms,blsigs,verfpk,setup_data["alpha"],mix_data["_msg_shares"],mix_data["_rand_shares"],_blshares)
+    result= [str(serialize_wrapper(dpk_bbsig_pfs)),str(serialize_wrapper(blsigs))]
+    print(json.dumps(result))
 
 
 
-def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands):
+def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,election_id):
     """ZK proofs for plaintext votes across all elections"""
-    db=init()
-    election_ids = db.keys.distinct("election_id")
-    
-    all_results = {}
-
-    for election_id in election_ids:
-        try:
-            # Skip elections without decrypted data
-            if not db.decs.find_one({"election_id": election_id}):
-                print(f"Skipping election {election_id} - no decrypted data")
-                continue
-
-            f = io.StringIO()
-            with contextlib.redirect_stdout(f):
-                # Load election-specific data using updated load function
-                mix_data = load("mix", ["msgs_out", "_rand_shares"], election_id)
-                setup_data = load("setup", [
-                    'alpha', 'pai_pk', '_pai_sklist', 'elg_pk',
-                    '_elg_sklist', 'ck', 'ck_fo', '_pi',
-                    '_svecperm', 'permcomm'
-                ], election_id)
-                
-                enc_data = load("enc", ["comm", "enc_rand"], election_id)
-                comms = enc_data.get("comm", [])
-                enc_rands = enc_data.get("enc_rand", [])
-
-                # Deserialize global parameters
-                verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
-                sigs_rev = deserialize_wrapper(ast.literal_eval(sigs_rev))
-                enc_sigs_rev = deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
-                enc_sigs_rev_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
-
-                # Verify signatures for this election
-                status_verfsigs_rev = check_verfsigs_rev(
-                    sigs_rev, 
-                    comms, 
-                    verfpk, 
-                    enc_sigs_rev, 
-                    enc_sigs_rev_rands, 
-                    setup_data["elg_pk"],
-                    setup_data["pai_pk"],
-                    setup_data["alpha"]
-                )
-                assert status_verfsigs_rev, f"Signature verification failed for election {election_id}"
-
-                # Generate blinded signatures for this election
-                blsigs_rev, _blshares_rev = get_blsigs_rev(
-                    enc_sigs_rev,
-                    enc_rands,
-                    setup_data["ck"],
-                    setup_data["ck_fo"],
-                    setup_data["permcomm"],
-                    setup_data["alpha"],
-                    setup_data["elg_pk"],
-                    setup_data["pai_pk"],
-                    setup_data["_svecperm"],
-                    mix_data["_rand_shares"],
-                    setup_data["_pi"],
-                    setup_data["_elg_sklist"],
-                    setup_data["_pai_sklist"]
-                )
-
-                # Generate ZK proofs for this election
-                blsigs_S, blsigs_c, blsigs_r = blsigs_rev
-                _blshares_S, _blshares_c, _blshares_r = _blshares_rev
-                
-                dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(
-                    mix_data["msgs_out"],
-                    blsigs_S,
-                    blsigs_c,
-                    blsigs_r,
-                    verfpk,
-                    setup_data["alpha"],
-                    _blshares_S,
-                    _blshares_c,
-                    _blshares_r
-                )
-
-                # Store results per election
-                all_results[election_id] = {
-                    "proofs": serialize_wrapper(dpk_bbsplussig_pfs),
-                    "blsigs_rev": serialize_wrapper(blsigs_rev),
-                    "election_data": {
-                        "msgs_out": serialize_wrapper(mix_data["msgs_out"]),
-                        "comms": serialize_wrapper(comms)
-                    }
-                }
-
-        except Exception as e:
-            print(f"Error processing election {election_id}: {str(e)}")
-            continue
-
-    print(json.dumps(all_results, indent=2))
+    mix_data = load("mix", ["msgs_out", "_rand_shares"], election_id)
+    setup_data = load("setup", ['alpha', 'pai_pk', '_pai_sklist', 'elg_pk','_elg_sklist', 'ck', 'ck_fo', '_pi','_svecperm', 'permcomm'], election_id)
+    enc_data = load("enc", ["comm", "enc_rand"], election_id)
+    comms = enc_data.get("comm", [])
+    enc_rands = enc_data.get("enc_rand", [])
+    verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
+    sigs_rev = deserialize_wrapper(ast.literal_eval(sigs_rev))
+    enc_sigs_rev = deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
+    enc_sigs_rev_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
+    f = io.StringIO()
+    with contextlib.redirect_stdout(f):
+        status_verfsigs_rev = check_verfsigs_rev(sigs_rev,comms,verfpk,enc_sigs_rev,enc_sigs_rev_rands,setup_data["elg_pk"],setup_data["pai_pk"],setup_data["alpha"])
+        assert status_verfsigs_rev, f"Signature verification failed for election {election_id}"
+        blsigs_rev, _blshares_rev = get_blsigs_rev(enc_sigs_rev,enc_rands,setup_data["ck"],setup_data["ck_fo"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["pai_pk"],setup_data["_svecperm"],mix_data["_rand_shares"],setup_data["_pi"],setup_data["_elg_sklist"],setup_data["_pai_sklist"])
+        blsigs_S, blsigs_c, blsigs_r = blsigs_rev
+        _blshares_S, _blshares_c, _blshares_r = _blshares_rev        
+        dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(mix_data["msgs_out"],blsigs_S,blsigs_c,blsigs_r,verfpk,setup_data["alpha"],_blshares_S,_blshares_c,_blshares_r)
+    result= [str(serialize_wrapper(dpk_bbsplussig_pfs)),str(serialize_wrapper(blsigs_rev))]  
+    print(json.dumps(result))
 
 
 

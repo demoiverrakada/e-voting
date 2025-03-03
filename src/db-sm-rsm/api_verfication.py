@@ -67,7 +67,6 @@ def verifier_signature_zkrsm():
         try:
             f = io.StringIO()
             with contextlib.redirect_stdout(f):
-                # Load election-specific parameters
                 setup_data = load("setup", ["elg_pk", "pai_pk"], election_id)
                 enc_data = load("enc", ["comm"], election_id)
                 
@@ -99,13 +98,8 @@ def verifier_signature_zkrsm():
 
 
 
-def pf_zksm_verif(verfpk, sigs, enc_sigs, enc_sigs_rands, dpk_bbsig_pfs, blsigs):
+def pf_zksm_verif(verfpk, sigs, enc_sigs, enc_sigs_rands, dpk_bbsig_pfs, blsigs,election_id):
     """Verify ZK proofs for encrypted votes across all elections"""
-    db=init()
-    election_ids = db.keys.distinct("election_id")
-    
-    all_results = {}
-
     # Deserialize global parameters into election-specific dicts
     verfpk_dict = deserialize_wrapper(ast.literal_eval(verfpk))
     sigs_dict = deserialize_wrapper(ast.literal_eval(sigs))
@@ -113,144 +107,43 @@ def pf_zksm_verif(verfpk, sigs, enc_sigs, enc_sigs_rands, dpk_bbsig_pfs, blsigs)
     enc_sigs_rands_dict = deserialize_wrapper(ast.literal_eval(enc_sigs_rands))
     dpk_bbsig_pfs_dict = deserialize_wrapper(ast.literal_eval(dpk_bbsig_pfs))
     blsigs_dict = deserialize_wrapper(ast.literal_eval(blsigs))
+    mix_data = load("mix", ["msgs_out"], election_id)
+    setup_data = load("setup", ["alpha", "elg_pk"], election_id)
+    enc_data = load("enc", ["comm", "enc_hash"], election_id)
+    f = io.StringIO()
+    with contextlib.redirect_stdout(f):
+            status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs_dict,verfpk_dict,enc_sigs_dict,enc_sigs_rands_dict,setup_data["elg_pk"],setup_data["alpha"])
+            status_dpk_bbsig, result_comms = dpk_bbsig_nizkverifs(enc_data["comm"],blsigs_dict,verfpk_dict,dpk_bbsig_pfs_dict)
+            status_fwd= status_verfsigs and status_dpk_bbsig
+            result=[enc_data["enc_hash"],result_comms,status_fwd]
 
-    for election_id in election_ids:
-        try:
-            f = io.StringIO()
-            with contextlib.redirect_stdout(f):
-                # Load election-specific data
-                mix_data = load("mix", ["msgs_out"], election_id)
-                setup_data = load("setup", ["alpha", "elg_pk"], election_id)
-                enc_data = load("enc", ["comm", "enc_hash"], election_id)
-                
-                # Get parameters for current election
-                election_verfpk = verfpk_dict.get(str(election_id))
-                election_sigs = sigs_dict.get(str(election_id))
-                election_enc_sigs = enc_sigs_dict.get(str(election_id))
-                election_enc_rands = enc_sigs_rands_dict.get(str(election_id))
-                election_dpk_pfs = dpk_bbsig_pfs_dict.get(str(election_id))
-                election_blsigs = blsigs_dict.get(str(election_id))
-
-                # Verify signatures
-                status_verfsigs = check_verfsigs(
-                    mix_data['msgs_out'],
-                    election_sigs,
-                    election_verfpk,
-                    election_enc_sigs,
-                    election_enc_rands,
-                    setup_data["elg_pk"],
-                    setup_data["alpha"]
-                )
-                
-                # Verify proofs
-                status_dpk_bbsig, result_comms = dpk_bbsig_nizkverifs(
-                    enc_data["comm"],
-                    election_blsigs,
-                    election_verfpk,
-                    election_dpk_pfs
-                )
-
-                # Store results
-                all_results[election_id] = {
-                    "enc_hashes": enc_data["enc_hash"],
-                    "result_comms": result_comms,
-                    "status": status_verfsigs and status_dpk_bbsig,
-                    "details": {
-                        "signature_verification": status_verfsigs,
-                        "proof_verification": status_dpk_bbsig
-                    }
-                }
-
-        except KeyError as e:
-            print(f"Missing data for election {election_id}: {str(e)}")
-            all_results[election_id] = {"error": f"Missing parameter: {str(e)}"}
-        except Exception as e:
-            print(f"Error verifying election {election_id}: {str(e)}")
-            all_results[election_id] = {"error": str(e)}
-
-    print(json.dumps(all_results, indent=2))
+    print(json.dumps(result))
 
 
-def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands, dpk_bbsplussig_pfs, blsigs_rev):
+def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands, dpk_bbsplussig_pfs, blsigs_rev,election_id):
     """Verify ZK proofs for plaintext votes across all elections"""
-    client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
-    db = client["test"]
-    election_ids = db.keys.distinct("election_id")
-    
-    all_results = {}
-
-    # Deserialize global parameters into election-specific dicts
     verfpk_dict = deserialize_wrapper(ast.literal_eval(verfpk))
     sigs_rev_dict = deserialize_wrapper(ast.literal_eval(sigs_rev))
     enc_sigs_rev_dict = deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
     enc_sigs_rands_dict = deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
     dpk_pfs_dict = deserialize_wrapper(ast.literal_eval(dpk_bbsplussig_pfs))
     blsigs_rev_dict = deserialize_wrapper(ast.literal_eval(blsigs_rev))
+    mix_data = load("mix", ["msgs_out_dec", "msgs_out"], election_id)
+    setup_data = load("setup", ['alpha', 'pai_pk', 'elg_pk', 'ck', 'ck_fo', 'permcomm'], election_id)
+    enc_data = load("enc", ["comm", "enc_rand"], election_id)
+    candidates = load("load", [], election_id)
+    f = io.StringIO()
+    with contextlib.redirect_stdout(f):
+        status_verfsigs_rev = check_verfsigs_rev(sigs_rev_dict,enc_data["comm"],verfpk_dict,enc_sigs_rev_dict,enc_sigs_rands_dict,setup_data["elg_pk"],setup_data["pai_pk"],setup_data["alpha"])
+        assert status_verfsigs_rev
+        blsigs_S, blsigs_c, blsigs_r = blsigs_rev_dict
+        status_dpk_bbsplussig, result_msgs = dpk_bbsplussig_nizkverifs(mix_data["msgs_out"],blsigs_S,blsigs_c,blsigs_r,verfpk_dict,dpk_pfs_dict)
 
-    for election_id in election_ids:
-        try:
-            f = io.StringIO()
-            with contextlib.redirect_stdout(f):
-                # 1. Load election-specific data
-                mix_data = load("mix", ["msgs_out_dec", "msgs_out"], election_id)
-                setup_data = load("setup", [
-                    'alpha', 'pai_pk', 'elg_pk', 
-                    'ck', 'ck_fo', 'permcomm'
-                ], election_id)
-                enc_data = load("enc", ["comm", "enc_rand"], election_id)
-                candidates = load("load", [], election_id)
+        status_rev = status_verfsigs_rev and status_dpk_bbsplussig
+        updated_msgs_out_dec = [candidates[msg] for msg in mix_data["msgs_out_dec"]]
+        result=[updated_msgs_out_dec,result_msgs,status_rev]
+    print(json.dumps(result))
 
-                # 2. Get election-specific parameters
-                election_verfpk = verfpk_dict[str(election_id)]
-                election_sigs_rev = sigs_rev_dict[str(election_id)]
-                election_enc_sigs_rev = enc_sigs_rev_dict[str(election_id)]
-                election_enc_rands = enc_sigs_rands_dict[str(election_id)]
-                election_dpk_pfs = dpk_pfs_dict[str(election_id)]
-                election_blsigs_rev = blsigs_rev_dict[str(election_id)]
-
-                # 3. Signature Verification
-                status_verfsigs_rev = check_verfsigs_rev(
-                    election_sigs_rev,
-                    enc_data["comm"],
-                    election_verfpk,
-                    election_enc_sigs_rev,
-                    election_enc_rands,
-                    setup_data["elg_pk"],
-                    setup_data["pai_pk"],
-                    setup_data["alpha"]
-                )
-                
-                # 4. Proof Verification
-                blsigs_S, blsigs_c, blsigs_r = election_blsigs_rev
-                status_dpk_bbsplussig, result_msgs = dpk_bbsplussig_nizkverifs(
-                    mix_data["msgs_out"],
-                    blsigs_S,
-                    blsigs_c,
-                    blsigs_r,
-                    election_verfpk,
-                    election_dpk_pfs
-                )
-
-                # 5. Combine Results
-                status_rev = status_verfsigs_rev and status_dpk_bbsplussig
-                updated_msgs_out_dec = [candidates[msg] for msg in mix_data["msgs_out_dec"]]
-
-                # 6. Store per-election results
-                all_results[election_id] = {
-                    "decrypted_messages": updated_msgs_out_dec,
-                    "verified_messages": result_msgs,
-                    "verification_status": status_rev,
-                    "details": {
-                        "signature_verification": status_verfsigs_rev,
-                        "proof_verification": status_dpk_bbsplussig
-                    }
-                }
-
-        except Exception as e:
-            print(f"Error verifying election {election_id}: {str(e)}")
-            all_results[election_id] = {"error": str(e)}
-
-    print(json.dumps(all_results, indent=2))
 
 
 
