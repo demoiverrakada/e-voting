@@ -1,4 +1,4 @@
-FROM docker.io/demoiverrakada/evoting:updated1.0.0
+FROM docker.io/demoiverrakada/evoting:updated1.1.1
 
 # Set working directory
 COPY src/evoting_localstorage/project_evoting/package.json /app/evoting_localstorage/project_evoting/package.json
