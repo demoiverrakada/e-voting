@@ -82,7 +82,7 @@ router.post('/setup',requireAuth, async (req, res) => {
     const elect_id=Number(JSON.parse(electionId));
     try {
         document= await Keys.findOne({ election_id: elect_id });
-        if(document.length!=0) return res.status(400).send("Setup has already been done.")
+        if(document) return res.status(400).send("Setup has already been done.")
         const result= await callPythonFunction('setup',alp,elect_id);
         console.log(result); // Log the result or handle it internally
         res.send('Setup was successful.'); // Custom response

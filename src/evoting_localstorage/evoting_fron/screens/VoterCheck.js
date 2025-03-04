@@ -6,35 +6,50 @@ import checkReceipt from '../func/checkReceipt.js';
 const VoterVoted = (props) => {
     const [entryNum, setEntryNum] = useState('');
     // VoterCheck.js
-const checkVoterExistence = async () => {
-  try {
-    const data = await checkReceipt(entryNum);
+    const checkVoterExistence = async () => {
+      try {
+        const data = await checkReceipt(entryNum);
+        
+        if (data.error) {
+          Alert.alert('Error', data.error);
+          return;
+        }
     
-    if (data.error) {
-      Alert.alert('Error', data.error);
-      return;
-    }
-
-    // Get elections where voter hasn't voted yet
-    const eligibleElections = data.election_ids.filter(eid => 
-      !data.votes?.some(v => v.election_id === eid)
-    );
-
-    if (eligibleElections.length === 0) {
-      Alert.alert('Info', 'No remaining eligible elections');
-      return;
-    }
-
-    props.navigation.navigate('ElectionLoop', {
-      voter_id: entryNum,
-      elections: eligibleElections,
-      currentIndex: 0
-    });
-    Alert.alert("Voter is eligible for the following elections:")
-  } catch (err) {
-    Alert.alert('Error', err.message);
-  }
-};
+        const eligibleElections = data.election_ids.filter(eid => 
+          !data.votes?.some(v => v.election_id === eid)
+        );
+    
+        if (eligibleElections.length === 0) {
+          Alert.alert('Info', 'No remaining eligible elections');
+          return;
+        }
+    
+        // Create formatted list of elections
+        const electionList = eligibleElections
+          .map((eid, index) => `${index + 1}. Election ${eid}`)
+          .join('\n');
+    
+        Alert.alert(
+          'Eligible Elections',
+          `Voter can vote in:\n\n${electionList}`,
+          [
+            {
+              text: 'Proceed to Vote',
+              onPress: () => props.navigation.navigate('ElectionLoop', {
+                voter_id: entryNum,
+                elections: eligibleElections,
+                currentIndex: 0
+              })
+            },
+            { text: 'Cancel', style: 'cancel' }
+          ],
+          { cancelable: false }
+        );
+    
+      } catch (err) {
+        Alert.alert('Error', err.message);
+      }
+    };
 
   return (
     <View style={styles.container}>

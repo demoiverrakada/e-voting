@@ -52,10 +52,6 @@ const App = () => {
             path="/voterverification"
             element={<VoterVerificationApp />}
           />
-          <Route
-            path="/vvpat"
-            element={<VVPATVerificationApp />}
-          />
         </Routes>
       </div>
     </Router>
