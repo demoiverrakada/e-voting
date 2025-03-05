@@ -37,7 +37,7 @@ def verifier_signature_zksm():
                 mix_data = load("mix", ["msgs_out"], election_id)
                 verfpk, sigs, enc_sigs, enc_sigs_rands = get_verfsigs(
                     mix_data["msgs_out"], 
-                    setup_data["elg_pk"]
+                    setup_data["elg_pk"],election_id
                 )
 
                 # Store results per election
@@ -78,7 +78,7 @@ def verifier_signature_zkrsm():
                 verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands = get_verfsigs_rev(
                     comms,
                     setup_data["elg_pk"],
-                    setup_data["pai_pk"]
+                    setup_data["pai_pk"],election_id
                 )
 
                 # Store results per election
@@ -112,8 +112,8 @@ def pf_zksm_verif(verfpk, sigs, enc_sigs, enc_sigs_rands, dpk_bbsig_pfs, blsigs,
     enc_data = load("enc", ["comm", "enc_hash"], election_id)
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
-            status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs_dict,verfpk_dict,enc_sigs_dict,enc_sigs_rands_dict,setup_data["elg_pk"],setup_data["alpha"])
-            status_dpk_bbsig, result_comms = dpk_bbsig_nizkverifs(enc_data["comm"],blsigs_dict,verfpk_dict,dpk_bbsig_pfs_dict)
+            status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs_dict,verfpk_dict,enc_sigs_dict,enc_sigs_rands_dict,setup_data["elg_pk"],setup_data["alpha"],election_id)
+            status_dpk_bbsig, result_comms = dpk_bbsig_nizkverifs(enc_data["comm"],blsigs_dict,verfpk_dict,dpk_bbsig_pfs_dict,election_id)
             status_fwd= status_verfsigs and status_dpk_bbsig
             result=[enc_data["enc_hash"],result_comms,status_fwd]
 
@@ -134,10 +134,10 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands, dpk_bbspl
     candidates = load("load", [], election_id)
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
-        status_verfsigs_rev = check_verfsigs_rev(sigs_rev_dict,enc_data["comm"],verfpk_dict,enc_sigs_rev_dict,enc_sigs_rands_dict,setup_data["elg_pk"],setup_data["pai_pk"],setup_data["alpha"])
+        status_verfsigs_rev = check_verfsigs_rev(sigs_rev_dict,enc_data["comm"],verfpk_dict,enc_sigs_rev_dict,enc_sigs_rands_dict,setup_data["elg_pk"],setup_data["pai_pk"],setup_data["alpha"],election_id)
         assert status_verfsigs_rev
         blsigs_S, blsigs_c, blsigs_r = blsigs_rev_dict
-        status_dpk_bbsplussig, result_msgs = dpk_bbsplussig_nizkverifs(mix_data["msgs_out"],blsigs_S,blsigs_c,blsigs_r,verfpk_dict,dpk_pfs_dict)
+        status_dpk_bbsplussig, result_msgs = dpk_bbsplussig_nizkverifs(mix_data["msgs_out"],blsigs_S,blsigs_c,blsigs_r,verfpk_dict,dpk_pfs_dict,election_id)
 
         status_rev = status_verfsigs_rev and status_dpk_bbsplussig
         updated_msgs_out_dec = [candidates[msg] for msg in mix_data["msgs_out_dec"]]

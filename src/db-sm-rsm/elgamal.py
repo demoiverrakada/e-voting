@@ -4,16 +4,16 @@ from secretsharing import share
 from db import load,store
 from misc import serialize_wrapper,deserialize_wrapper
 
-def elgamal_th_keygen(alpha):
+def elgamal_th_keygen(alpha,election_id):
     sk = group.random(ZR)
     sklist = share(sk, alpha)
-    g1,h1 = load("generators",["g1","h1"]).values()
+    g1,h1 = load("generators",[election_id,"g1","h1"]).values()
     pk = (g1 ** sk, [g1 ** sklist[a] for a in range(len(sklist))]) 
     return sklist, pk
 
-def elgamal_encrypt(pk, m, randIn=None, randOut=False):
+def elgamal_encrypt(pk, m, election_id,randIn=None, randOut=False):
     _pk, _ = pk
-    g1,h1 = load("generators",["g1","h1"]).values()
+    g1,h1 = load("generators",[election_id,"g1","h1"]).values()
     if randIn is None:
         r  = group.random(ZR)
     else:
@@ -31,8 +31,8 @@ def elgamal_share_decrypt(pk, c, _skshare):
     c1, c2 = c
     return c1 ** _skshare
 
-def elgamal_combine_decshares(pk, cs, decshares):
-    g1,h1 = load("generators",["g1","h1"]).values()
+def elgamal_combine_decshares(pk, cs, decshares,election_id):
+    g1,h1 = load("generators",[election_id,"g1","h1"]).values()
     decfactors = [g1 ** 0] * len(cs)
     for a in range(len(decshares)):
         decfactors = [decfactors[i] * decshares[a][i] for i in range(len(cs))]
@@ -40,8 +40,8 @@ def elgamal_combine_decshares(pk, cs, decshares):
     ms = [c2s[i] / decfactors[i] for i in range(len(cs))]
     return ms
 
-def elgamal_th_decrypt(sklist, c):
-    g1,h1 = load("generators",["g1","h1"]).values()
+def elgamal_th_decrypt(sklist, c,election_id):
+    g1,h1 = load("generators",[election_id,"g1","h1"]).values()
     c1, c2 = c 
     c1term = g1 ** 0
     for k in range(len(sklist)):
@@ -57,18 +57,18 @@ def elgamal_div(c1, c2):
 def elgamal_exp(c1, a):
     return (c1[0] ** a, c1[1] ** a)
 
-def elgamal_reencrypt(pk, c, randIn=None, randOut=False):
-    g1,h1 = load("generators",["g1","h1"]).values()
+def elgamal_reencrypt(pk, c, election_id,randIn=None, randOut=False):
+    g1,h1 = load("generators",[election_id,"g1","h1"]).values()
     if randOut:
-        c_iden, r = elgamal_encrypt(pk, g1 ** 0, randIn=randIn, randOut=True)
+        c_iden, r = elgamal_encrypt(pk, g1 ** 0, election_id,randIn=randIn, randOut=True)
         return elgamal_mult(c, c_iden), r
     else:
-        c_iden = elgamal_encrypt(pk, g1 ** 0, randIn=randIn)
+        c_iden = elgamal_encrypt(pk, g1 ** 0, election_id,randIn=randIn)
         return elgamal_mult(c, c_iden)
 
 #### Proof of knowledge of correct decryption share ####
 
-def elgamal_share_decryption_batchpf(pk, decshares, cs, deltavec, k, _sklist):
+def elgamal_share_decryption_batchpf(pk, decshares, cs, deltavec, k, _sklist,election_id):
     """ Batch proof of correctness of the decryption shares. 
 
     Given ElGamal ciphertexts ((c10,c11),...,(cN0,cN1)) and decryption shares (c1k,...,cNk) for the k^th decryptor alongwith values 
@@ -83,7 +83,7 @@ def elgamal_share_decryption_batchpf(pk, decshares, cs, deltavec, k, _sklist):
         PK{(d_k): hk^{delta}c1k^{delta1}...cNk^{deltaN} = (g_1^{delta}c10^{delta1}...cN0^{deltaN})^{sk_k}},
     which is a proof of the form PK{(d): a=b^d}. This is efficient because the deltas are small!
     """
-    g1,h1 = load("generators",["g1","h1"]).values()
+    g1,h1 = load("generators",[election_id,"g1","h1"]).values()
     _pk, pklist = pk
     lhs = pklist[k] ** deltavec[0]
     for i in range(1, len(deltavec)):
@@ -105,8 +105,8 @@ def elgamal_share_decryption_batchpf(pk, decshares, cs, deltavec, k, _sklist):
 
     return chal, z_skshare
 
-def elgamal_share_decryption_batchverif(pk, decshares, cs, deltavec, k, pf):
-    g1,h1 = load("generators",["g1","h1"]).values()
+def elgamal_share_decryption_batchverif(pk, decshares, cs, deltavec, k, pf,election_id):
+    g1,h1 = load("generators",[election_id,"g1","h1"]).values()
     _pk, pklist = pk
     lhs = pklist[k] ** deltavec[0]
     for i in range(1, len(deltavec)):

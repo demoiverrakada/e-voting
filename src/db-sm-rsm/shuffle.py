@@ -22,11 +22,11 @@ rs = gmpy2.random_state(random.randint(0,100000))
 
 #### Utilities ############################################################################
 
-def commkey(n):
+def commkey(n,election_id):
     # Ensuring we generate at least two generators because the generating set of the Paillier 
     # ciphertext is of size 2. Protocol 15 of the first paper above (step 2) then requires that 
     # the commitment key must support at least two elements. 
-    g1,h1=load("generators",["g1","h1"]).values()
+    g1,h1=load("generators",[election_id,"g1","h1"]).values()
     return n, h1, [group.random(G1) for i in range(max(n,2))]
 
 def commit_vector(ck, vs, s):
@@ -111,9 +111,9 @@ def expprod(basevec, expvec, mod=None):
 
 #### Proof of knowledge of the opening of a permutation matrix commitment. #########################
 
-def compute_perm_nizkproof(ck, evec, _pi, _svec):
+def compute_perm_nizkproof(ck, evec, _pi, _svec,election_id):
     n, h1, gs = ck
-    g1,h12=load("generators",["g1","h1"]).values()
+    g1,h12=load("generators",[election_id,"g1","h1"]).values()
     t = sum(_svec)
     edashvec = applyperm(evec, _pi)
     sdashvec = [group.random(ZR) for i in range(n)]
@@ -126,8 +126,8 @@ def compute_perm_nizkproof(ck, evec, _pi, _svec):
         w = sdashvec[i] + w*edashvec[i]
     return B, t, k, edashvec, sdashvec, w
 
-def commitmsg_perm_nizkproof(ck, B):
-    g1,h12= load("generators",["g1","h1"]).values()
+def commitmsg_perm_nizkproof(ck, B,election_id):
+    g1,h12= load("generators",[election_id,"g1","h1"]).values()
     n, h1, gs = ck
     rt = group.random(ZR)
     rk = group.random(ZR)
@@ -157,9 +157,9 @@ def respmsg_perm_nizkproof(ck, t, k, edashvec, sdashvec, w, rt, rk, redash, rsda
     zw = rw - w*c
     return zt, zk, zedash, zsdash, zw
 
-def lhs_perm_nizkverif(ck, a, evec, B):
+def lhs_perm_nizkverif(ck, a, evec, B,election_id):
     n, h1, gs = ck
-    g1,h12=load("generators",["g1","h1"]).values()
+    g1,h12=load("generators",[election_id,"g1","h1"]).values()
     LC1 = group.init(G1, iden)
     A = group.init(G1, iden)
     GS = group.init(G1, iden)
@@ -178,9 +178,9 @@ def lhs_perm_nizkverif(ck, a, evec, B):
     LW *= g1 ** (-eprod)
     return LC1, LC2, LB, LW
 
-def rhs_perm_nizkverif(ck, B, zt, zk, zedash, zsdash, zw):
+def rhs_perm_nizkverif(ck, B, zt, zk, zedash, zsdash, zw,election_id):
     n, h1, gs = ck
-    g1,h12= load("generators",["g1","h1"]).values()
+    g1,h12= load("generators",[election_id,"g1","h1"]).values()
     ZC1 = h1 ** zt
     ZC2 = h1 ** zk
     for i in range(n):
@@ -274,7 +274,7 @@ def perm_nizkverif(ck, a, evec, pf):
 
 #### Proof of an El Gamal shuffle ################################################################
 
-def shuffle_elgamal_nizkproof(ck, elgpk, cinvec, coutvec, permcomm, evec, _pi, _svec, _rvec):
+def shuffle_elgamal_nizkproof(ck, elgpk, cinvec, coutvec, permcomm, evec, _pi, _svec, _rvec,election_id):
     """ Proof that coutvec is a permutation and re-encryption of cinvec under the El Gamal 
     encryption scheme (protocol 3 of paper 2 above): 
     
@@ -294,7 +294,7 @@ def shuffle_elgamal_nizkproof(ck, elgpk, cinvec, coutvec, permcomm, evec, _pi, _
 
     # Compute
     n, h1, gs = ck
-    g1,h12= load("generators",["g1","h1"]).values()
+    g1,h12= load("generators",[election_id,"g1","h1"]).values()
     evec = [group.init(ZR, int(e)) for e in evec]
     B, t, k, edashvec, sdashvec, w = compute_perm_nizkproof(ck, evec, _pi, _svec)
     u = dot(_rvec, evec)
@@ -315,7 +315,7 @@ def shuffle_elgamal_nizkproof(ck, elgpk, cinvec, coutvec, permcomm, evec, _pi, _
 
     return B, c, zt, zk, zedash, zsdash, zw, zu
 
-def shuffle_elgamal_nizkverif(ck, elgpk, cinvec, coutvec, permcomm, evec, pf):
+def shuffle_elgamal_nizkverif(ck, elgpk, cinvec, coutvec, permcomm, evec, pf,election_id):
     """ Verify the proof that coutvec is a permutation and re-encryption of cinvec under the 
     El Gamal encryption scheme.
     
@@ -334,7 +334,7 @@ def shuffle_elgamal_nizkverif(ck, elgpk, cinvec, coutvec, permcomm, evec, pf):
     }
     """
     _elgpk, _elgpklist = elgpk
-    g1,h12= load("generators",["g1","h1"]).values()
+    g1,h12= load("generators",[election_id,"g1","h1"]).values()
     n, h1, gs = ck
     B, c, zt, zk, zedash, zsdash, zw, zu = pf
     

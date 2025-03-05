@@ -30,11 +30,11 @@ def sharerands(n, alpha, purpose):
             res.append([group.random(ZR) for i in range(n)])
     return res
 
-def sharemults(shares1, shares2, alpha, purpose):
+def sharemults(shares1, shares2, alpha,election_id, purpose):
     """ Given shares1 = [(x11,...,xn1),...,(x1m,...,xnm)] and shares2 = [(y11,...,yn1),...,(y1m,...,ynm)] where n 
     denotes the number of items and m (=alpha) denotes the number of parties, compute [(z11,...,zn1),...,(z1m,...,znm)], 
     where zi1 + ... + zim = zi = xi * yi = (xi1 + ... + xim) * (yi1 + ... + yim). """
-    beaver_a_shares,beaver_b_shares,beaver_c_shares=load("setup",["beaver_a_shares","beaver_b_shares","beaver_c_shares"]).values()
+    beaver_a_shares,beaver_b_shares,beaver_c_shares=load("setup",[election_id,"beaver_a_shares","beaver_b_shares","beaver_c_shares"]).values()
     myn = len(shares1[0])
     dshares, eshares = [], []
     for a in range(alpha):
@@ -87,9 +87,9 @@ if __name__ == "__main__":
     beaver_a_shares['test'] = list(zip(*[share(beaver_a[i], alpha) for i in range(2)]))
     beaver_b_shares['test'] = list(zip(*[share(beaver_b[i], alpha) for i in range(2)]))
     beaver_c_shares['test'] = list(zip(*[share(beaver_c[i], alpha) for i in range(2)]))
-    
+    election_id=1
     shares1 = list(zip(*[share(group.init(ZR, 3), alpha), share(group.init(ZR, 6), alpha)]))
     shares2 = list(zip(*[share(group.init(ZR, 5), alpha), share(group.init(ZR, 10), alpha)]))
-    multshares = sharemults(shares1, shares2, alpha, purpose='test')
+    multshares = sharemults(shares1, shares2, alpha,election_id, purpose='test')
     mul = [reconstruct(multshares_item) for multshares_item in zip(*multshares)]
     print("Mul", mul)

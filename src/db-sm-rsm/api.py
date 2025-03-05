@@ -69,7 +69,7 @@ def setup(alpha,election_id):
             _pai_sklist_single.append(_pai_sk_a)
             pai_pklist_single.append(pai_pk_a)
 
-        _elg_sklist, elg_pk = elgamal_th_keygen(alpha)
+        _elg_sklist, elg_pk = elgamal_th_keygen(alpha,election_id)
         
         store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,election_id])
     print("Setup was done successful")
@@ -122,7 +122,7 @@ def mixer():
                 beaver_a_shares, beaver_b_shares, beaver_c_shares = gen_beaver_triples(n, alpha)
 
                 # Generate permutation commitment
-                ck = commkey(n)
+                ck = commkey(n,election_id)
                 ck_fo = commkey_fo(n, N=pai_pk[0])
                 _pi, _re_pi = genperms(n, alpha)
                 _svecperm = [[group.random(ZR) for _ in range(n)] for _ in range(alpha)]
@@ -180,11 +180,11 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
         # Get encryption commitments
         enc_data = load("enc", ["comm"], election_id)
         comms = enc_data.get("comm", [])
-        status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"])
+        status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"],election_id)
         assert status_verfsigs, f"Signature verification failed for election {election_id}"
         blsigs, _blshares = get_blsigs(enc_sigs,setup_data["ck"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["_svecperm"],setup_data["_pi"], 
-        setup_data["_re_pi"],setup_data["_elg_sklist"])
-        dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms,blsigs,verfpk,setup_data["alpha"],mix_data["_msg_shares"],mix_data["_rand_shares"],_blshares)
+        setup_data["_re_pi"],setup_data["_elg_sklist"],election_id)
+        dpk_bbsig_pfs = dpk_bbsig_nizkproofs(comms,blsigs,verfpk,setup_data["alpha"],mix_data["_msg_shares"],mix_data["_rand_shares"],_blshares,election_id)
     result= [str(serialize_wrapper(dpk_bbsig_pfs)),str(serialize_wrapper(blsigs))]
     print(json.dumps(result))
 
@@ -203,12 +203,12 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,election_id):
     enc_sigs_rev_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rev_rands))
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
-        status_verfsigs_rev = check_verfsigs_rev(sigs_rev,comms,verfpk,enc_sigs_rev,enc_sigs_rev_rands,setup_data["elg_pk"],setup_data["pai_pk"],setup_data["alpha"])
+        status_verfsigs_rev = check_verfsigs_rev(sigs_rev,comms,verfpk,enc_sigs_rev,enc_sigs_rev_rands,setup_data["elg_pk"],setup_data["pai_pk"],setup_data["alpha"],election_id)
         assert status_verfsigs_rev, f"Signature verification failed for election {election_id}"
-        blsigs_rev, _blshares_rev = get_blsigs_rev(enc_sigs_rev,enc_rands,setup_data["ck"],setup_data["ck_fo"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["pai_pk"],setup_data["_svecperm"],mix_data["_rand_shares"],setup_data["_pi"],setup_data["_elg_sklist"],setup_data["_pai_sklist"])
+        blsigs_rev, _blshares_rev = get_blsigs_rev(enc_sigs_rev,enc_rands,setup_data["ck"],setup_data["ck_fo"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["pai_pk"],setup_data["_svecperm"],mix_data["_rand_shares"],setup_data["_pi"],setup_data["_elg_sklist"],setup_data["_pai_sklist"],election_id)
         blsigs_S, blsigs_c, blsigs_r = blsigs_rev
         _blshares_S, _blshares_c, _blshares_r = _blshares_rev        
-        dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(mix_data["msgs_out"],blsigs_S,blsigs_c,blsigs_r,verfpk,setup_data["alpha"],_blshares_S,_blshares_c,_blshares_r)
+        dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(mix_data["msgs_out"],blsigs_S,blsigs_c,blsigs_r,verfpk,setup_data["alpha"],_blshares_S,_blshares_c,_blshares_r,election_id)
     result= [str(serialize_wrapper(dpk_bbsplussig_pfs)),str(serialize_wrapper(blsigs_rev))]  
     print(json.dumps(result))
 
