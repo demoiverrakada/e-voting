@@ -27,12 +27,12 @@ def process_bulletins():
                 "voter_id": bulletin['voter_id'],
                 "ov_hash": receipt['ov_hash'],
                 "enc_hash": receipt['enc_hash'],
-                "enc_msg": json.loads(receipt['enc_msg']),
-                "comm": json.loads(receipt['comm']),
-                "enc_msg_share": json.loads(receipt['enc_msg_shares']),
-                "enc_rand_share": json.loads(receipt['enc_rand_shares']),
+                "enc_msg": (receipt['enc_msg']),
+                "comm": (receipt['comm']),
+                "enc_msg_share": (receipt['enc_msg_shares']),
+                "enc_rand_share": (receipt['enc_rand_shares']),
                 "pfcomm": receipt['pfcomm'],
-                "enc_rand": json.loads(receipt['enc_rand']),
+                "enc_rand": (receipt['enc_rand']),
                 "pf_encmsg": receipt['pf_encmsg'],
                 "pf_encrand": receipt['pf_encrand'],
                 "pfs_enc_msg_share": receipt['pf_enc_msg_shares'],
@@ -41,7 +41,7 @@ def process_bulletins():
 
             # Insert into votes collection
             votes_collection.insert_one(vote_doc)
-            print(f"Processed voter {bulletin['voter_id']} in election {bulletin['election_id']}")
+            #print(f"Processed voter {bulletin['voter_id']} in election {bulletin['election_id']}")
 
         except KeyError as e:
             print(f"Missing field {str(e)} in bulletin {bulletin.get('_id')}")

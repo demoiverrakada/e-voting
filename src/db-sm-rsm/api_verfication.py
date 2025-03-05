@@ -169,7 +169,7 @@ def audit(commitment, booth_num, bid, election_id):
         candidates = load("load", [], election_id)
 
         for i in range(len(commitment)):
-            receipt_data = load("receipt", [election_id, commitment[i], "enc_msg", "comm", "enc_msg_share", "enc_rand_share"])
+            receipt_data = load("receipt", [commitment[i], "enc_msg", "comm", "enc_msg_share", "enc_rand_share"],election_id)
             enc_msg.append(receipt_data["enc_msg"])
             comm.append(receipt_data["comm"])
             enc_msg_share.append(receipt_data["enc_msg_share"])

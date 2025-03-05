@@ -231,7 +231,7 @@ def get_blsigs(enc_sigs, ck, permcomm, alpha, elgpk, _svecperm, _pi, _re_pi, _el
                             status_pk_bl = status_pk_bl and pk_enc_bl_verif(elgpk, enc_bls[adash][i], enc_sigs[i], pf[adash][i],election_id)
                             print("status_pk_bl:",status_pk_bl)
         pprint("status_pk_bl:", status_pk_bl)
-        g1,h1=load("generators",[election_id,"g1","h1"]).values()
+        g1,h1=load("generators",["g1","h1"],election_id).values()
         enc_blsigs = [elgamal_encrypt(elgpk, g1 ** 0, randIn=0)] * n
         for a in range(alpha):
             with timer("mixer %d: generate encrypted blinded BB signatures" % a):
@@ -322,7 +322,7 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
 
             from db import load
             from elgamal import elgamal_th_decrypt
-            _elg_sklist = load("setup", [election_id,"_elg_sklist"])
+            _elg_sklist = load("setup", ["_elg_sklist"],election_id)
             print("decryptions of original enc_sigs_S:")
             for i, enc_sig_S in enumerate(enc_sigs_S):
                 sig_S = elgamal_th_decrypt(_elg_sklist["_elg_sklist"], enc_sig_S,election_id)
@@ -360,7 +360,7 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
                         status_shuffle_blsigs_rev = status_shuffle_blsigs_rev and shuffle_paillier_nizkverif(ck, ck_fo, auth_paipk, enc_sigs_r_1[adash], enc_sigs_r_2[adash], permcomm[adash], evec_r[adash], pf_r[adash])
                         print("status_shuffle_blsigs_rev after r (paillier):", status_shuffle_blsigs_rev)
         pprint("status_shuffle_blsigs_rev:", status_shuffle_blsigs_rev)
-    g1,h1=load("generators",[election_id,"g1","h1"]).values()
+    g1,h1=load("generators",["g1","h1"],election_id).values()
     # Generate encrypted blinded signatures
     with timer("generate encrypted blinded BBS+ signatures", report_subtimers=mixers(alpha)):
         _blshares_S, _blshares_c, _blshares_r, _blshares_cdash, _blshares_rdash = [], [], [], [], []

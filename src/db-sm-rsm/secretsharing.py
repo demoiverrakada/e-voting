@@ -34,7 +34,7 @@ def sharemults(shares1, shares2, alpha,election_id, purpose):
     """ Given shares1 = [(x11,...,xn1),...,(x1m,...,xnm)] and shares2 = [(y11,...,yn1),...,(y1m,...,ynm)] where n 
     denotes the number of items and m (=alpha) denotes the number of parties, compute [(z11,...,zn1),...,(z1m,...,znm)], 
     where zi1 + ... + zim = zi = xi * yi = (xi1 + ... + xim) * (yi1 + ... + yim). """
-    beaver_a_shares,beaver_b_shares,beaver_c_shares=load("setup",[election_id,"beaver_a_shares","beaver_b_shares","beaver_c_shares"]).values()
+    beaver_a_shares,beaver_b_shares,beaver_c_shares=load("setup",["beaver_a_shares","beaver_b_shares","beaver_c_shares"],election_id).values()
     myn = len(shares1[0])
     dshares, eshares = [], []
     for a in range(alpha):
