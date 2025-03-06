@@ -450,7 +450,7 @@ def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_o
     #c.drawImage(qr_image2, right_x + 60, right_y - 270, width=200, height=200)
     
     has = group.hash(c_w_hash, type=ZR)
-    sigma_c = bbsig.bbsign(has, _sk)
+    sigma_c = bbsig.bbsign(has, _sk,election_id)
     qr_data3 = []
     qr_data3.append(j)
     qr_data3.append(sigma_c)

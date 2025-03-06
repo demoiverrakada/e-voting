@@ -7,8 +7,8 @@ from misc import serialize_wrapper,deserialize_wrapper
 def elgamal_th_keygen(alpha,election_id):
     sk = group.random(ZR)
     sklist = share(sk, alpha)
-    g1,h1 = load("generators",["g1","h1"],election_id).values()
-    pk = (g1 ** sk, [g1 ** sklist[a] for a in range(len(sklist))]) 
+    g1= load("generators",["g1","h1"],election_id)
+    pk = (g1["g1"] ** sk, [g1["g1"] ** sklist[a] for a in range(len(sklist))]) 
     return sklist, pk
 
 def elgamal_encrypt(pk, m, election_id,randIn=None, randOut=False):

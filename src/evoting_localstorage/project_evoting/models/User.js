@@ -114,7 +114,7 @@ AdminSchema.methods.comparePassword = function (candidatePassword) {
 
 // Schema to store votes on server
 const VotesSchema = new mongoose.Schema({
-    election_id:{type:Number,unique:true,required:true},
+    election_id:{type:Number,required:true},
     voter_id: {
         type: String,
         required: true,
@@ -172,7 +172,7 @@ const VoterSchema = new mongoose.Schema({
 
 // Schema for receipts
 const ReceiptSchema = new mongoose.Schema({
-    election_id:{type:Number,required:true,unique:true},
+    election_id:{type:Number,required:true},
     ov_hash:{type:String,required: true},
     enc_hash: {type:String,required: true},
     enc_msg:{type:String,required: true}, 
@@ -191,8 +191,7 @@ const ReceiptSchema = new mongoose.Schema({
 const BulletinSchema=new mongoose.Schema({
     election_id:{
         type:Number,
-        required:true,
-        unique:true
+        required:true
     },
     voter_id:{
         type:String,
