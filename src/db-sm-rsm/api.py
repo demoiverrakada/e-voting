@@ -17,7 +17,7 @@ from misc import timer
 from elgamal import elgamal_th_keygen,elgamal_encrypt
 from optpaillier import pai_decrypt as pai_decrypt_single
 import ast
-from misc import serialize_wrapper, deserialize_wrapper
+from misc import serialize_wrapper, deserialize_wrapper,pprint
 from bbsig import bbbatchverify
 import pymongo
 
@@ -94,25 +94,26 @@ def mixer():
         print(f"Processing election {election_id}")
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
+        #if True:
             try:
-                # Process bulletins for this election
-                process_bulletins()  # Ensure process_bulletins handles election_id
-
                 # Load election-specific parameters
-                keys_data = load("keys", ["alpha", "pai_pk", "pai_pklist_single", 
+                process_bulletins(election_id) 
+                keys_data = load("setup", ["alpha", "pai_pk", "pai_pklist_single", 
                                         "_pai_sklist", "_pai_sklist_single"], election_id)
                 alpha = keys_data["alpha"]
                 pai_pk = keys_data["pai_pk"]
                 pai_pklist_single = keys_data["pai_pklist_single"]
                 _pai_sklist = keys_data["_pai_sklist"]
                 _pai_sklist_single = keys_data["_pai_sklist_single"]
-
+                #print(alpha, pai_pk,pai_pklist_single,_pai_sklist,_pai_sklist_single)
                 # Load encrypted data for this election
-                votes_data = load("votes", ["enc_msg", "enc_msg_share", "enc_rand_share"], election_id)
+                votes_data = load("enc", ['enc_msg', 'enc_msg_share', 'enc_rand_share'], election_id)
+                print(votes_data)
                 enc_msgs = votes_data["enc_msg"]
                 enc_msg_shares = votes_data["enc_msg_share"]
                 enc_rand_shares = votes_data["enc_rand_share"]
-                
+                print("length of enc_msg_shares",len(enc_msg_shares))
+                print("length of enc_msgs",len(enc_msgs))
                 n = len(enc_msgs)
                 if n == 0:
                     print(f"No votes found for election {election_id}")
@@ -130,11 +131,11 @@ def mixer():
 
                 # Generate permutation proofs
                 evec = [[group.init(ZR, random.getrandbits(kappa_e)) for _ in range(n)] for _ in range(alpha)]
-                pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a]) for a in range(alpha)]
+                pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a],election_id) for a in range(alpha)]
                 
                 # Verify permutation proofs
                 status_permcomm = all(
-                    perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a])
+                    perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a],election_id)
                     for a in range(alpha)
                 )
                 assert status_permcomm, f"Permutation proof verification failed for election {election_id}"
@@ -150,16 +151,17 @@ def mixer():
                     alpha, pai_pk, pai_pklist_single, _pai_sklist, _pai_sklist_single,
                     _pi, _svecperm
                 )
-
                 # Decrypt messages
-                res = load("load", [], election_id)  # Ensure proper election ID handling
+                res = load("load", [], election_id) # Ensure proper election ID handling
+                if not res or len(res) == 0:
+                    print(f"Warning: No data found in 'load' collection for election {election_id}")
                 msgs_out_dec = []
                 for j in range(len(msgs_out)):
                     i = int(str(msgs_out[j])) % len(res)
                     msgs_out_dec.append(i)
 
                 # Store results with election ID
-                store("decs", [election_id, msgs_out_dec, msgs_out, _msg_shares, _rand_shares])
+                store("mix", [election_id, msgs_out_dec, msgs_out, _msg_shares, _rand_shares])
                 
             except Exception as e:
                 print(f"Error processing election {election_id}: {str(e)}")
@@ -171,7 +173,9 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
     """ZK proofs for encrypted votes across all elections"""
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
-        mix_data = load("mix", ["msgs_out", "_msg_shares", "_rand_shares"], election_id)
+        election_id=int(election_id)
+        mix_data = load("mix", ["msgs_out","_msg_shares","_rand_shares"], election_id)
+        print("mix_data",mix_data)
         setup_data = load("setup", ["alpha", "ck", "permcomm", "elg_pk", "_svecperm", "_pi", "_re_pi", "_elg_sklist"], election_id)
         verfpk = deserialize_wrapper(ast.literal_eval(verfpk))
         sigs = deserialize_wrapper(ast.literal_eval(sigs))
@@ -179,8 +183,10 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
         enc_sigs_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rands))   
         # Get encryption commitments
         enc_data = load("enc", ["comm"], election_id)
-        comms = enc_data.get("comm", [])
-        status_verfsigs = check_verfsigs(mix_data['msgs_out'],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"],election_id)
+        comms = enc_data["comm"]
+        #print("setup_data",setup_data)
+        #print("enc_data",enc_data)
+        status_verfsigs = check_verfsigs(mix_data["msgs_out"],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"],election_id)
         assert status_verfsigs, f"Signature verification failed for election {election_id}"
         blsigs, _blshares = get_blsigs(enc_sigs,setup_data["ck"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["_svecperm"],setup_data["_pi"], 
         setup_data["_re_pi"],setup_data["_elg_sklist"],election_id)
@@ -192,6 +198,7 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
 
 def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,election_id):
     """ZK proofs for plaintext votes across all elections"""
+    election_id=int(election_id)
     mix_data = load("mix", ["msgs_out", "_rand_shares"], election_id)
     setup_data = load("setup", ['alpha', 'pai_pk', '_pai_sklist', 'elg_pk','_elg_sklist', 'ck', 'ck_fo', '_pi','_svecperm', 'permcomm'], election_id)
     enc_data = load("enc", ["comm", "enc_rand"], election_id)

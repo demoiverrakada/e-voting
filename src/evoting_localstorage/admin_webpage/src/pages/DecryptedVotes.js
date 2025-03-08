@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import './DecryptedVotes.css';
 import Navigation from '../Navigation';
 import FinalVotes from './FinalVotes';
-import Loading from './Loading'
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function DecryptedVotes() {
@@ -33,9 +32,10 @@ function DecryptedVotes() {
       );
       console.log('Decrypted votes:', response.data);
       alert('Votes decrypted successfully.');
+      // Automatically fetch the updated votes
+      await handleGetDcrpVotes();
     } catch (err) {
       alert(`Failed to decrypt votes: ${err.message}`);
-    } finally {
       setLoading(false);
     }
   };
@@ -47,10 +47,13 @@ function DecryptedVotes() {
       const votesData = response.data;
       setDecryptedVotes(votesData);
       setElectionIds(Object.keys(votesData));
-      setSelectedElection(Object.keys(votesData)[0]);
+      if (Object.keys(votesData).length > 0) {
+        setSelectedElection(Object.keys(votesData)[0]);
+      }
       localStorage.setItem("decryptedVotes", JSON.stringify(votesData));
-      alert("Decrypted votes fetched successfully.");
+      console.log("Decrypted votes fetched:", votesData);
     } catch (err) {
+      console.error("Failed to fetch decrypted votes:", err);
       alert(`Failed to fetch decrypted votes: ${err.message}`);
     } finally {
       setLoading(false);
@@ -65,19 +68,28 @@ function DecryptedVotes() {
     <div className="decrypted-container">
       <h2>Decrypted Votes</h2>
 
-      {loading ? (
-        <Loading message="Please wait while we process the votes..." />
-      ) : (
-        <>
-          <button onClick={handleDecryptVotes}>Decrypt Votes</button>
-          <button onClick={handleGetDcrpVotes}>Fetch Decrypted Votes</button>
-        </>
-      )}
+      <div className="action-buttons">
+        {loading ? (
+          <div className="loading-spinner-container">
+            <div className="loading-spinner"></div>
+            <p>Processing...</p>
+          </div>
+        ) : (
+          <>
+            <button onClick={handleDecryptVotes}>Decrypt Votes</button>
+            <button onClick={handleGetDcrpVotes}>Fetch Decrypted Votes</button>
+          </>
+        )}
+      </div>
 
       {electionIds.length > 0 && (
-        <div>
+        <div className="election-selector">
           <label htmlFor="election-select">Select Election: </label>
-          <select id="election-select" value={selectedElection} onChange={handleElectionChange}>
+          <select 
+            id="election-select" 
+            value={selectedElection} 
+            onChange={handleElectionChange}
+          >
             {electionIds.map((id) => (
               <option key={id} value={id}>Election {id}</option>
             ))}
@@ -85,24 +97,27 @@ function DecryptedVotes() {
         </div>
       )}
 
-      {selectedElection && decryptedVotes[selectedElection] && (
-        <table className="votes-table">
-          <thead>
-            <tr>
-              <th>Candidate Index</th>
-              <th>Vote Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            {decryptedVotes[selectedElection].msgs_out_dec.map((vote, index) => (
-              <tr key={index}>
-                <td>{vote[0]}</td>
-                <td>{vote[1]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+{selectedElection && decryptedVotes[selectedElection] && (
+  <div className="votes-table-wrapper">
+    <h3 className="table-header">Election Results</h3>
+    <table className="votes-table">
+      <thead>
+        <tr>
+          <th>Candidate Name</th>
+          <th>Vote Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {decryptedVotes[selectedElection].map((vote, index) => (
+          <tr key={index}>
+            <td>{vote.name}</td>
+            <td>{vote.votes}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
 
       <Routes>
         <Route path="/final_votes" element={<FinalVotes />} />
@@ -114,4 +129,3 @@ function DecryptedVotes() {
 }
 
 export default DecryptedVotes;
-

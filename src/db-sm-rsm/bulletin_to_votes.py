@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 import json
 
-def process_bulletins():
+def process_bulletins(election_id):
     client = MongoClient('mongodb://root:pass@eadb:27017')
     db = client['test']
 
@@ -14,7 +14,7 @@ def process_bulletins():
             # Find receipt with election_id match
             receipt = receipts_collection.find_one({
                 'enc_hash': bulletin['commitment'],
-                'election_id': bulletin['election_id']
+                'election_id': election_id
             })
 
             if not receipt:
@@ -29,14 +29,14 @@ def process_bulletins():
                 "enc_hash": receipt['enc_hash'],
                 "enc_msg": (receipt['enc_msg']),
                 "comm": (receipt['comm']),
-                "enc_msg_share": (receipt['enc_msg_shares']),
-                "enc_rand_share": (receipt['enc_rand_shares']),
+                "enc_msg_share": (receipt['enc_msg_share']),
+                "enc_rand_share": (receipt['enc_rand_share']),
                 "pfcomm": receipt['pfcomm'],
                 "enc_rand": (receipt['enc_rand']),
                 "pf_encmsg": receipt['pf_encmsg'],
                 "pf_encrand": receipt['pf_encrand'],
-                "pfs_enc_msg_share": receipt['pf_enc_msg_shares'],
-                "pfs_enc_rand_share": receipt['pf_enc_rand_shares']
+                "pfs_enc_msg_share": receipt['pfs_enc_msg_share'],
+                "pfs_enc_rand_share": receipt['pfs_enc_rand_share']
             }
 
             # Insert into votes collection

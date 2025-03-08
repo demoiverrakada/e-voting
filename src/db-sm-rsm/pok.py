@@ -214,7 +214,7 @@ def dpk_bbsplussig_nizkproofs(msgs, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha,
             genh2 = inveg1f2
             genh3 = fT
             z1s.append([(genh2 ** _blshares_S[a][j]) * (genh3 ** _delta0[a][j]) for j in range(myn)])
-            pf_z1.append([pkcomm(z1s[a][j], _blshares_S[a][j], _delta0[a][j], base=(genh2, genh3)) for j in range(myn)])
+            pf_z1.append([pkcomm(z1s[a][j], _blshares_S[a][j], _delta0[a][j], election_id,base=(genh2, genh3)) for j in range(myn)])
 
     status_pk_z1 = True
     for a in range(alpha):
@@ -223,7 +223,7 @@ def dpk_bbsplussig_nizkproofs(msgs, blsigs_S, blsigs_c, blsigs_r, verfpk, alpha,
                 if adash == a: continue
                 else: 
                     for j in range(myn):
-                        status_pk_z1 = status_pk_z1 and pkcommverif(z1s[adash][j], pf_z1[adash][j], base=(genh2, genh3))
+                        status_pk_z1 = status_pk_z1 and pkcommverif(z1s[adash][j], pf_z1[adash][j], election_id,base=(genh2, genh3))
     pprint("status_pk_z1:", status_pk_z1)
 
     for a in range(alpha):

@@ -134,15 +134,18 @@ def mix(ck, ck_fo, permcomm, enc_msgs, enc_msg_shares, enc_rand_shares, alpha, p
     # Decryption of encrypted message and randomness shares by each mix-server
     with timer("decryption of individual message/randomness shares", report_subtimers=mixers(alpha)):
         _msg_shares, _rand_shares = [], []
+        print(alpha)
         for a in range(alpha):
             with timer("mixer %d: decryption of individual message/randomness shares" % a):
                 enc_msg_shares_a = list(zip(*enc_msg_shares))[a]
+                pprint("here")
                 enc_rand_shares_a = list(zip(*enc_rand_shares))[a]
+                print("there")
                 _msg_shares_a = [pai_decrypt_single(pai_pklist_single[a], _pai_sklist_single[a], enc_msg_share_a, embedded_q=q) for enc_msg_share_a in enc_msg_shares_a]
+                print("where")
                 _rand_shares_a = [pai_decrypt_single(pai_pklist_single[a], _pai_sklist_single[a], enc_rand_share_a, embedded_q=q) for enc_rand_share_a in enc_rand_shares_a]
                 _msg_shares.append(_msg_shares_a)
                 _rand_shares.append(_rand_shares_a)
-
     return msgs_out, _msg_shares, _rand_shares
 
 def get_verfsigs(msgs_out, elgpk,election_id):
@@ -150,7 +153,7 @@ def get_verfsigs(msgs_out, elgpk,election_id):
     with timer("verifier: creating BB signatures and encryptions"):
         _verfsk, verfpk = bbkeygen(election_id)
         sigs = [bbsign(msg_out, _verfsk,election_id) for msg_out in msgs_out]
-        enc_sigs, enc_sigs_rands = encrypt_sigs(elgpk, sigs)
+        enc_sigs, enc_sigs_rands = encrypt_sigs(elgpk, sigs,election_id)
         print(verfpk, sigs, enc_sigs, enc_sigs_rands)
         return verfpk, sigs, enc_sigs, enc_sigs_rands
 
@@ -166,7 +169,7 @@ def check_verfsigs(msgs_out, sigs, verfpk, enc_sigs, enc_sigs_rands, elgpk, alph
             #print(sigs,"in check_verfsigs")
             status_checkverfsigs = status_checkverfsigs and bbbatchverify(sigs, msgs_out, verfpk,election_id)
             #print(bbbatchverify(sigs, msgs_out, verfpk),"check for bbatchverify")
-            enc_sigs_dash = tuple([elgamal_encrypt(elgpk, sigs[i], randIn=enc_sigs_rands[i]) for i in range(len(sigs))])
+            enc_sigs_dash = tuple([elgamal_encrypt(elgpk, sigs[i], election_id,randIn=enc_sigs_rands[i]) for i in range(len(sigs))])
             #print(enc_sigs_dash,"enc_sigs_dash")
             #print(enc_sigs,"enc_sigs")
             status_checkverfsigs = status_checkverfsigs and (enc_sigs_dash == enc_sigs)
@@ -217,7 +220,7 @@ def get_blsigs(enc_sigs, ck, permcomm, alpha, elgpk, _svecperm, _pi, _re_pi, _el
         for a in range(alpha):
             with timer("mixer %d: generate encrypted blinded BB signatures and proofs of knowledge of blinding factors" % a):
                 _blshares.append([group.random(ZR) for _ in range(n)])
-                enc_bl_a, _rand_enc_bl_a = zip(*[elgamal_reencrypt(elgpk, elgamal_exp(enc_sigs[i], _blshares[a][i]), randOut=True) for i in range(len(enc_sigs))])
+                enc_bl_a, _rand_enc_bl_a = zip(*[elgamal_reencrypt(elgpk, elgamal_exp(enc_sigs[i], _blshares[a][i]), election_id,randOut=True) for i in range(len(enc_sigs))])
                 pf.append([pk_enc_bl(elgpk, enc_bl_a[i], enc_sigs[i], _rand_enc_bl_a[i], _blshares[a][i],election_id) for i in range(len(enc_sigs))])
                 enc_bls.append(enc_bl_a)
 
@@ -232,7 +235,7 @@ def get_blsigs(enc_sigs, ck, permcomm, alpha, elgpk, _svecperm, _pi, _re_pi, _el
                             print("status_pk_bl:",status_pk_bl)
         pprint("status_pk_bl:", status_pk_bl)
         g1,h1=load("generators",["g1","h1"],election_id).values()
-        enc_blsigs = [elgamal_encrypt(elgpk, g1 ** 0, randIn=0)] * n
+        enc_blsigs = [elgamal_encrypt(elgpk, g1 ** 0,election_id, randIn=0)] * n
         for a in range(alpha):
             with timer("mixer %d: generate encrypted blinded BB signatures" % a):
                 enc_blsigs = [elgamal_mult(enc_blsigs[i], enc_bls[a][i]) for i in range(len(enc_blsigs))]
@@ -269,11 +272,11 @@ def get_verfsigs_rev(comms, elgpk, paipk,election_id):
     with timer("verifier: creating BBS+ signatures and encryptions"):
         _verfsk, verfpk = bbspluskeygen(election_id)
         sigs_rev = [bbsplusquasisign_commitment(comm, _verfsk,election_id) for comm in comms]
-        enc_sigs_rev, enc_sigs_rev_rands = encrypt_sigs_rev(elgpk, paipk, sigs_rev)
+        enc_sigs_rev, enc_sigs_rev_rands = encrypt_sigs_rev(elgpk, paipk, sigs_rev,election_id)
     return verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands
 
-def encrypt_sigs_rev(elgpk, paipk, sigs_rev):
-    enc_sigs_S, enc_sigs_S_rands = zip(*[elgamal_encrypt(elgpk, sigs_rev[i][0], randOut=True) for i in range(len(sigs_rev))])
+def encrypt_sigs_rev(elgpk, paipk, sigs_rev,election_id):
+    enc_sigs_S, enc_sigs_S_rands = zip(*[elgamal_encrypt(elgpk, sigs_rev[i][0],election_id, randOut=True) for i in range(len(sigs_rev))])
     enc_sigs_c, enc_sigs_c_rands = zip(*[pai_encrypt(paipk, sigs_rev[i][1], randOut=True) for i in range(len(sigs_rev))])
     enc_sigs_rhat, enc_sigs_rhat_rands = zip(*[pai_encrypt(paipk, sigs_rev[i][2], randOut=True) for i in range(len(sigs_rev))])
     return (enc_sigs_S, enc_sigs_c, enc_sigs_rhat), (enc_sigs_S_rands, enc_sigs_c_rands, enc_sigs_rhat_rands)
@@ -287,7 +290,7 @@ def check_verfsigs_rev(sigs_rev, comms, verfpk, enc_sigs_rev, enc_sigs_rev_rands
     for a in range(alpha):
         with timer("mixer %d: checking verifier's signatures and encryptions" % a):
             status_checkverfsigs_rev = status_checkverfsigs_rev and bbsplusquasibatchverify(sigs_rev, comms, verfpk,election_id)
-            enc_sigs_S_dash = tuple([elgamal_encrypt(elgpk, sigs_rev[i][0], randIn=enc_sigs_S_rands[i]) for i in range(len(sigs_rev))])
+            enc_sigs_S_dash = tuple([elgamal_encrypt(elgpk, sigs_rev[i][0], election_id,randIn=enc_sigs_S_rands[i]) for i in range(len(sigs_rev))])
             enc_sigs_c_dash = tuple([pai_encrypt(paipk, sigs_rev[i][1], randIn=enc_sigs_c_rands[i]) for i in range(len(sigs_rev))])
             enc_sigs_rhat_dash = tuple([pai_encrypt(paipk, sigs_rev[i][2], randIn=enc_sigs_rhat_rands[i]) for i in range(len(sigs_rev))])
             status_checkverfsigs_rev = status_checkverfsigs_rev and (enc_sigs_S_dash == enc_sigs_S) and (enc_sigs_c_dash == enc_sigs_c) and (enc_sigs_rhat_dash == enc_sigs_rhat)
@@ -313,7 +316,7 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
         pf_S, pf_c, pf_r = [], [], []
         for a in range(alpha):
             with timer("mixer %d: reencrypting encrypted BBS+ signatures" % a):
-                reenc_sigs_S, _rands_S = zip(*[elgamal_reencrypt(auth_elgpk, enc_sig_S, randOut=True) for enc_sig_S in enc_sigs_S])
+                reenc_sigs_S, _rands_S = zip(*[elgamal_reencrypt(auth_elgpk, enc_sig_S,election_id, randOut=True) for enc_sig_S in enc_sigs_S])
                 reenc_sigs_c, _rands_c = zip(*[pai_reencrypt(auth_paipk, enc_sig_c, randOut=True) for enc_sig_c in enc_sigs_c])
                 reenc_sigs_r, _rands_r = zip(*[pai_reencrypt(auth_paipk, enc_sig_r, randOut=True) for enc_sig_r in enc_sigs_r])
                 enc_sigs_S_new = permute(reenc_sigs_S, _pi[a])
@@ -330,7 +333,7 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
 
             print("decryptions of enc_sigs_S after permutation:")
             for i, enc_sig_S_new in enumerate(enc_sigs_S_new):
-                sig_S_new = elgamal_th_decrypt(_elg_sklist["_elg_sklist"], enc_sig_S_new)
+                sig_S_new = elgamal_th_decrypt(_elg_sklist["_elg_sklist"], enc_sig_S_new,election_id)
                 print("sig_S_new :", sig_S_new)
 
             with timer("mixer %d: creating proof of shuffle of encrypted BBS+ signatures" % a):
@@ -372,7 +375,7 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
                 _blshares_r.append([group.random(ZR) for _ in range(myn)])
                 _blshares_cdash.append([(int(_blshares_c[a][i]) + q*random.randint(0, beta)) for i in range(myn)])
                 _blshares_rdash.append([(int(_blshares_r[a][i]) + q*random.randint(0, beta)) for i in range(myn)])
-                enc_bl_a_S, _rand_enc_bl_a_S = zip(*[elgamal_encrypt(auth_elgpk, g1**_blshares_S[a][i], randOut=True) for i in range(myn)])
+                enc_bl_a_S, _rand_enc_bl_a_S = zip(*[elgamal_encrypt(auth_elgpk, g1**_blshares_S[a][i], election_id,randOut=True) for i in range(myn)])
                 enc_bl_a_c, _rand_enc_bl_a_c = zip(*[pai_encrypt(auth_paipk, _blshares_cdash[a][i], randOut=True) for i in range(myn)])
                 enc_bl_a_r, _rand_enc_bl_a_r = zip(*[pai_encrypt(auth_paipk, _blshares_rdash[a][i], randOut=True) for i in range(myn)])
                 pf_bl_S.append([pk_enc_blrev_S(auth_elgpk, enc_bl_a_S[i], _rand_enc_bl_a_S[i], _blshares_S[a][i],election_id) for i in range(myn)])
@@ -418,7 +421,7 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
                 deltavec_S.append([group.init(ZR, int(gmpy2.mpz_urandomb(rs, kappa_e))) for i in range(myn)])
                 deltavec_c.append([gmpy2.mpz_urandomb(rs, kappa_e) for i in range(myn)])
                 deltavec_r.append([gmpy2.mpz_urandomb(rs, kappa_e) for i in range(myn)])
-                pf_S.append(elgamal_share_decryption_batchpf(auth_elgpk, decshares_S_a, enc_blsigs_S, deltavec_S[a], a, _auth_elgsklist))
+                pf_S.append(elgamal_share_decryption_batchpf(auth_elgpk, decshares_S_a, enc_blsigs_S, deltavec_S[a], a, _auth_elgsklist,election_id))
                 pf_c.append(pai_share_decryption_batchpf(auth_paipk, decshares_c_a, enc_blsigs_c, deltavec_c[a], a, _auth_paisklist))
                 pf_r.append(pai_share_decryption_batchpf(auth_paipk, decshares_r_a, enc_blsigs_r, deltavec_r[a], a, _auth_paisklist))
 
@@ -427,13 +430,13 @@ def get_blsigs_rev(enc_sigs_rev, enc_rands, ck, ck_fo, permcomm, alpha, auth_elg
                 for adash in range(alpha):
                     if adash == a: continue
                     else: 
-                        status_decshares_blsigs_rev = status_decshares_blsigs_rev and elgamal_share_decryption_batchverif(auth_elgpk, decshares_S[adash], enc_blsigs_S, deltavec_S[adash], adash, pf_S[adash])
+                        status_decshares_blsigs_rev = status_decshares_blsigs_rev and elgamal_share_decryption_batchverif(auth_elgpk, decshares_S[adash], enc_blsigs_S, deltavec_S[adash], adash, pf_S[adash],election_id)
                         status_decshares_blsigs_rev = status_decshares_blsigs_rev and pai_share_decryption_batchverif(auth_paipk, decshares_c[adash], enc_blsigs_c, deltavec_c[adash], adash, pf_c[adash])
                         status_decshares_blsigs_rev = status_decshares_blsigs_rev and pai_share_decryption_batchverif(auth_paipk, decshares_r[adash], enc_blsigs_r, deltavec_r[adash], adash, pf_r[adash])
 
         for a in range(alpha):
             with timer("mixer %d: combining decryption shares" % a):
-                blsigs_S = elgamal_combine_decshares(auth_elgpk, enc_blsigs_S, decshares_S)
+                blsigs_S = elgamal_combine_decshares(auth_elgpk, enc_blsigs_S, decshares_S,election_id)
                 blsigs_c = pai_combine_decshares(auth_paipk, decshares_c, embedded_q=q)
                 blsigs_r = pai_combine_decshares(auth_paipk, decshares_r, embedded_q=q)
         pprint("status_decshares_blsigs_rev", status_decshares_blsigs_rev)

@@ -191,7 +191,7 @@ def rhs_perm_nizkverif(ck, B, zt, zk, zedash, zsdash, zw,election_id):
     ZW = h1 ** zw
     return ZC1, ZC2, ZB, ZW
 
-def perm_nizkproof(ck, a, evec, _pi, _svec):
+def perm_nizkproof(ck, a, evec, _pi, _svec,election_id):
     """ Proof of knowledge of the opening of a permutation matrix commitment (see protocol 1
     of paper 2 above): 
     
@@ -228,10 +228,10 @@ def perm_nizkproof(ck, a, evec, _pi, _svec):
 
     # Compute
     evec = [group.init(ZR, int(e)) for e in evec]
-    B, t, k, edashvec, sdashvec, w = compute_perm_nizkproof(ck, evec, _pi, _svec)
+    B, t, k, edashvec, sdashvec, w = compute_perm_nizkproof(ck, evec, _pi, _svec,election_id)
 
     # Commit
-    C1, C2, CB, CU, rt, rk, redash, rsdash, rw = commitmsg_perm_nizkproof(ck, B)
+    C1, C2, CB, CU, rt, rk, redash, rsdash, rw = commitmsg_perm_nizkproof(ck, B,election_id)
 
     # Challenge
     c = group.hash((a, evec) + (C1, C2) + tuple(CB) + (CU, ), type=ZR)
@@ -241,7 +241,7 @@ def perm_nizkproof(ck, a, evec, _pi, _svec):
 
     return B, c, zt, zk, zedash, zsdash, zw
 
-def perm_nizkverif(ck, a, evec, pf):
+def perm_nizkverif(ck, a, evec, pf,election_id):
     """ Verify the proof of knowledge of the opening of a permutation matrix commitment.
     
     Recall the POK:
@@ -258,10 +258,10 @@ def perm_nizkverif(ck, a, evec, pf):
 
     # LHS of the equation
     evec = [group.init(ZR, int(e)) for e in evec]
-    LC1, LC2, LB, LW = lhs_perm_nizkverif(ck, a, evec, B)
+    LC1, LC2, LB, LW = lhs_perm_nizkverif(ck, a, evec, B,election_id)
 
     # RHS of the equation, but evaluated using the z-values received from the prover
-    ZC1, ZC2, ZB, ZW = rhs_perm_nizkverif(ck, B, zt, zk, zedash, zsdash, zw)
+    ZC1, ZC2, ZB, ZW = rhs_perm_nizkverif(ck, B, zt, zk, zedash, zsdash, zw,election_id)
 
     verif = (
         ((LC1 ** c) * ZC1, 
@@ -296,11 +296,11 @@ def shuffle_elgamal_nizkproof(ck, elgpk, cinvec, coutvec, permcomm, evec, _pi, _
     n, h1, gs = ck
     g1,h12= load("generators",["g1","h1"],election_id).values()
     evec = [group.init(ZR, int(e)) for e in evec]
-    B, t, k, edashvec, sdashvec, w = compute_perm_nizkproof(ck, evec, _pi, _svec)
+    B, t, k, edashvec, sdashvec, w = compute_perm_nizkproof(ck, evec, _pi, _svec,election_id)
     u = dot(_rvec, evec)
 
     # Commit
-    C1, C2, CB, CU, rt, rk, redash, rsdash, rw = commitmsg_perm_nizkproof(ck, B)
+    C1, C2, CB, CU, rt, rk, redash, rsdash, rw = commitmsg_perm_nizkproof(ck, B,election_id)
     ru = group.random(ZR)
     CC = (g1 ** (-ru), _elgpk ** (-ru))
     for i in range(n):
@@ -340,14 +340,14 @@ def shuffle_elgamal_nizkverif(ck, elgpk, cinvec, coutvec, permcomm, evec, pf,ele
     
     # LHS of the equation
     evec = [group.init(ZR, int(e)) for e in evec]
-    LC1, LC2, LB, LW = lhs_perm_nizkverif(ck, permcomm, evec, B)
+    LC1, LC2, LB, LW = lhs_perm_nizkverif(ck, permcomm, evec, B,election_id)
     LCC1, LCC2 = group.init(G1, iden), group.init(G1, iden)  # Note that x = group.init(G1, iden) gives an identity element whereas x = iden does not!
     for i in range(n):
         LCC1 *= (cinvec[i][0] ** evec[i])
         LCC2 *= (cinvec[i][1] ** evec[i])
 
     # RHS of the equation, but evaluated using the z-values received from the prover
-    ZC1, ZC2, ZB, ZW = rhs_perm_nizkverif(ck, B, zt, zk, zedash, zsdash, zw)
+    ZC1, ZC2, ZB, ZW = rhs_perm_nizkverif(ck, B, zt, zk, zedash, zsdash, zw,election_id)
     ZCC1, ZCC2 = (g1 ** (-zu), _elgpk ** (-zu))
     for i in range(n):
         ZCC1 *= coutvec[i][0] ** zedash[i]

@@ -306,7 +306,7 @@ router.post('/pf_zksm_verf', async (req, res) => {
             console.log("Sigs:", Sigs);
             console.log("EncSigs:", EncSigs);
             console.log("EncSigsRands:", EncSigsRands);
-
+            console.log("election_id",electionId);
             // Call Python function with election ID parameter
             const result2 = await callPythonFunction2('pf_zksm',Verfpk,Sigs,EncSigs,EncSigsRands,electionId);
 
@@ -316,7 +316,9 @@ router.post('/pf_zksm_verf', async (req, res) => {
                 });
             }
             const formattedResult2 = handleParsedResult(result2, res);
-            const [dpk_bbsig_pfs, blsigs] = formattedResult2;
+            console.log("formattedResult2",formattedResult2)
+            const dpk_bbsig_pfs = formattedResult2['0'];
+            const blsigs = formattedResult2['1']
             const DpkBbsigPfs = reconstructOriginal(dpk_bbsig_pfs);
             const Blsigs = reconstructOriginal(blsigs);
             // Verify proof for current election
@@ -366,7 +368,8 @@ router.post('/pf_zkrsm_verf', async (req, res) => {
                     });
                 }
                 const formattedResult2 = handleParsedResult(result2, res);
-                const [dpk_bbsplussig_pfs, blsigs_rev] = formattedResult2;
+                const dpk_bbsplussig_pfs = formattedResult2['0'];
+                const blsigs_rev=formattedResult2['1'];
                 const DpkBbplussigPfs = reconstructOriginal(dpk_bbsplussig_pfs);
                 const BlsigsRev = reconstructOriginal(blsigs_rev);
                 const result3 = await callPythonFunction('verfrsmproof',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands,DpkBbplussigPfs,BlsigsRev,electionId );
@@ -378,7 +381,7 @@ router.post('/pf_zkrsm_verf', async (req, res) => {
                 const parsedResult = JSON.parse(result3);
                 allElectionResults[electionId] = {"decrypted_votes": parsedResult[0],"results": parsedResult[1],"status_reverse_set_membership": parsedResult[2]};
             }
-    
+            console.log("here")
             return res.send(allElectionResults);
     
         } catch (err) {

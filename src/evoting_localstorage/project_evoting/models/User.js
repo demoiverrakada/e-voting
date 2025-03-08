@@ -10,13 +10,23 @@ const dbConnection = mongoose.createConnection(mongoUrl, {
     useUnifiedTopology: true
 });
 
-dbConnection.on('connected', () => {
+dbConnection.on('connected', async () => {
     console.log('Connected to MongoDB');
+    
+    // Add this code block to drop the unique index on voter_id
+    try {
+        await dbConnection.db.collection('bulletins').dropIndex('voter_id_1');
+        console.log('Successfully dropped the voter_id unique index');
+    } catch (error) {
+        console.log('Error dropping index or index does not exist:', error.message);
+    }
 });
+
 
 dbConnection.on('error', (err) => {
     console.log('Error connecting to MongoDB', err);
 });
+
 
 // Schema for Polling officer and their methods
 const PollingSchema = new mongoose.Schema({
@@ -203,7 +213,6 @@ const BulletinSchema=new mongoose.Schema({
     },
     commitment:{
         type:String,
-        unique:true,
         required:true
     },
     pref_id:{
@@ -216,7 +225,7 @@ const BulletinSchema=new mongoose.Schema({
     }
 
 });
-
+BulletinSchema.index({ voter_id: 1, election_id: 1 }, { unique: true });
 const keysSchema=new mongoose.Schema({
     election_id:{type:Number,unique:true,required:true},
     alpha:{type:String,required:true},

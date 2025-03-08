@@ -313,40 +313,65 @@ router.get('/bulletin', async (req, res) => {
 
 router.get('/getVotes', async (req, res) => {
     try {
-        // Group Decs by election_id and process nested structure
-        const decs = await Dec.aggregate([
-            {
-                $group: {
-                    _id: "$election_id",
-                    documents: { $push: "$$ROOT" }
-                }
+      // Fetch all Decs documents
+      const decs = await Dec.find().lean();
+  
+      // Fetch all candidates
+      const candidates = await Candidate.find().lean();
+  
+      // Group votes by election_id
+      const groupedVotes = decs.reduce((acc, dec) => {
+        const electionId = dec.election_id;
+  
+        // Ensure the election_id exists in the accumulator
+        if (!acc[electionId]) {
+          acc[electionId] = [];
+        }
+  
+        // Extract vote data from msgs_out_dec
+        if (Array.isArray(dec.msgs_out_dec) && dec.msgs_out_dec.length > 1) {
+          const voteData = dec.msgs_out_dec[1]; // Second element contains the vote data
+          voteData.forEach(item => {
+            if (Array.isArray(item) && item.length >= 2) {
+              acc[electionId].push(item[1]); // Push the candidate index (vote)
             }
-        ]);
-
-        // Process data for frontend compatibility
-        const response = decs.reduce((acc, election) => {
-            const electionId = election._id;
-            
-            acc[electionId] = {
-                msgs_out_dec: election.documents.flatMap(doc => 
-                    doc.msgs_out_dec.map(entry => 
-                        // Extract candidate index and vote count from nested arrays
-                        [entry[0][0], entry[0][1][0]] // [String, Number]
-                    )
-                )
-            };
-            
-            return acc;
-        }, {});
-
-        res.json(response);
-
+          });
+        }
+  
+        return acc;
+      }, {});
+  
+      // Process votes for each election
+      const response = Object.keys(groupedVotes).reduce((acc, electionId) => {
+        // Filter candidates for this election
+        const electionCandidates = candidates.filter(c => c.election_id == electionId);
+  
+        // Initialize a vote counts array based on the number of candidates in this election
+        const voteCounts = new Array(electionCandidates.length).fill(0);
+  
+        // Increment vote counts based on groupedVotes for this election
+        groupedVotes[electionId].forEach(vote => {
+          if (voteCounts[vote] !== undefined) {
+            voteCounts[vote] += 1;
+          }
+        });
+  
+        // Map candidates to their names and vote counts
+        acc[electionId] = electionCandidates.map((candidate, index) => ({
+          name: candidate.name,
+          votes: voteCounts[index]
+        }));
+  
+        return acc;
+      }, {});
+  
+      res.json(response);
     } catch (err) {
-        console.error('Error fetching data:', err);
-        res.status(500).json({ error: err.message });
+      console.error('Error fetching data:', err);
+      res.status(500).json({ error: err.message });
     }
-});
-
+  });
+  
       
 
 // for signing in Polling Officer

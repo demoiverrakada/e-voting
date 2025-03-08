@@ -51,38 +51,50 @@ export default function Scanner(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F7FC', // Lighter background for a clean look
-    justifyContent: 'center', // Center the content vertically
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
+    paddingTop: 20,
+    backgroundColor: "#f5f5f5", // Changed from #F2F7FC to match target style
   },
   headerText: {
-    fontSize: 30, // Larger font size for header
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 25, // Extra space between header and scanner
-    color: '#4A90E2', // Soft blue color for the header
-    letterSpacing: 1.5,
+    fontSize: 22, // Reduced from 30 to match target style
+    fontWeight: "bold",
+    color: "#6200ea", // Changed from #4A90E2 to purple theme
+    textAlign: "center",
+    marginBottom: 25,
+    letterSpacing: 1, // Slightly reduced from original
   },
   marker: {
-    borderColor: '#4A90E2', // Blue border for the scanner marker
+    borderColor: '#6200ea', // Updated to purple theme
     borderWidth: 2,
+    // Added shadow effects for depth
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   button: {
-    marginTop: 20,
-    paddingVertical: 12,
+    marginTop: 25, // Increased from 20
+    paddingVertical: 14, // Increased from 12
     borderRadius: 25,
-    backgroundColor: '#4A90E2', // Button matches the header color
-    elevation: 4,
+    backgroundColor: "#6200ea", // Changed to purple theme
+    // Enhanced shadow effects
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5, // Increased from 4
   },
   buttonLabel: {
-    color: '#F1F1F2', // Light color text for the button
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
+    textTransform: "uppercase", // Added to match target style
   },
   alert: {
     fontSize: 16,
-    textAlign: 'center',
-    color: '#333', // Darker color for alert text
+    textAlign: "center",
+    color: "#444", // Changed from #333 to softer color
+    fontStyle: "italic", // Added for emphasis
   },
 });

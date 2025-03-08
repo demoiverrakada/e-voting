@@ -59,39 +59,52 @@ def load(funcs, params, election_id):
     db = init()
     collection_name = function_map[funcs]
     collection = db[collection_name]
-    result = {}
     try:
-        if collection_name == 'keys':
+        if collection_name =='keys':
+            result = {}
             document = collection.find_one({"election_id":election_id})
+            #print(document)
             if document:
                 for param in params:
-                    result[param] = deserialize_wrapper(document[param])
+                    if param in document:
+                        result[param] = deserialize_wrapper(document[param])
         
         elif collection_name == 'generators':
+            result = {}
             document = collection.find_one({"election_id": election_id})
             if document:
                 for param in params:
-                    result[param] = deserialize_wrapper(document[param])
+                    if param in document:
+                        result[param] = deserialize_wrapper(document[param])
         
         elif collection_name == 'decs':
+            result = {}
             document = collection.find_one({"election_id": election_id})
+            #print(document)
             if document:
                 for param in params:
-                    result[param] = deserialize_wrapper(document[param])
+                    if param in document:
+                        result[param] = deserialize_wrapper(document[param])
         
         elif collection_name == 'votes':
-            documents = collection.find({"election_id": election_id})
-            result[param] = []
-            for doc in documents:
-                for param in params:
+            result = {}
+            for param in params:
+                #print(param)
+                result[param] = []
+                # Create a fresh cursor for each parameter
+                parameter_documents = collection.find({"election_id": election_id})
+                for doc in parameter_documents:
                     deserialized = deserialize_wrapper(doc[param])
                     result[param].append(deserialized)
         
         elif collection_name == 'candidates':
+            result=[]
             documents = collection.find({"election_id": election_id})
             result = [doc["name"] for doc in documents]
+            return result
         
         elif collection_name == 'receipts':
+            result = {}
             document = collection.find_one({
                 "election_id": params[0],
                 "enc_hash": params[1]
@@ -104,5 +117,4 @@ def load(funcs, params, election_id):
     except Exception as e:
         print(f"Error loading data: {str(e)}")
         return {}
-
     return result

@@ -32,20 +32,23 @@ def verifier_signature_zksm():
         try:
             f = io.StringIO()
             with contextlib.redirect_stdout(f):
-                # Load election-specific parameters
+            # Load election-specific parameters
                 setup_data = load("setup", ["elg_pk", "alpha"], election_id)
                 mix_data = load("mix", ["msgs_out"], election_id)
+                
+                # Get verification signatures
                 verfpk, sigs, enc_sigs, enc_sigs_rands = get_verfsigs(
                     mix_data["msgs_out"], 
-                    setup_data["elg_pk"],election_id
+                    setup_data["elg_pk"],
+                    election_id
                 )
 
-                # Store results per election
+                # Convert all serialized objects to strings to ensure JSON compatibility
                 all_results[election_id] = {
-                    "verfpk": serialize_wrapper(verfpk),
-                    "sigs": serialize_wrapper(sigs),
-                    "enc_sigs": serialize_wrapper(enc_sigs),
-                    "enc_sigs_rands": serialize_wrapper(enc_sigs_rands)
+                    "verfpk": str(serialize_wrapper(verfpk)),
+                    "sigs": str(serialize_wrapper(sigs)),
+                    "enc_sigs": str(serialize_wrapper(enc_sigs)),
+                    "enc_sigs_rands": str(serialize_wrapper(enc_sigs_rands))
                 }
 
         except Exception as e:
@@ -54,6 +57,7 @@ def verifier_signature_zksm():
 
     # Maintain original output structure with election context
     print(json.dumps(all_results, indent=2))
+
 
 
 def verifier_signature_zkrsm():
@@ -71,7 +75,7 @@ def verifier_signature_zkrsm():
                 enc_data = load("enc", ["comm"], election_id)
                 
                 # Get commitments for this election
-                comms = enc_data.get("comm", [])
+                comms = enc_data["comm"]
                 print(comms, "comms")
 
                 # Generate reverse signatures for this election
@@ -83,10 +87,10 @@ def verifier_signature_zkrsm():
 
                 # Store results per election
                 all_results[election_id] = {
-                    "verfpk": serialize_wrapper(verfpk),
-                    "sigs_rev": serialize_wrapper(sigs_rev),
-                    "enc_sigs_rev": serialize_wrapper(enc_sigs_rev),
-                    "enc_sigs_rev_rands": serialize_wrapper(enc_sigs_rev_rands)
+                    "verfpk": str(serialize_wrapper(verfpk)),
+                    "sigs_rev": str(serialize_wrapper(sigs_rev)),
+                    "enc_sigs_rev": str(serialize_wrapper(enc_sigs_rev)),
+                    "enc_sigs_rev_rands": str(serialize_wrapper(enc_sigs_rev_rands))
                 }
 
         except Exception as e:
@@ -101,6 +105,7 @@ def verifier_signature_zkrsm():
 def pf_zksm_verif(verfpk, sigs, enc_sigs, enc_sigs_rands, dpk_bbsig_pfs, blsigs,election_id):
     """Verify ZK proofs for encrypted votes across all elections"""
     # Deserialize global parameters into election-specific dicts
+    election_id=int(election_id)
     verfpk_dict = deserialize_wrapper(ast.literal_eval(verfpk))
     sigs_dict = deserialize_wrapper(ast.literal_eval(sigs))
     enc_sigs_dict = deserialize_wrapper(ast.literal_eval(enc_sigs))
@@ -122,6 +127,7 @@ def pf_zksm_verif(verfpk, sigs, enc_sigs, enc_sigs_rands, dpk_bbsig_pfs, blsigs,
 
 def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands, dpk_bbsplussig_pfs, blsigs_rev,election_id):
     """Verify ZK proofs for plaintext votes across all elections"""
+    election_id=int(election_id)
     verfpk_dict = deserialize_wrapper(ast.literal_eval(verfpk))
     sigs_rev_dict = deserialize_wrapper(ast.literal_eval(sigs_rev))
     enc_sigs_rev_dict = deserialize_wrapper(ast.literal_eval(enc_sigs_rev))
@@ -149,10 +155,11 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands, dpk_bbspl
 
 def audit(commitment, booth_num, bid, election_id):
     f = io.StringIO()
+    election_id=int(election_id)
     g12, h12 = load("generators", ["g1", "h1"], election_id).values()
 
     for i in range(len(commitment)):
-        result = load("receipt", [election_id, commitment[i], "accessed"])
+        result = load("receipt", [commitment[i], "accessed"],election_id)
         accessed = result.get("accessed")
         if accessed is True:
             print(f"The ballot for election {election_id} has already been audited or used to cast a vote.")
