@@ -7,7 +7,6 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import checkPO from '../func/checkPO.js';
 
 function LoginScreenPO(props) {

@@ -104,15 +104,22 @@ def load(funcs, params, election_id):
             return result
         
         elif collection_name == 'receipts':
-            result = {}
+            result={}
+            param_value = params[0]
             document = collection.find_one({
-                "election_id": params[0],
-                "enc_hash": params[1]
+                'enc_hash': param_value,
+                'election_id': election_id
             })
+            del params[0]  # Remove the first parameter (enc_hash)
             if document:
-                result = {k: deserialize_wrapper(v) for k, v in document.items() 
-                         if k not in ['_id', 'election_id', 'accessed']}
-                result["enc_hash"] = params[1]
+                for key in params:
+                    if key != "accessed":
+                        deserialized_item = deserialize_wrapper(document[key])
+                        result[key] = deserialized_item
+                    elif key == "accessed":
+                        result[key] = document[key]
+                result["enc_hash"] = param_value
+            return result
 
     except Exception as e:
         print(f"Error loading data: {str(e)}")

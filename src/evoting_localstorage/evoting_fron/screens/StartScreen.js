@@ -31,9 +31,6 @@ function StartScreen(props) {
     checkAppInitialization();
   }, []);
 
-  const Admin = async () => {
-    props.navigation.replace("loginAdmin");
-  };
 
   const PO = async () => {
     props.navigation.replace("loginPO");

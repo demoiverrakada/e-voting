@@ -30,15 +30,22 @@ const VoterSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
         required: true
+    },
+    election_id:{
+        type:Number,
+        required:true
     }
 });
 
 
 const BulletinSchema=new mongoose.Schema({
+    election_id:{
+        type:Number,
+        required:true
+    },
     voter_id:{
         type:String,
-        required:true,
-        unique:true
+        required:true
     },
     booth_num:{
         type:Number,
@@ -46,11 +53,19 @@ const BulletinSchema=new mongoose.Schema({
     },
     commitment:{
         type:String,
-        unique:true,
+        required:true
+    },
+    pref_id:{
+        type:String,
+        required:true
+    },
+    hash_value:{
+        type:String,
         required:true
     }
-});
 
+});
+BulletinSchema.index({ voter_id: 1, election_id: 1 }, { unique: true });
 
 const pairingElementSchema = new mongoose.Schema({
     $binary: {
@@ -64,25 +79,27 @@ const pairingElementSchema = new mongoose.Schema({
   });
 
 const keysSchema=new mongoose.Schema({
+    election_id:{type:Number,unique:true,required:true},
     alpha:{type:String,required:true},
-    pai_pk:{type: [[String, Array]],required:true},
-    _pai_sklist:{type:String,required:true},
-    pai_pklist_single:{type:[[String, Array]],required:true},
-    _pai_sklist_single:{type:String,required:true},
-    elg_pk:{type:[[String, Array]],required:true},
-    _elg_sklist:{type:String,required:true},
-    ck:{type:String,required:true},
-    ck_fo:{type:String,required:true},
-    _pi:{type:String,required:true},
-    _re_pi:{type:String,required:true},
-    _svecperm:{type:String,required:true},
-    permcomm:{type:String,required:true},
-    beaver_a_shares:{type:String,required:true},
-    beaver_b_shares:{type:String,required:true},
-    beaver_c_shares:{type:String,required:true}
+    pai_pk:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _pai_sklist:{type:[mongoose.Schema.Types.Mixed],required:true},
+    pai_pklist_single:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _pai_sklist_single:{type:[mongoose.Schema.Types.Mixed],required:true},
+    elg_pk:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _elg_sklist:{type:[mongoose.Schema.Types.Mixed],required:true},
+    ck:{type:[mongoose.Schema.Types.Mixed],required:true},
+    ck_fo:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _pi:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _re_pi:{type:[mongoose.Schema.Types.Mixed],required:true},
+    _svecperm:{type:[mongoose.Schema.Types.Mixed],required:true},
+    permcomm:{type:[mongoose.Schema.Types.Mixed],required:true},
+    beaver_a_shares:{type:[mongoose.Schema.Types.Mixed],required:true},
+    beaver_b_shares:{type:[mongoose.Schema.Types.Mixed],required:true},
+    beaver_c_shares:{type:[mongoose.Schema.Types.Mixed],required:true}
 });
 
 const generatorSchema=new mongoose.Schema({
+    election_id:{type:Number,unique:true,required:true},
     g1:{type:String,required:true},
     f2:{type:String,required:true},
     eg1f2:{type:String,required:true},

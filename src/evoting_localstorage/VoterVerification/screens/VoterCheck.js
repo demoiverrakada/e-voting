@@ -8,7 +8,7 @@ const VoterVoted = (props) => {
 
     const fetchVotingHistory = async () => {
         try {
-            const response = await fetch("http://192.168.1.8:7000/fetch", {
+            const response = await fetch("http://192.168.1.2:7000/fetch", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ const VoterVoted = (props) => {
                             </Text>
                             <Text>Voted Preference: {election.preference}</Text>
                             <Text style={styles.hashText}>
-                                Encrypted Hash: {election.hash_value}
+                                Commitment value: {election.commitment}
                             </Text>
                         </View>
                     ))}
@@ -73,53 +73,70 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#e0e0e0', // Slightly darker for better contrast
     },
     heading: {
-        fontSize: 24,
+        fontSize: 26,
+        fontWeight: 'bold',
         marginBottom: 20,
-        color: '#333',
+        color: '#222', // Darker for better readability
         textAlign: 'center',
     },
     input: {
-        backgroundColor: 'white',
+        backgroundColor: '#fff',
         marginBottom: 15,
-        padding: 12,
-        borderRadius: 8,
+        padding: 14,
+        borderRadius: 10,
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#bbb', // Darker border for visibility
+        fontSize: 16,
+        color: '#000', // Ensure text is clearly visible
     },
     button: {
-        backgroundColor: '#2196F3',
-        borderRadius: 8,
-        paddingVertical: 10,
+        backgroundColor: '#1976D2', // Slightly darker blue for better contrast
+        borderRadius: 10,
+        paddingVertical: 12,
         marginBottom: 20,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
     },
     buttonLabel: {
-        color: 'white',
-        fontSize: 16,
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: '600',
+        textAlign: 'center',
     },
     resultsContainer: {
         flex: 1,
     },
     electionCard: {
-        backgroundColor: 'white',
-        padding: 15,
-        borderRadius: 8,
-        marginBottom: 10,
-        elevation: 2,
+        backgroundColor: '#fff',
+        padding: 16,
+        borderRadius: 10,
+        marginBottom: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     electionTitle: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 8,
-        color: '#333',
+        marginBottom: 6,
+        color: '#222',
     },
     hashText: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 8,
+        fontSize: 13,
+        color: '#555', // Darker gray for better readability
+        marginTop: 6,
     },
 });
+
+
 
 export default VoterVoted;

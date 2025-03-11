@@ -392,36 +392,34 @@ router.post('/pf_zkrsm_verf', async (req, res) => {
 
 router.post('/fetch', async (req, res) => {
     console.log(req.body);
-      try {
-        const { commitment, voter_id, preference } = req.body;
-        console.log(commitment);
-        const checkVoter = await Voter.find({ voter_id });
-        if (!checkVoter) {
-          return res.status(422).send({ error: "This voter_id is not in the voter list" });
+    try {
+        const { voter_id } = req.body;
+        const checkVoter = await Voter.find({ voter_id:voter_id });
+        if (!checkVoter || checkVoter.length === 0) {
+            return res.status(422).send({ error: "This voter_id is not in the voter list" });
         }
-    
-        const Bullet = await Bulletin.find({ voter_id });
-        if (!Bullet) {
-          return res.status(422).send({ error: "This voter_id has not voted in the election" });
+
+        const Bullet = await Bulletin.find({ voter_id:voter_id });
+        if (!Bullet || Bullet.length === 0) {
+            return res.status(422).send({ error: "This voter_id has not voted in the election" });
         }
-    
-        // No need to parse commitment; it's already an array
-        const num = Number(preference); // Convert preference to a number
-    
-        // Check if Bullet.commitment matches the specified commitment
-        console.log(Bullet.commitment)
-        console.log(commitment[num])
-        if (Bullet.commitment === commitment[num]) {
-    console.log("here I am ")      
-    return res.send({message:"Voter details verified"});
-        } else {
-    console.log("there I am")
-          return res.status(422).send({ error: "Your vote doesn't match with the bulletin. Report to authorities." });
-        }
-      } catch (err) {
-        return res.status(422).send(err.message);
-      }
-    });
+            //console.log("here I am ")
+            //console.log(Bullet)
+            // Prepare the response with an elections array
+            const electionsData = Bullet.map(bullet => ({
+                election_id: bullet.election_id, // Assuming this exists
+                preference: bullet.pref_id, // Assuming this exists
+                commitment: bullet.commitment, // Assuming this exists
+            }));
+
+            return res.send({ elections: electionsData });
+    } catch (err) {
+        console.error(err); // Log the error for debugging purposes
+        return res.status(500).send({ error: "Internal Server Error" });
+    }
+});
+
+
     
     
 router.post('/audit', async (req, res) => {

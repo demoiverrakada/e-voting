@@ -166,6 +166,7 @@ def audit(commitment, booth_num, bid, election_id):
             return
 
     with contextlib.redirect_stdout(f):
+    #if True:
         setup_data = load("setup", ['alpha', '_pai_sklist_single', 'pai_pklist_single'], election_id)
         alpha = setup_data['alpha']
         _pai_sklist_single = setup_data['_pai_sklist_single']
@@ -176,7 +177,7 @@ def audit(commitment, booth_num, bid, election_id):
         candidates = load("load", [], election_id)
 
         for i in range(len(commitment)):
-            receipt_data = load("receipt", [commitment[i], "enc_msg", "comm", "enc_msg_share", "enc_rand_share"],election_id)
+            receipt_data = load("receipt", [commitment[i], "enc_msg", "comm", "enc_msg_share", "enc_rand_share"], election_id)
             enc_msg.append(receipt_data["enc_msg"])
             comm.append(receipt_data["comm"])
             enc_msg_share.append(receipt_data["enc_msg_share"])
@@ -205,8 +206,8 @@ def audit(commitment, booth_num, bid, election_id):
         name = candidates[v_w_nbar]
         gamma_w = (g12**v_w) * (h12**r_w)
 
-        if gamma_w == comm[i] and v_w == int(bid) + i:
-            receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[i]), 'election_id': election_id})
+        if gamma_w == comm[i] and int(v_w) == int(int(bid) + i):
+            receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[i])})
             if receipt:
                 receipts_collection.update_one(
                     {'_id': receipt['_id']},

@@ -19,10 +19,10 @@ import LoginScreenPO from './screens/LoginScreenPO.js'
 import LoadingScreen from './screens/LoadingScreen.js'
 import HomeScreenPO from './screens/HomeScreenPO.js';
 import StartScreen from './screens/StartScreen.js';
-import VoterCheck from './screens/VoterCheck.js';
-import Scanner2 from './screens/Scanner2.js';
+import VoterVoted from './screens/VoterCheck.js';
+import Scanner from './screens/Scanner2.js';
 import Scanner3 from  './screens/Scanner3.js';
-import ElectionLoop from './screens/ElectionLoopHandler.js';
+import ElectionLoopHandler from './screens/ElectionLoopHandler.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack =createNativeStackNavigator();
 function App(){
@@ -49,11 +49,11 @@ function App(){
       <Stack.Navigator>
             <Stack.Screen name="start" component={StartScreen} options={{ headerShown: false }}/>
             <Stack.Screen name="loading" component ={LoadingScreen} options={{ headerShown: false }}/>
-            <Stack.Screen name="homePO" component ={HomeScreenPO} options={{ headerShown: false }}/>
             <Stack.Screen name="loginPO" component ={LoginScreenPO} options={{ headerShown: false }}/>
-            <Stack.Screen name='VoterCheck' component={VoterCheck} options={{ headerShown: false }}/>
-            <Stack.Screen name='ElectionLoop' component={ElectionLoop} options={{ headerShown: false }}/>
-            <Stack.Screen name='scanner2' component={Scanner2} options={{ headerShown: false }}/>
+            <Stack.Screen name="homePO" component ={HomeScreenPO} options={{ headerShown: false }}/>
+            <Stack.Screen name='VoterCheck' component={VoterVoted} options={{ headerShown: false }}/>
+            <Stack.Screen name='ElectionLoop' component={ElectionLoopHandler} options={{ headerShown: false }}/>
+            <Stack.Screen name='scanner2' component={Scanner} options={{ headerShown: false }}/>
             <Stack.Screen name='scanner3' component={Scanner3} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
