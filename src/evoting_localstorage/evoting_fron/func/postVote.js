@@ -92,7 +92,10 @@ const postVote = async (preference, commitments, booth_num,election_id) => {
 
     // Step 5: Check receipt
     // Alert.alert("Debug", "Checking receipt...");
-    const existingReceipt = myData.receipt.find(receipt => receipt.ballot_id === ballot_id);
+    const existingReceipt = myData.receipt.find(receipt => 
+      receipt.ballot_id === ballot_id && 
+      receipt.election_id === election_id
+    );
     if (!existingReceipt) {
       Alert.alert("Error", "Ballot not found in the list.");
       return { error: 'Ballot not found in the list' };
@@ -117,7 +120,12 @@ const postVote = async (preference, commitments, booth_num,election_id) => {
     // Alert.alert("Debug", "Updating voter and receipt data...");
     const updatedVoterIndex = myData.voter.findIndex(voter => voter.voter_id === voter_id);
     if (updatedVoterIndex !== -1) {
-      myData.voter[updatedVoterIndex].vote = true;
+      const voterElections = myData.voter[updatedVoterIndex].elections;
+      const electionIndex = voterElections.findIndex(e => e.election_id === election_id);
+      if (electionIndex !== -1) {
+        voterElections[electionIndex].vote = true;
+        voterElections[electionIndex].ballot_id = ballot_id;
+      }
     }
 
     const updatedReceiptIndex = myData.receipt.findIndex(receipt => receipt.ballot_id === ballot_id);

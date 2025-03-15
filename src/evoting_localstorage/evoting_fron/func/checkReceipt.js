@@ -7,10 +7,10 @@ const storeLastVerifiedVoter = async (voterId, voterIndex) => {
   try {
     const fileContents = await RNFS.readFile(writeFilePath, 'utf8');
     let myData = JSON.parse(fileContents);
-    myData.lastVerifiedVoter = { 
-      voter_id: voterId, 
+    myData.lastVerifiedVoter = {
+      voter_id: voterId,
       voter_index: voterIndex,
-      elections: myData.voter[voterIndex]?.election_ids || []
+      elections: myData.voter[voterIndex]?.elections.map(e => e.election_id) || []
     };
     await RNFS.writeFile(writeFilePath, JSON.stringify(myData), 'utf8');
   } catch (error) {
@@ -32,9 +32,9 @@ const checkReceipt = async (entryNum) => {
     
     // Get elections where voter hasn't voted yet
     const votedElections = voter.votes?.map(v => v.election_id) || [];
-    const eligibleElections = voter.election_ids?.filter(eid => 
-      !votedElections.includes(eid)
-    ) || [];
+    const eligibleElections = voter.elections
+  .filter(e => !e.vote)
+  .map(e => e.election_id);
 
     if (eligibleElections.length === 0) {
       return { error: "No eligible elections remaining" };

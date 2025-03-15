@@ -109,7 +109,11 @@ const checkReceipt2 = async (commitments) => {
     }
 
     // Update the voter_id in the existing receipt
-    myData.receipt[existingReceiptIndex].voter_id = lastVerifiedVoter.voter_id;
+    const receipt = myData.receipt[existingReceiptIndex];
+    if (receipt.election_id !== myData.voter[lastVerifiedVoter.voter_index]?.elections.some(e => e.election_id === receipt.election_id)) {
+      return { error: "Ballot doesn't match voter's elections" };
+    }
+    receipt.voter_id = lastVerifiedVoter.voter_id;
     // Alert.alert("checkReceipt2 - Updated Voter ID", `Updated voter_id to ${lastVerifiedVoter.voter_id}`);
 
     await RNFS.writeFile(writeFilePath, JSON.stringify(myData), 'utf8');
