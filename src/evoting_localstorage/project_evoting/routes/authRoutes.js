@@ -75,6 +75,9 @@ function callPythonFunction2(functionName, ...params){
     }
 }
 
+let requestStatus = {"generate":"pending","upload":"pending","decryption":"pending"};
+
+
 // endpoint for generating the keys for the election
 router.post('/setup',requireAuth, async (req, res) => {
     const {alpha,electionId} = req.body;
@@ -132,10 +135,12 @@ router.post('/generate', requireAuth, async (req, res) => {
                 }
             });
         });
+        requestStatus["generate"] = "success";
 
     } catch (error) {
         console.error(error);
         res.status(500).send(error.message);
+        requestStatus["generate"] = "failed";
     }
 });
 
@@ -183,10 +188,12 @@ router.post('/upload', requireAuth, async (req, res) => {
 
         // Respond to the client
         res.send({ status: 'OK', message: 'Upload process and receipt updates successful', result });
+        requestStatus["upload"] = "success";
     } catch (err) {
         console.log("check 3");
         console.error(err);
         res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
+        requestStatus["upload"] = "failed";
     }
 });
 
@@ -259,25 +266,6 @@ router.post('/upload_voters', requireAuth, async (req, res) => {
     }
 });
 
-router.get('/pk', async (req, res) => {
-    try {
-        const existingKey = await Keys.findOne();
-        if (!existingKey) {
-            return res.status(422).send({ error: "Setup has not been done yet." });
-        }
-        console.log("here")
-        // Sending the response in correct JSON format
-        console.log(existingKey)
-        res.status(200).send({
-            pai_pk: JSON.stringify(existingKey.pai_pk),
-            pai_pklist_single: JSON.stringify(existingKey.pai_pklist_single),
-            elg_pk: JSON.stringify(existingKey.elg_pk)
-        });
-        console.log(res);
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
 
 
 // endpoint to 
@@ -293,9 +281,11 @@ router.post('/mix', requireAuth, async (req, res) => {
         }
         console.log(result); // Log the result or handle it internally
         res.send('Mixing and Decryption was successful'); // Custom response
+        requestStatus["decryption"] = "success";
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message); // Send error message if something goes wrong
+        requestStatus["decryption"] = "failed";
     }
 });
 
@@ -486,6 +476,11 @@ router.post('/runBuild1', async (req, res) => {
         console.error('Error while processing the request:', err.message);
         res.status(500).json({ error: err.message });
     }
+});
+
+
+router.get("/status", (req, res) => {
+    res.json(requestStatus);
 });
 
 

@@ -51,4 +51,11 @@ services:
       command: /root/.nvm/versions/node/v22.3.0/bin/npm start
       ports:
         - "7001:3000" 
+
+  demo:
+    build: .
+    working_dir: /app/evoting_localstorage/demo
+    command: /root/.nvm/versions/node/v22.3.0/bin/npm start
+    ports:
+      - "8080:3000"
   

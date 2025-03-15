@@ -6,8 +6,10 @@ export default function ElectionLoopHandler({ route, navigation }) {
 
   useEffect(() => {
     if (currentIndex >= elections.length) {
-      Alert.alert('Complete', 'All elections processed!');
-      navigation.navigate('homePO');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'homePO' }]
+      });
       return;
     }
 
@@ -28,7 +30,7 @@ export default function ElectionLoopHandler({ route, navigation }) {
         }
       ]
     );
-  }, [currentIndex]);
+  }, [currentIndex, elections.length, navigation]);
 
   return <View />;
 }

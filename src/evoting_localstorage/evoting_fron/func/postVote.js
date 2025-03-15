@@ -150,6 +150,13 @@ const postVote = async (preference, commitments, booth_num,election_id) => {
     Alert.alert("Error", `Unexpected error: ${err.message}`);
     return { error: err.message };
   }
+  finally {
+    // Clear memory-heavy objects
+    password = null;
+    comms2.length = 0;
+    comms.length = 0;
+    System.gc(); // Force garbage collection
+  }
 };
 
 export default postVote;

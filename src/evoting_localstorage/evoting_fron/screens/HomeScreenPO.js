@@ -91,7 +91,8 @@ const extractVotesToExternalStorage = async () => {
     await makeFileReadOnly(destPath);
     Alert.alert('Success', 'File has been saved to your Downloads folder.');
   } catch (err) {
-    Alert.alert('Error', `An error occurred: ${err.message}`);
+    console.error('Hash error:', err);
+    Alert.alert('Error', 'Failed to generate security hashes');
   }
 };
 

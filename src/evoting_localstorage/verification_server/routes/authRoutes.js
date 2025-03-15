@@ -275,6 +275,8 @@ function handleParsedResult(result, res) {
 }
 
 
+let requestStatus = {"audit":"pending","voterverf":"pending","decryption_sm":"pending","vvpatverf":"pending"};
+
 
 router.post('/pf_zksm_verf', async (req, res) => {
     try {
@@ -331,11 +333,12 @@ router.post('/pf_zksm_verf', async (req, res) => {
             const parsedResult = JSON.parse(result3);
             allElectionResults[electionId] = {"encrypted_votes": parsedResult[0],"results": parsedResult[1],"status_forward_set_membership": parsedResult[2]};
         }
+        requestStatus["decryption_sm"] = "success";
         return res.send(allElectionResults);
-
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
+        requestStatus["decryption_sm"] = "failed"
     }
 });
 
@@ -381,12 +384,14 @@ router.post('/pf_zkrsm_verf', async (req, res) => {
                 const parsedResult = JSON.parse(result3);
                 allElectionResults[electionId] = {"decrypted_votes": parsedResult[0],"results": parsedResult[1],"status_reverse_set_membership": parsedResult[2]};
             }
-            console.log("here")
+            //console.log("here")
+            requestStatus["decryption_rsm"] = "success"
             return res.send(allElectionResults);
     
         } catch (err) {
             console.error(err);
             res.status(500).send(err.message);
+            requestStatus["decryption_rsm"] = "failed"
         }
 });
 
@@ -411,10 +416,11 @@ router.post('/fetch', async (req, res) => {
                 preference: bullet.pref_id, // Assuming this exists
                 commitment: bullet.commitment, // Assuming this exists
             }));
-
+            requestStatus["voterverf"] = "success"
             return res.send({ elections: electionsData });
     } catch (err) {
         console.error(err); // Log the error for debugging purposes
+        requestStatus["voterverf"] = "failed"
         return res.status(500).send({ error: "Internal Server Error" });
     }
 });
@@ -464,10 +470,11 @@ router.post('/audit', async (req, res) => {
             success: true,
             results: formattedResults
         });
-    
+        requestStatus["audit"] = "success"
         } catch (err) {
             // Catch and return any errors that occur
             console.error("Error during audit:", err.message);
+            requestStatus["audit"] = "failed"
             return res.status(500).json({ error: err.message });
         }
     });
@@ -530,31 +537,8 @@ router.post('/runBuild3', async(req, res) => {
     }
 });
 
-router.post('/runBuild4', async(req, res) => {
-    try {
-        // Path to the pre-existing app file
-        const appPath = path.join('/app/evoting_localstorage/VVPATverification/android/app/build/outputs/apk/release', 'app-release.apk');
-
-        // Check if the file exists
-        if (!fs.existsSync(appPath)) {
-            return res.status(404).json({
-                success: false,
-                message: 'The app file was not found.'
-            });
-        }
-
-        // Send the app file as a download
-        console.log('Sending the generated app file to the client');
-        res.download(appPath, 'app-release.apk', (err) => {
-            if (err) {
-                console.error('Error sending the app file:', err);
-                res.status(500).json({ error: 'Failed to send the app file.' });
-            }
-        });
-    } catch (err) {
-        // Handle any errors that occur
-        console.error('Error while trying to send the file:', err.message);
-        res.status(500).json({ error: err.message });
-    }
+router.get("/status", (req, res) => {
+    res.json(requestStatus);
 });
+
 module.exports = router;

@@ -26,7 +26,6 @@ function OptionsPage() {
             <button onClick={() => handleNavigation('/upload_voters')}>Upload Voter List</button>
             <button onClick={() => handleNavigation('/setup')}>Setup System</button>
             <button onClick={() => handleNavigation('/generate_ballots')}>Generate Ballots</button>
-            <button onClick={() => handleNavigation('/public_keys')}>Fetch Public Keys</button>
           </div>
         </div>
         <div className="section during-poll">

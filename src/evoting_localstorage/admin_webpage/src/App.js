@@ -21,7 +21,6 @@ function App() {
         <Route path="/setup" element={<Setup />} />
         <Route path="/generate_ballots" element={<GenerateBallot />} />
         <Route path = "/decrypted_votes" element = {<DecryptedVotes />}/>
-        <Route path = "/public_keys" element = {<PublicKeys />}/>
         <Route path = "/evoting_app" element = {<EvotingApp />}/>
         <Route path="/upload_votes" element={<UploadDefault />} />
         <Route path="/upload_candidate" element={<UploadCandidate />} />
