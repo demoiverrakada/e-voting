@@ -10,6 +10,7 @@ import VerifySetMembership from "./pages/VerifySetMembership.js";
 import VerifyReverseSetMembership from "./pages/VerifyReverseSetMembership.js";
 import BallotAudit from "./pages/BallotAudit.js";
 import VoterVerificationApp from "./pages/VoterVerification.js";
+import VerifyVVPAT from "./pages/VVPATVerification.js";
 const App = () => {
   return (
     <Router>
@@ -32,6 +33,9 @@ const App = () => {
             <Link to ="/voterverification" className="btn">
               Generate Voter Verification app
             </Link>
+            <Link to ="/vvpatverification" className="btn">
+              Verify VVPAT
+            </Link>
           </div>
         </main>
 
@@ -51,6 +55,10 @@ const App = () => {
           <Route
             path="/voterverification"
             element={<VoterVerificationApp />}
+          />
+          <Route
+            path="/vvpatverification"
+            element={<VerifyVVPAT />}
           />
         </Routes>
       </div>

@@ -219,7 +219,16 @@ def audit(commitment, booth_num, bid, election_id):
 
     print(json.dumps(result))
 
-
+def VVPATverif(bid,election_id):
+    election_id=int(election_id)
+    data=load("mix",["msgs_out"],election_id)
+    candidates=load("load",[],election_id)
+    length=len(data['msgs_out'])
+    for ext_vote in range(length):
+        if(abs(int(data['msgs_out'][ext_vote])-int(bid))<=len(candidates)):
+            print(json.dumps({'cand_name':candidates[abs(int(data['msgs_out'][ext_vote])-int(bid))],'extended_vote':int(data['msgs_out'][ext_vote])}))
+            return
+    print("This VVPAT doesn't correspond to a decrypted vote.")
 
 
 if __name__ == "__main__":

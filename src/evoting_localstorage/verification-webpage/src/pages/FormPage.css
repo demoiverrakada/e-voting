@@ -116,5 +116,93 @@
     background-color: #eee;
     padding: 10px;
   }
+
   
+/* QR Scanner Styles */
+.qr-scanner-container {
+  margin: 20px 0;
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.scan-result {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #dee2e6;
+}
+
+.scan-result strong {
+  word-break: break-all;
+  font-family: monospace;
+}
+
+.form-group {
+  margin: 20px 0;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  max-width: 400px;
+}
+
+.button-group {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.result-container {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.result-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.result-item .label {
+  font-weight: bold;
+  color: #333;
+}
+
+.result-item .value {
+  color: #666;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+.result-item .value.code {
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.btn-small {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  margin-left: 10px;
+}
+
   

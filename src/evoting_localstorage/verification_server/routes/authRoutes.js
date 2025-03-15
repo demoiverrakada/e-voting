@@ -479,6 +479,32 @@ router.post('/audit', async (req, res) => {
         }
     });
 
+router.post('/vvpat', async (req, res) => {
+        try {
+            const { bid,electionId } = req.body;
+    
+            // Validate input
+            if (!bid) {
+                return res.status(400).json({ error: "Ballot id is required." });
+            }
+    
+            // Call the Python function with the bid
+            const result = await callPythonFunction("vvpat", bid,electionId);
+    
+            // Handle the result
+            if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
+                return res.json({ results: result });
+            } else if (typeof result === "object" && result.cand_name &&result.extended_vote) {
+                return res.json({ cand_name: result.cand_name ,extended_vote:result.extended_vote});
+            } else {
+                // Handle unexpected response from Python function
+                return res.status(500).json({ error: "Unexpected response from verification process." });
+            }
+        } catch (err) {
+            console.error("Error during VVPAT verification:", err.message);
+            return res.status(500).json({ error: "Internal server error." });
+        }
+    });
     
 
 router.post('/runBuild2', async(req, res) => {
