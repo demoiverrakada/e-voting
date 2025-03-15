@@ -127,6 +127,7 @@ dependencies {
 }
 project.ext.react = [
     enableHermes: true,
-    enableVmCleanup: false // Prevents libjsexecutor.so crashes
+    enableVmCleanup: false,  // Prevents libjsexecutor.so crashes
+    deleteDebugFilesAfterNDKBuild: false  // Needed for SHA256 operations
 ]
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
