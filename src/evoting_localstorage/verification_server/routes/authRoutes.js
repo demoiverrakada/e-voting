@@ -493,15 +493,19 @@ router.post('/vvpat', async (req, res) => {
     
             // Handle the result
             if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
+                requestStatus["vvpatverf"] = "failed"
                 return res.json({ results: result });
             } else if (typeof result === "object" && result.cand_name &&result.extended_vote) {
+                requestStatus["vvpatverf"] = "success"
                 return res.json({ cand_name: result.cand_name ,extended_vote:result.extended_vote});
             } else {
                 // Handle unexpected response from Python function
+                requestStatus["vvpatverf"] = "failed"
                 return res.status(500).json({ error: "Unexpected response from verification process." });
             }
         } catch (err) {
             console.error("Error during VVPAT verification:", err.message);
+            requestStatus["vvpatverf"] = "failed"
             return res.status(500).json({ error: "Internal server error." });
         }
     });

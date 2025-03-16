@@ -12,7 +12,7 @@ COPY src/evoting_localstorage/verification-webpage/package.json /app/evoting_loc
 COPY src/evoting_localstorage/demo/package.json /app/evoting_localstorage/demo/package.json
 COPY src /app
 WORKDIR /app/
-RUN rm -rf /root/.gradle/caches/
+
 # Install node modules
 RUN /bin/bash --login -c "cd evoting_localstorage/project_evoting && npm install"
 RUN /bin/bash --login -c "cd evoting_localstorage/verification_server && npm install"
@@ -20,20 +20,16 @@ RUN /bin/bash --login -c "cd evoting_localstorage/verification_server && npm ins
 # RUN /bin/bash --login -c "cd evoting_localstorage/BallotAudit/android && sed -i 's/\r$//' gradlew"
 # RUN /bin/bash --login -c "cd evoting_localstorage/BallotAudit/android && ./gradlew clean"
 # RUN /bin/bash --login -c "cd evoting_localstorage/BallotAudit/android && nice -n 19 ./gradlew assembleRelease"
-# RUN rm -rf /root/.gradle/caches/
 RUN /bin/bash --login -c "cd evoting_localstorage/bulletin && npm install"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron && npm install --legacy-peer-deps"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron && npm install react-native-bcrypt --legacy-peer-deps"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron && npm install react-native-screens@3.29.0 --legacy-peer-deps"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron &&  npm install react@18.2.0"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron/android && sed -i 's/\r$//' gradlew"
-RUN rm -rf /root/.gradle/caches/
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron/android && ./gradlew clean"
 RUN /bin/bash --login -c "cd evoting_localstorage/evoting_fron/android && nice -n 19 ./gradlew assembleRelease"
-# RUN rm -rf /root/.gradle/caches/
 # RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification && npm install"
 # RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && sed -i 's/\r$//' gradlew"
-# RUN rm -rf /root/.gradle/caches/
 # RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && ./gradlew clean"
 # RUN /bin/bash --login -c "cd evoting_localstorage/VoterVerification/android && nice -n 19 ./gradlew assembleRelease"
 RUN /bin/bash --login -c "cd evoting_localstorage/admin_webpage && npm install --force"

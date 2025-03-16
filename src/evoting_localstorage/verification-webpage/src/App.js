@@ -33,7 +33,7 @@ const App = () => {
             <Link to ="/voterverification" className="btn">
               Generate Voter Verification app
             </Link>
-            <Link to ="/vvpatverification" className="btn">
+            <Link to ="/verifyvvpat" className="btn">
               Verify VVPAT
             </Link>
           </div>
@@ -57,7 +57,7 @@ const App = () => {
             element={<VoterVerificationApp />}
           />
           <Route
-            path="/vvpatverification"
+            path="/verifyvvpat"
             element={<VerifyVVPAT />}
           />
         </Routes>
