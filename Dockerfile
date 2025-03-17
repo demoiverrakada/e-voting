@@ -1,5 +1,8 @@
 FROM docker.io/demoiverrakada/evoting:updated1.1.1
 
+RUN useradd -m appuser && \mkdir -p /app && \chown -R appuser:appuser /app
+COPY --chown=appuser:appuser src /app
+
 # Set working directory
 COPY src/evoting_localstorage/project_evoting/package.json /app/evoting_localstorage/project_evoting/package.json
 COPY src/evoting_localstorage/verification_server/package.json /app/evoting_localstorage/verification_server/package.json
@@ -37,3 +40,8 @@ RUN /bin/bash --login -c "cd evoting_localstorage/verification-webpage && npm in
 RUN /bin/bash --login -c "cd evoting_localstorage/demo && npm install --force"
 RUN ln -s /root/.nvm/versions/node/v22.3.0/bin/node /usr/bin/node && \
     ln -s /root/.nvm/versions/node/v22.3.0/bin/npm /usr/bin/npm
+
+
+RUN find /app -type d -exec chmod 755 {} + && \
+find /app -type f -exec chmod 644 {} + && \
+find /app -name "*.sh" -exec chmod +x {} +
