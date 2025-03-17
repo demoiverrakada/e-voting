@@ -42,6 +42,3 @@ RUN ln -s /root/.nvm/versions/node/v22.3.0/bin/node /usr/bin/node && \
     ln -s /root/.nvm/versions/node/v22.3.0/bin/npm /usr/bin/npm
 
 
-RUN find /app -type d -exec chmod 755 {} + && \
-find /app -type f -exec chmod 644 {} + && \
-find /app -name "*.sh" -exec chmod +x {} +
