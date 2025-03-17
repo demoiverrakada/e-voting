@@ -1,8 +1,5 @@
 FROM docker.io/demoiverrakada/evoting:updated1.1.1
 
-RUN useradd -m appuser && \mkdir -p /app && \chown -R appuser:appuser /app
-COPY --chown=appuser:appuser src /app
-
 # Set working directory
 COPY src/evoting_localstorage/project_evoting/package.json /app/evoting_localstorage/project_evoting/package.json
 COPY src/evoting_localstorage/verification_server/package.json /app/evoting_localstorage/verification_server/package.json
