@@ -38,4 +38,4 @@ RUN /bin/bash --login -c "cd evoting_localstorage/demo && npm install --force"
 RUN ln -s /root/.nvm/versions/node/v22.3.0/bin/node /usr/bin/node && \
     ln -s /root/.nvm/versions/node/v22.3.0/bin/npm /usr/bin/npm
 
-
+RUN chmod 755 /app/evoting_localstorage/demo/node_modules/.bin/*
