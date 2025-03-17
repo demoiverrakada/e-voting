@@ -55,7 +55,7 @@ services:
   demo:
     build: .
     working_dir: /app/evoting_localstorage/demo
-    command: BROWSER=none /root/.nvm/versions/node/v22.3.0/bin/npm start
+    command: /root/.nvm/versions/node/v22.3.0/bin/npm start
     ports:
       - "8080:3000"
   
