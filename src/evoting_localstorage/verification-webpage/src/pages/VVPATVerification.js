@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import QrReader from "react-qr-reader";
+import {QrReader} from "react-qr-reader";
 import "./FormPage.css";
 import Loading from './Loading';
 
