@@ -58,4 +58,6 @@ services:
     command: /root/.nvm/versions/node/v22.3.0/bin/npm start
     ports:
       - "8080:3000"
+    environment:
+    - BROWSER=none
   
