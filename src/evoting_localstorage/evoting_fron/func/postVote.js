@@ -94,7 +94,7 @@ const postVote = async (preference, commitments, booth_num,election_id) => {
     // Alert.alert("Debug", "Checking receipt...");
     const existingReceipt = myData.receipt.find(receipt => 
       receipt.ballot_id === ballot_id && 
-      receipt.election_id === election_id
+      Number(receipt.election_id) === Number(election_id)
     );
     if (!existingReceipt) {
       Alert.alert("Error", "Ballot not found in the list.");
@@ -158,13 +158,7 @@ const postVote = async (preference, commitments, booth_num,election_id) => {
     Alert.alert("Error", `Unexpected error: ${err.message}`);
     return { error: err.message };
   }
-  finally {
-    // Clear memory-heavy objects
-    password = null;
-    comms2.length = 0;
-    comms.length = 0;
-    System.gc(); // Force garbage collection
-  }
+  
 };
 
 export default postVote;
