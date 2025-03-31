@@ -9,15 +9,17 @@ const VoterVoted = (props) => {
     const checkVoterExistence = async () => {
       try {
         const data = await checkReceipt(entryNum);
-        
-        if (data.error) {
-          Alert.alert('Error', data.error);
-          return;
-        }
     
-        const eligibleElections = data.election_ids.filter(eid => 
-          !data.votes?.some(v => v.election_id === eid)
-        );
+      if (data.error) {
+        Alert.alert('Error', data.error);
+        return;
+      }
+
+    // Corrected property names below
+      const eligibleElections = data.eligibleElections.filter(eid => 
+        !data.votedElections?.some(v => v === eid)
+      );
+
     
         if (eligibleElections.length === 0) {
           Alert.alert('Info', 'No remaining eligible elections');
