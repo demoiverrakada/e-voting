@@ -110,7 +110,9 @@ const checkReceipt2 = async (commitments) => {
 
     // Update the voter_id in the existing receipt
     const receipt = myData.receipt[existingReceiptIndex];
-    if (receipt.election_id !== myData.voter[lastVerifiedVoter.voter_index]?.elections.some(e => e.election_id === receipt.election_id)) {
+    if (!myData.voter[lastVerifiedVoter.voter_index]?.elections.some(e => 
+      Number(e.election_id) === Number(receipt.election_id)
+    )) {
       return { error: "Ballot doesn't match voter's elections" };
     }
     receipt.voter_id = lastVerifiedVoter.voter_id;
