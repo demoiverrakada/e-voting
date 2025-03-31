@@ -30,11 +30,13 @@ const checkReceipt = async (entryNum) => {
 
     const voter = myData.voter[voterIndex];
     
-    // Get elections where voter hasn't voted yet
-    const votedElections = voter.votes?.map(v => v.election_id) || [];
+    // Handle undefined votes by defaulting to an empty array
+    const votedElections = (voter.votes || []).map(v => v.election_id);
+    
+    // Filter elections where vote is false
     const eligibleElections = voter.elections
-  .filter(e => !e.vote)
-  .map(e => e.election_id);
+      .filter(e => !e.vote)
+      .map(e => e.election_id);
 
     if (eligibleElections.length === 0) {
       return { error: "No eligible elections remaining" };
@@ -53,5 +55,6 @@ const checkReceipt = async (entryNum) => {
     return { error: "Verification failed" };
   }
 };
+
 
 export default checkReceipt;
