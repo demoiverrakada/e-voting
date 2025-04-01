@@ -8,7 +8,7 @@ const VoterVoted = (props) => {
 
     const fetchVotingHistory = async () => {
         try {
-            const response = await fetch("http://192.168.1.2:7000/fetch", {
+            const response = await fetch("http://10.194.23.132:7000/fetch", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

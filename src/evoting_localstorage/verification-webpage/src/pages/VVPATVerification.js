@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {QrReader} from "react-qr-reader";
+import { QrReader } from "react-qr-reader"; // Replace with react-qr-barcode-scanner
 import "./FormPage.css";
 import Loading from './Loading';
+import Scanner from "react-qr-barcode-scanner"; // Import the library
 
 const VerifyVVPAT = () => {
   const navigate = useNavigate();
@@ -15,16 +16,17 @@ const VerifyVVPAT = () => {
   const [scanning, setScanning] = useState(false);
   const [scanComplete, setScanComplete] = useState(false);
 
-  const handleScan = data => {
+  const handleScan = (data) => {
     if (data) {
-      setBid(data);
+      setBid(data.text); // Use the decoded text
       setScanComplete(true);
       setScanning(false);
     }
   };
 
-  const handleError = err => {
-    setError("QR Scan Failed: " + err);
+  const handleError = (err) => {
+    console.error("QR Scan Error:", err);
+    setError("QR Scan Failed: " + err.message);
     setScanning(false);
   };
 
@@ -39,7 +41,8 @@ const VerifyVVPAT = () => {
     setResult(null);
 
     try {
-      const response = await axios.post("http://localhost:7000/vvpat", 
+      const response = await axios.post(
+        "http://localhost:7000/vvpat",
         { bid, electionId },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -59,11 +62,11 @@ const VerifyVVPAT = () => {
       {/* QR Scanner Section */}
       {scanning && (
         <div className="qr-scanner-container">
-          <QrReader
-            delay={300}
-            onError={handleError}
-            onScan={handleScan}
-            style={{ width: "100%", maxWidth: "400px" }}
+          <Scanner
+            onDecode={handleScan}
+            onScannerLoad={() => console.log("Scanner loaded")}
+            constraints={{ video: { facingMode: "environment" } }} // Use environment-facing camera
+            captureSize={{ width: 1280, height: 720 }}
           />
           <button 
             onClick={() => setScanning(false)}

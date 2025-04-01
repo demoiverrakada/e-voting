@@ -54,7 +54,7 @@ let z = 0;
       };
 
       const response = await fetch(
-        "http://192.168.1.2:7000/audit",
+        "http://10.194.23.132:7000/audit",
         {
           method: "POST",
           headers: {
