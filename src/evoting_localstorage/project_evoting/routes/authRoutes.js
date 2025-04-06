@@ -12,6 +12,8 @@ const path = require('path');
 const { spawn } = require('child_process');
 const archiver = require('archiver');
 router.use(cors());
+const async = require('async');
+const os = require('os');
 // function for running api.py python script
 function callPythonFunction(functionName, ...params) {
     const scriptPath = join(__dirname, '../../../db-sm-rsm/api.py');
@@ -21,6 +23,7 @@ function callPythonFunction(functionName, ...params) {
     console.log(`Running: precomputing=0 ${pythonExecutable} ${args.join(' ')}`);
     const pythonProcess = spawnSync(pythonExecutable, args, {
         env: { ...process.env, precomputing: '0' },
+        maxBuffer: 1024 * 1024 * 10
     });
 
     if (pythonProcess.error) {
@@ -52,6 +55,7 @@ function callPythonFunction2(functionName, ...params){
     console.log(`Running: ${pythonExecutable} ${args.join(' ')}`);
     const pythonProcess = spawnSync(pythonExecutable, args, {
         env: { ...process.env, precomputing: '0' },
+        maxBuffer: 1024 * 1024 * 10
     });
 
     if (pythonProcess.error) {
@@ -79,189 +83,206 @@ let requestStatus = {"generate":"pending","upload":"pending","decryption":"pendi
 
 
 // endpoint for generating the keys for the election
-router.post('/setup',requireAuth, async (req, res) => {
-    const {alpha,electionId} = req.body;
+router.post('/setup', requireAuth, async (req, res) => {
+    const { alpha, electionId } = req.body;
     const alp = Number(JSON.parse(alpha));
-    const elect_id=Number(JSON.parse(electionId));
+    const numElections = Number(JSON.parse(electionId)); // Total elections to create
+
     try {
-        document= await Keys.findOne({ election_id: elect_id });
-        if(document) return res.status(400).send("Setup has already been done.")
-        const result= await callPythonFunction('setup',alp,elect_id);
-        console.log(result); // Log the result or handle it internally
-        res.send('Setup was successful.'); // Custom response
+        // Check if any election in 1..numElections already exists
+        for (let i = 1; i <= numElections; i++) {
+            const existing = await Keys.findOne({ election_id: i });
+            if (existing) {
+                return res.status(400).json({ error: `Setup already done for election ${i}` });
+            }
+        }
+
+        // Create elections sequentially
+        for (let i = 1; i <= numElections; i++) {
+            await callPythonFunction('setup', alp, i);
+            console.log(`Election ${i} setup complete`);
+        }
+
+        res.json({ message: `Setup successful for ${numElections} elections` });
     } catch (error) {
         console.error(error);
-        res.status(500).send(error.message); // Send error message if something goes wrong
+        res.status(500).json({ error: error.message });
     }
 });
 
+// Generate ballots for multiple elections
 router.post('/generate', requireAuth, async (req, res) => {
     const { n, electionId } = req.body;
-    const num = Number(n);
-    const elect_id = Number(electionId);
+    const numBallots = Number(n);
+    const numElections = Number(electionId);
     const outputDirectory = '/output';
 
     try {
-        // Call the Python function to generate ballots
-        const result = await callPythonFunction("generate", num, elect_id);
-        console.log(result);
+        // 1. Parallelize ballot generation and individual ZIP creation
+        const concurrencyLimit = Math.min(os.cpus().length, 20); // Adjust based on system capacity
+        const electionIds = Array.from({ length: numElections }, (_, i) => i + 1);
 
-        // Read the generated PDF files from the output directory for this election
-        const files = fs.readdirSync(outputDirectory)
-            .filter(file => file.startsWith(`election_id_${elect_id}_`) && file.endsWith('.pdf'));
+        await async.eachLimit(electionIds, concurrencyLimit, async (i) => {
+            // Generate ballots for this election
+            await callPythonFunction('generate', numBallots, i);
+            console.log(`Ballots generated for election ${i}`);
 
-        if (files.length === 0) {
-            return res.status(404).send('No ballots generated for this election.');
-        }
+            // Find PDFs for this election
+            const electionFiles = fs.readdirSync(outputDirectory)
+                .filter(file => file.startsWith(`election_id_${i}_`) && file.endsWith('.pdf'));
 
-        // Create a zip archive of the generated PDFs
-        const zipFileName = `election_id_${elect_id}_ballots.zip`;
-        const zipFilePath = path.join(outputDirectory, zipFileName);
-        const output = fs.createWriteStream(zipFilePath);
-        const archive = archiver('zip', { zlib: { level: 9 } });
+            if (electionFiles.length === 0) {
+                console.warn(`No PDFs found for election ${i}`);
+                return;
+            }
 
-        archive.pipe(output);
-        files.forEach(file => {
-            archive.file(path.join(outputDirectory, file), { name: file });
-        });
-        archive.finalize();
+            // Create individual ZIP
+            const individualZipName = `election_id_${i}_ballots.zip`;
+            const individualZipPath = path.join(outputDirectory, individualZipName);
+            
+            await new Promise((resolve, reject) => {
+                const output = fs.createWriteStream(individualZipPath);
+                const archive = archiver('zip', { zlib: { level: 9 } });
 
-        // When the zip is ready, send it to the client
-        output.on('close', () => {
-            res.download(zipFilePath, zipFileName, err => {
-                if (err) {
-                    console.error('Error sending zip file:', err);
-                    res.status(500).send('Error downloading the ballots.');
-                }
+                output.on('close', () => {
+                    console.log(`Created individual ZIP for election ${i}`);
+                    resolve();
+                });
+
+                archive.on('error', reject);
+                archive.pipe(output);
+                
+                electionFiles.forEach(file => {
+                    archive.file(path.join(outputDirectory, file), { name: file });
+                });
+
+                archive.finalize();
             });
         });
-        requestStatus["generate"] = "success";
+
+        // 2. Create master ZIP
+        const zipFiles = fs.readdirSync(outputDirectory)
+            .filter(file => file.startsWith('election_id_') && file.endsWith('_ballots.zip'));
+
+        if (zipFiles.length === 0) {
+            return res.status(404).json({ error: 'No ballots generated' });
+        }
+
+        const masterZipName = 'all_elections_combined.zip';
+        const masterZipPath = path.join(outputDirectory, masterZipName);
+        
+        await new Promise((resolve, reject) => {
+            const outputStream = fs.createWriteStream(masterZipPath);
+            const archive = archiver('zip', { zlib: { level: 9 } });
+
+            outputStream.on('close', resolve);
+            archive.on('error', reject);
+            archive.pipe(outputStream);
+            
+            zipFiles.forEach(file => {
+                archive.file(path.join(outputDirectory, file), { name: file });
+            });
+
+            archive.finalize();
+        });
+
+        // 3. Send the master ZIP
+        res.download(masterZipPath, masterZipName, (err) => {
+            if (err) {
+                console.error('Download error:', err);
+                res.status(500).json({ error: 'Failed to download ballots' });
+            }
+        });
 
     } catch (error) {
         console.error(error);
-        res.status(500).send(error.message);
-        requestStatus["generate"] = "failed";
+        res.status(500).json({ error: error.message });
     }
 });
 
 
-
-
-// endpoint for uploading the votes list
+const BATCH_SIZE = 1000;
 router.post('/upload', requireAuth, async (req, res) => {
-    console.log("check 1");
     try {
-        console.log("check 2");
         const jsonData = req.body;
-        console.log(jsonData);
 
-        // Insert data into the Bulletin collection
-        const result = await Bulletin.insertMany(jsonData);
-        console.log(result);
-        if (!result) {
-            return res.status(422).send({ error: "Error during uploading process" });
+        // Batch processing for Bulletin
+        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
+            const batch = jsonData.slice(i, i + BATCH_SIZE);
+            const result = await Bulletin.insertMany(batch);
+
+            // Process receipts for each batch
+            await Promise.all(result.map(async (entry) => {
+                const { commitment } = entry;
+                const receipt = await Receipt.findOne({ enc_hash: commitment });
+                
+                if (receipt) {
+                    const { ov_hash } = receipt;
+                    const updatedReceipts = await Receipt.updateMany(
+                        { ov_hash },
+                        { accessed: true }
+                    );
+                    console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
+                }
+            }));
         }
-        console.log("check 4");
-        // Update the Receipt collection
-        await Promise.all(result.map(async (entry) => {
-            const { commitment } = entry;
-        
-            // Find the ov_hash associated with the given enc_hash
-            const receipt = await Receipt.findOne({ enc_hash: commitment });
-            console.log(receipt);
-            console.log("check 5");
-            if (receipt) {
-                const { ov_hash } = receipt;
-        
-                // Update all entries containing the same ov_hash
-                console.log("check 6");
-                const updatedReceipts = await Receipt.updateMany(
-                    { ov_hash },               // Find all entries with the same ov_hash
-                    { accessed: true }         // Set accessed to true
-                );
-        
-                console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
-            } else {
-                console.log(`No Receipt found with enc_hash: ${commitment}`);
-            }
-        }));
 
-        // Respond to the client
-        res.send({ status: 'OK', message: 'Upload process and receipt updates successful', result });
+        res.send({ status: 'OK', message: 'Upload process and receipt updates successful' });
         requestStatus["upload"] = "success";
     } catch (err) {
-        console.log("check 3");
         console.error(err);
         res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
         requestStatus["upload"] = "failed";
     }
 });
 
-
 router.post('/upload_candidate', requireAuth, async (req, res) => {
     try {
         const jsonData = req.body;
 
-        // Insert data into MongoDB
-        console.log(jsonData);
-        const result = await Candidate.insertMany(jsonData);
-
-        if (!result) {
-            return res.status(422).send({ error: "Error during uploading process" });
+        // Batch insert candidates
+        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
+            const batch = jsonData.slice(i, i + BATCH_SIZE);
+            await Candidate.insertMany(batch);
         }
 
-        // Send back a success response with status 200
-        return res.status(200).send({ status: 'OK', message: 'Candidates uploaded successfully', data: result });
-
+        return res.status(200).send({ status: 'OK', message: 'Candidates uploaded successfully' });
     } catch (err) {
         console.error(err);
-        // Handle errors gracefully
         return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
     }
 });
 
-router.post('/upload_PO', requireAuth,async (req, res) => {
-    console.log("check 2");
+router.post('/upload_PO', requireAuth, async (req, res) => {
     try {
         const jsonData = req.body;
 
-        // Insert data into MongoDB
-        console.log(jsonData);
-        const result = await PO.insertMany(jsonData);
-
-        if (!result) {
-            return res.status(422).send({ error: "Error during uploading process" });
+        // Batch insert polling officers
+        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
+            const batch = jsonData.slice(i, i + BATCH_SIZE);
+            await PO.insertMany(batch);
         }
 
-        // Send back a success response with status 200
-        return res.status(200).send({ status: 'OK', message: 'Polling Officer uploaded successfully', data: result });
-
+        return res.status(200).send({ status: 'OK', message: 'Polling Officers uploaded successfully' });
     } catch (err) {
         console.error(err);
-        // Handle errors gracefully
         return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
     }
-        
 });
 
 router.post('/upload_voters', requireAuth, async (req, res) => {
     try {
         const jsonData = req.body;
 
-        // Insert data into MongoDB
-        console.log(jsonData);
-        const result = await Voter.insertMany(jsonData);
-
-        if (!result) {
-            return res.status(422).send({ error: "Error during uploading process" });
+        // Batch insert voters
+        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
+            const batch = jsonData.slice(i, i + BATCH_SIZE);
+            await Voter.insertMany(batch);
         }
 
-        // Send back a success response with status 200
-        return res.status(200).send({ status: 'OK', message: 'Voters uploaded successfully', data: result });
-
+        return res.status(200).send({ status: 'OK', message: 'Voters uploaded successfully' });
     } catch (err) {
         console.error(err);
-        // Handle errors gracefully
         return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
     }
 });

@@ -19,7 +19,7 @@ function GenerateBallot() {
 
   const handleGenerate = async () => {
     if (!electionId) {
-      alert('Please enter an Election ID');
+      alert('Please enter number of elections');
       return;
     }
 
@@ -61,7 +61,7 @@ function GenerateBallot() {
       ) : (
         <form className="generate-form">
           <label>
-            Election ID:
+            Number of elections:
             <input
               type="number"
               value={electionId}

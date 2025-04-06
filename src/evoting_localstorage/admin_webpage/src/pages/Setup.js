@@ -53,7 +53,7 @@ function Setup() {
       ) : (
         <form className="setup-form">
           <label>
-            Election ID:
+            Number of Elections to be conducted:
             <input
               type="number"
               value={electionId}

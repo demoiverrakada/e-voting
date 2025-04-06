@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { QrReader } from "react-qr-reader"; // Replace with react-qr-barcode-scanner
+import jsQR from "jsqr";
 import "./FormPage.css";
 import Loading from './Loading';
-import Scanner from "react-qr-barcode-scanner"; // Import the library
+import Scanner from "react-qr-barcode-scanner";
 
 const VerifyVVPAT = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+  
+  // State management
   const [bid, setBid] = useState("");
   const [electionId, setElectionId] = useState("");
   const [result, setResult] = useState(null);
@@ -16,20 +19,68 @@ const VerifyVVPAT = () => {
   const [scanning, setScanning] = useState(false);
   const [scanComplete, setScanComplete] = useState(false);
 
+  // Handle QR scan from camera
   const handleScan = (data) => {
     if (data) {
-      setBid(data.text); // Use the decoded text
+      setBid(data.text);
       setScanComplete(true);
       setScanning(false);
+      setError(null);
     }
   };
 
+  // Handle scan errors
   const handleError = (err) => {
     console.error("QR Scan Error:", err);
     setError("QR Scan Failed: " + err.message);
     setScanning(false);
   };
 
+  // Handle image upload and QR decoding
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const imageData = await readFileAsImageData(file);
+      const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+      
+      if (qrCode) {
+        setBid(qrCode.data);
+        setScanComplete(true);
+        setError(null);
+      } else {
+        setError("No QR code found in the uploaded image");
+      }
+    } catch (err) {
+      setError("Error processing image: " + err.message);
+    }
+  };
+
+  // Convert image file to ImageData
+  const readFileAsImageData = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          resolve(ctx.getImageData(0, 0, img.width, img.height));
+        };
+        img.src = e.target.result;
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle verification submission
   const handleVerify = async () => {
     if (!bid || !electionId) {
       setError("Both Ballot ID and Election ID are required");
@@ -46,7 +97,6 @@ const VerifyVVPAT = () => {
         { bid, electionId },
         { headers: { "Content-Type": "application/json" } }
       );
-
       setResult(response.data);
     } catch (err) {
       setError(err.response?.data?.error || "Verification failed");
@@ -59,33 +109,27 @@ const VerifyVVPAT = () => {
     <div className="form-page">
       <h2>VVPAT Verification</h2>
 
-      {/* QR Scanner Section */}
-      {scanning && (
-        <div className="qr-scanner-container">
-          <Scanner
-            onDecode={handleScan}
-            onScannerLoad={() => console.log("Scanner loaded")}
-            constraints={{ video: { facingMode: "environment" } }} // Use environment-facing camera
-            captureSize={{ width: 1280, height: 720 }}
-          />
-          <button 
-            onClick={() => setScanning(false)}
-            className="btn btn-secondary"
-          >
-            Cancel Scan
-          </button>
-        </div>
-      )}
-
-      {/* Scan Controls */}
-      {!scanning && !scanComplete && (
-        <button 
-          onClick={() => setScanning(true)}
-          className="btn"
-        >
-          Scan Ballot QR Code
-        </button>
-      )}
+      {/* Scan/Upload Options */}
+      <div className="scan-options">
+        {!scanning && !scanComplete && (
+          <div className="option-group">
+            
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              style={{ display: 'none' }}
+            />
+            <button 
+              onClick={() => fileInputRef.current.click()}
+              className="btn"
+            >
+              Upload QR Image
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Scanned BID Display */}
       {scanComplete && (
@@ -118,7 +162,11 @@ const VerifyVVPAT = () => {
 
       {/* Action Buttons */}
       <div className="button-group">
-        <button onClick={handleVerify} className="btn" disabled={!bid || !electionId}>
+        <button 
+          onClick={handleVerify} 
+          className="btn" 
+          disabled={!bid || !electionId}
+        >
           Verify
         </button>
         <button onClick={() => navigate("/")} className="btn btn-secondary">
@@ -126,9 +174,9 @@ const VerifyVVPAT = () => {
         </button>
       </div>
 
+      {/* Loading and Results */}
       {isLoading && <Loading message="Verifying VVPAT..." />}
-
-      {/* Results Display */}
+      
       {result && (
         <div className="result-container">
           {result.error ? (
@@ -151,9 +199,11 @@ const VerifyVVPAT = () => {
         </div>
       )}
 
+      {/* Error Messages */}
       {error && <div className="error">{error}</div>}
     </div>
   );
 };
 
 export default VerifyVVPAT;
+

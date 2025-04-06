@@ -1,74 +1,82 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, Alert, StyleSheet } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Button } from 'react-native-paper';
-
-import checkReceipt2 from '../func/checkReceipt2.js';
 
 export default function Scanner(props) {
-
   const checkSend = async (qrcodedata) => {
     try {
-      // Alert.alert(qrcodedata[0]);
       const { voter_id, election_id, remainingElections, currentIndex } = props.route.params;
       let firstArray = '';
 
-      // Start the loop from index 1
+      // Extract the first array from qrcodedata
       for (let i = 1; i < qrcodedata.length; i++) {
         const char = qrcodedata[i];
         if (char === ']') {
           firstArray += char;
-          break; // End of the first array
+          break;
         }
-        firstArray += char; // Append characters to the firstArray
+        firstArray += char;
       }
-      // Alert.alert(firstArray);
-        const data=await checkReceipt2(firstArray);     
-        
-    
-        if (data.message === 'Ballot exists and verified successfully.') {
-          console.log("successfully submitted voter receipt");
-          Alert.alert(
-            'Encrypted candidate ID successfully verified',
-            'Enter the voter preference number',
-            [{ text: 'OK', onPress: () => props.navigation.navigate('scanner3', { commitments: qrcodedata,
-              election_id,
-              voter_id,
-              remainingElections,
-              currentIndex}) }],
-            { cancelable: false }
-          );
-        }
-      else {
+
+      // Simulate API call to check receipt
+      const data = await checkReceipt2(firstArray);
+
+      if (data.message === 'Ballot exists and verified successfully.') {
+        console.log("Successfully submitted voter receipt");
+        Alert.alert(
+          'Encrypted candidate ID successfully verified',
+          'Enter the voter preference number',
+          [
+            {
+              text: 'OK',
+              onPress: () =>
+                props.navigation.navigate('scanner3', {
+                  commitments: qrcodedata,
+                  election_id,
+                  voter_id,
+                  remainingElections,
+                  currentIndex,
+                }),
+            },
+          ],
+          { cancelable: false }
+        );
+      } else {
         Alert.alert('Error', data.error, [{ text: 'OK' }], { cancelable: false });
         props.navigation.navigate("homePO");
       }
     } catch (err) {
-      console.log("some problem in posting", err);
+      console.log("Some problem in posting", err);
       Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
       props.navigation.navigate("homePO");
     }
   };
 
-
-  const isValidQRCode = (data) => {
-    return data !== undefined;
+  const handleQRCodeScanned = async (data) => {
+    Alert.alert(
+      'QR Code Scanned',
+      'Do you want to proceed or rescan?',
+      [
+        {
+          text: 'Rescan',
+          onPress: () => console.log('Rescanning...'), // Simply dismisses alert to allow rescanning
+        },
+        {
+          text: 'Proceed',
+          onPress: async () => {
+            await checkSend(data); // Proceed with processing the scanned QR code
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Scan Encrypted Candidates ID's</Text>
+      <Text style={styles.headerText}>Scan Receipt QR Code</Text>
       <QRCodeScanner
-        onRead={async ({ data }) => {
-          if (isValidQRCode(data)) {
-            // Alert.alert(data);
-            await checkSend(data);
-            console.log('Valid QR code detected:', data);
-          } else {
-            console.log('Invalid QR code detected:', data);
-          }
-        }}
+        onRead={({ data }) => handleQRCodeScanned(data)} // Handle scanned QR code
         showMarker={true}
         markerStyle={styles.marker}
       />
@@ -79,25 +87,25 @@ export default function Scanner(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2', // Retains a clean, calming background
+    backgroundColor: '#A1D6E2',
     justifyContent: 'center',
-    paddingHorizontal: 20, // Increased padding for improved responsiveness
-    paddingVertical: 16, // Balanced vertical padding
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   headerText: {
-    fontSize: 36, // Slightly increased for better emphasis
-    marginLeft: 20, // Adjusted for alignment with modern spacing trends
-    marginTop: 15, // Added more breathing room at the top
-    color: '#3B3B3B', // Dark gray for better contrast
-    fontWeight: '700', // Bold weight for improved visual hierarchy
-    letterSpacing: 1, // Subtle letter spacing for better readability
+    fontSize: 36,
+    marginLeft: 20,
+    marginTop: 15,
+    color: '#3B3B3B',
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   marker: {
-    borderColor: '#1995AD', // Maintains the distinct blue-green color
-    borderWidth: 2, // Added border width for a more prominent marker
-    borderRadius: 12, // Slightly increased rounding for a polished look
-    padding: 5, // Added padding to create breathing room within the marker
-    alignSelf: 'center', // Centers the marker for balanced design
+    borderColor: '#1995AD',
+    borderWidth: 2,
+    borderRadius: 12,
+    padding: 5,
+    alignSelf: 'center',
   },
   button: {
     marginTop: 25, // Increased for better spacing from other components

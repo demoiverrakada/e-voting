@@ -12,8 +12,8 @@ require('./models/User')
 //routes will come below this
 const requireToken=require('./middelware/requireToken')
 const authRoutes=require('./routes/authRoutes')
-
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '200mb' })); // Set a higher limit, e.g., 50MB
+app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 app.use(authRoutes)
 
 
@@ -22,7 +22,6 @@ app.use(authRoutes)
     res.send('hello')
 })
 */
-app.use(bodyParser.json())
 
 app.post('/',(req,res)=>
 {

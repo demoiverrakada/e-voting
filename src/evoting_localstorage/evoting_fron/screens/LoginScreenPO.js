@@ -107,8 +107,9 @@ const styles = StyleSheet.create({
     color: '#555', // Subtle gray for secondary text
   },
   textInput: {
-    width: '100%', // Full width input for better usability
-    padding: 14, // Increased padding for comfortable touch targets
+    width: '90%', // Increased width to make it more horizontally prominent
+    height: 45, // Reduced height for a sleeker look
+    paddingHorizontal: 15, // Comfortable horizontal padding for typing
     marginBottom: 20,
     borderWidth: 1, // Adds a border for better visibility
     borderColor: '#ccc', // Neutral gray border
@@ -144,9 +145,6 @@ const styles = StyleSheet.create({
     fontSize: 18, // Larger font for clarity
     fontWeight: '600', // Slightly less bold for a refined look
     letterSpacing: 1, // Adds modern spacing between letters
-  },
-  buttonHover: {
-    backgroundColor: '#026c92', // Darker shade when hovering (you can implement this with interactivity)
   },
   inputLabel: {
     fontSize: 16, // Clear label text size

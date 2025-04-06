@@ -489,7 +489,7 @@ router.post('/vvpat', async (req, res) => {
             }
     
             // Call the Python function with the bid
-            const result = await callPythonFunction("vvpat", bid,electionId);
+            const result = await callPythonFunction("vvpat", JSON.stringify(JSON.parse(bid)[0]),electionId);
     
             // Handle the result
             if (result === "This VVPAT doesn't correspond to a decrypted vote.") {

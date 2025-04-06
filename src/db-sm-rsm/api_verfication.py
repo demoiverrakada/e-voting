@@ -237,7 +237,8 @@ if __name__ == "__main__":
         "verfrsmproof":pf_zkrsm_verif,
         "verfsigsm":verifier_signature_zksm,
         "verfsigrsm":verifier_signature_zkrsm,
-        "audit":audit
+        "audit":audit,
+        "vvpat":VVPATverif
     }
 
     func_name = sys.argv[1]

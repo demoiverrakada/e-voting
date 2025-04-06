@@ -92,7 +92,11 @@ const extractVotesToExternalStorage = async () => {
     Alert.alert('Success', 'File has been saved to your Downloads folder.');
   } catch (err) {
     console.error('Hash error:', err);
-    Alert.alert('Error', 'Failed to generate security hashes');
+    Alert.alert(
+      'Failed to generate security hashes', 
+      err.message
+      [{ text: 'OK' }] // Optional button configuration
+    );
   }
 };
 
@@ -100,10 +104,6 @@ const extractVotesToExternalStorage = async () => {
 function HomeScreenPO(props) {
   const check = () => {
     props.navigation.navigate('VoterCheck');
-  };
-
-  const upload = () => {
-    props.navigation.navigate('scanner2');
   };
 
   const logout = async () => {
@@ -120,16 +120,7 @@ function HomeScreenPO(props) {
         style={[styles.button, { backgroundColor: '#1995AD' }]}
         labelStyle={styles.buttonLabel}
       >
-        Verify Voter and Ballot
-      </Button>
-
-      <Button
-        mode='contained'
-        onPress={upload}
-        style={[styles.button, { backgroundColor: '#1995AD' }]}
-        labelStyle={styles.buttonLabel}
-      >
-        Upload Voter Receipt
+        Verify Voter and Upload Voter Receipt
       </Button>
 
       <Button
