@@ -9,7 +9,7 @@ const fs = require('fs');
 const { join } = require('path');
 const path = require('path');
 const { Voter,Bulletin,Keys,Generator} = require('../models/User');
-
+const JSONbig = require('json-bigint')({ storeAsString: true });
 router.use(cors());
 // function for running api.py python script
 function callPythonFunction(functionName, ...params) {
@@ -489,7 +489,7 @@ router.post('/vvpat', async (req, res) => {
             }
     
             // Call the Python function with the bid
-            const result = await callPythonFunction("vvpat", JSON.stringify(JSON.parse(bid)[0]),electionId);
+            const result = await callPythonFunction("vvpat",(JSONbig.parse(bid)[0]),electionId);
     
             // Handle the result
             if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
