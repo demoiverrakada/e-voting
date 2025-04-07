@@ -54,7 +54,7 @@ let z = 0;
       };
 
       const response = await fetch(
-        "http://10.194.23.132:7000/audit",
+        "http://10.194.4.166:7000/audit",
         {
           method: "POST",
           headers: {
@@ -99,7 +99,9 @@ let z = 0;
       </Card.Content>
     </Card>
   );
-  
+  const back = async () => {
+    props.navigation.navigate("start");
+  };
   return (
     <View style={styles.container}>
       {loading ? (
@@ -119,10 +121,18 @@ let z = 0;
           <Button
             mode="contained"
             onPress={checkSend}
-            style={styles.button}
+            style={styles.button1}
             labelStyle={styles.buttonText}
           >
             Audit Ballot
+          </Button>
+          <Button
+            mode="contained"
+            onPress={back}
+            style={styles.button2}
+            labelStyle={styles.buttonText}
+          >
+            Audit a new Ballot
           </Button>
         </>
       )}
@@ -143,7 +153,7 @@ let z = 0;
       textAlign: "center",
       marginBottom: 25,
     },
-    button: {
+    button1: {
       marginTop: 25,
       paddingVertical: 14,
       borderRadius: 25,
@@ -153,10 +163,21 @@ let z = 0;
       shadowOpacity: 0.1,
       shadowRadius: 4,
     },
+    button2: {
+      marginTop: 25,
+      paddingVertical: 14,
+      borderRadius: 25,
+      backgroundColor: "#000000",
+      shadowColor: "#000", // Added shadow for depth
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
     buttonText: {
       fontSize: 16,
       fontWeight: "bold",
       textTransform: "uppercase",
+      color:"#ffffff"
     },
     resultsList: {
       marginBottom: 30,

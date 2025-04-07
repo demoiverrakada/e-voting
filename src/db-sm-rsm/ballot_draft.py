@@ -153,8 +153,11 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     draw.text((election_id_x_right, election_id_y), election_text, font=subtitlefont, fill='black')
     draw.text((int(0.2 * bh), 0.07 * bh), "VVPAT side", font=titlefont, fill='black')
     draw.text((int(0.2 * bh), 0.07 * bh + 100), "(Drop into the ballot box)", font=subtitlefont, fill='black')
+    draw.text((int(0.2 * bh), 0.07 * bh + 140), "Mark your choice on BOTH sides", font=smallfont, fill='black')
+
     draw.text((center_x + int(0.2 * bh), 0.07 * bh), "Receipt side", font=titlefont, fill='black')
     draw.text((center_x + int(0.2 * bh), 0.07 * bh + 100), "(Bring back for scanning)", font=subtitlefont, fill='black')
+    draw.text((center_x + int(0.2 * bh), 0.07 * bh + 140), "Take this side with you", font=smallfont, fill='black')
 
     # QR code containing encrypted votes
     qr_code2 = "qr_updated.png"
@@ -176,6 +179,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     draw.text((box_startx + 20, text_y - 100), "Your choice", font=boldfont, fill='black')
     draw.text((center_x + 20, text_y - 100), "Your choice", font=boldfont, fill='black')
     draw.text((center_x - (center_x - box_startx) // 2, text_y - 50), "(Mark across the line)", font=smallfont, fill='black')
+    draw.text((center_x - (center_x - box_startx) // 2, text_y - 20), "※ Mark BOTH sides identically", font=smallfont, fill='black')
     n = 0
     print("testing5")
     for i, candname in enumerate(candidates):
@@ -196,6 +200,7 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     #draw.line((box_endx, candname_top, box_endx, candname_bot), fill='gray', width=5)
     draw.line((box_endx + 100, candname_top, box_endx + 100, candname_bot), fill='gray', width=5)
     draw.text((box_startx + 30, candname_bot + 20), "(Separate along the line after marking)", font=smallfont, fill='black')
+    draw.text((box_startx + 30, candname_bot + 50), "↓ Tear here after voting ↓", font=smallfont, fill='black')
     print("testing6")
     # QR code containing the bid
     qr_code = "qr_code.png"
@@ -205,6 +210,10 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     bid_y = text_y + 150
     draw.text((bid_x + 60, bid_y - 50), "Ballot ID", font=boldfont, fill='black')
     image.paste(qr_bid, (bid_x, bid_y))
+    final_instr_y = bid_y + 300
+    draw.text((int(0.1 * bw), final_instr_y), "IMPORTANT: Mark BOTH sides identically", font=boldfont, fill='black')
+    draw.text((int(0.1 * bw), final_instr_y + 50), "• Drop LEFT side (VVPAT) into ballot box", font=font, fill='black')
+    draw.text((int(0.1 * bw), final_instr_y + 100), "• Keep RIGHT side (Receipt) with you for verification", font=font, fill='black')
     print("testing7")
     # QR code containing the booth num
     # qr_code3 = "qr_code3.png"

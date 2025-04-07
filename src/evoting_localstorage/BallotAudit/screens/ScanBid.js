@@ -31,7 +31,7 @@ export default function Scanner(props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Scan Ballot ID</Text>
+      <Text style={styles.headerText}>Scan Ballot ID on the VVPAT side of the Ballot</Text>
       <QRCodeScanner
         onRead={async ({ data }) => {
           if (isValidQRCode(data)) {
