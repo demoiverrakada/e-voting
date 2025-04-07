@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Alert, StyleSheet } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import checkReceipt2 from '../func/checkReceipt2.js';
 
 export default function Scanner(props) {
+  const [scannedData, setScannedData] = useState(null);
+  const [showScanner, setShowScanner] = useState(true);
+
   const checkSend = async (qrcodedata) => {
     try {
       const { voter_id, election_id, remainingElections, currentIndex } = props.route.params;
+      
       let firstArray = '';
-
-      // Extract the first array from qrcodedata
       for (let i = 1; i < qrcodedata.length; i++) {
         const char = qrcodedata[i];
         if (char === ']') {
@@ -18,27 +21,22 @@ export default function Scanner(props) {
         firstArray += char;
       }
 
-      // Simulate API call to check receipt
       const data = await checkReceipt2(firstArray);
-
+      
       if (data.message === 'Ballot exists and verified successfully.') {
-        console.log("Successfully submitted voter receipt");
         Alert.alert(
           'Encrypted candidate ID successfully verified',
           'Enter the voter preference number',
-          [
-            {
-              text: 'OK',
-              onPress: () =>
-                props.navigation.navigate('scanner3', {
-                  commitments: qrcodedata,
-                  election_id,
-                  voter_id,
-                  remainingElections,
-                  currentIndex,
-                }),
-            },
-          ],
+          [{
+            text: 'OK', 
+            onPress: () => props.navigation.navigate('scanner3', {
+              commitments: qrcodedata,
+              election_id,
+              voter_id,
+              remainingElections,
+              currentIndex
+            })
+          }],
           { cancelable: false }
         );
       } else {
@@ -52,21 +50,28 @@ export default function Scanner(props) {
     }
   };
 
-  const handleQRCodeScanned = async (data) => {
+  const handleScan = (data) => {
+    setShowScanner(false); // Temporarily hide scanner
+    setScannedData(data);
+    
     Alert.alert(
-      'QR Code Scanned',
-      'Do you want to proceed or rescan?',
+      'Confirm Scan',
+      'Is this scan correct?',
       [
         {
           text: 'Rescan',
-          onPress: () => console.log('Rescanning...'), // Simply dismisses alert to allow rescanning
+          onPress: () => {
+            setScannedData(null);
+            setShowScanner(true); // Show scanner again
+          }
         },
         {
           text: 'Proceed',
           onPress: async () => {
-            await checkSend(data); // Proceed with processing the scanned QR code
-          },
-        },
+            await checkSend(data);
+            setShowScanner(true); // Reset scanner after processing
+          }
+        }
       ],
       { cancelable: false }
     );
@@ -75,11 +80,15 @@ export default function Scanner(props) {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Scan Receipt QR Code</Text>
-      <QRCodeScanner
-        onRead={({ data }) => handleQRCodeScanned(data)} // Handle scanned QR code
-        showMarker={true}
-        markerStyle={styles.marker}
-      />
+      
+      {showScanner && (
+        <QRCodeScanner
+          key={scannedData} // Force re-render when rescanning
+          onRead={({ data }) => handleScan(data)}
+          showMarker={true}
+          markerStyle={styles.marker}
+        />
+      )}
     </View>
   );
 }

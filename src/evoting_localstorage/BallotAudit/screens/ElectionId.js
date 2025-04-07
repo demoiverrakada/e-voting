@@ -7,29 +7,43 @@ const ElectionId = (props) => {
     const bid = props.route.params.bid;
     const [election_id, setElectionID] = useState(''); // Initialize as string for input handling
 
+    const confirmElectionID = async () => {
+        Alert.alert(
+            'Confirm Election ID',
+            `You have entered Election ID: ${election_id}. Do you want to proceed?`,
+            [
+                {
+                    text: 'Re-enter',
+                    onPress: () => setElectionID(''), // Reset the input for reentry
+                },
+                {
+                    text: 'Proceed',
+                    onPress: () => {
+                        // Navigate to the next screen with the election_id
+                        props.navigation.navigate('audit', {
+                            commitments: commitments,
+                            bid: bid,
+                            election_id: parseInt(election_id),
+                        });
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
+    };
+
     const checkElectionID = async () => {
-        // Convert to number and validate
+        // Validate election_id as a positive number
         const numericElectionId = parseInt(election_id);
-        
+
         if (isNaN(numericElectionId) || numericElectionId <= 0) {
             Alert.alert('Invalid Input', 'Please enter a valid election ID number');
             return;
         }
+
         try {
-            Alert.alert(
-                'Election ID entered successfully',
-                "Audit ballot next",
-                [{
-                    text: 'OK', 
-                    onPress: () => props.navigation.navigate('audit', {
-                        commitments: commitments,
-                        bid: bid,
-                        election_id: numericElectionId
-                    })
-                }],
-                { cancelable: false }
-            );
-            setElectionID(''); // Reset input
+            // Ask for confirmation before proceeding
+            await confirmElectionID();
         } catch (error) {
             console.error('Error during fetch:', error);
             Alert.alert('Error', 'Error in connecting to the server', [
@@ -40,83 +54,91 @@ const ElectionId = (props) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Enter Election ID of the ballot</Text>
-            <TextInput
-                placeholder="Enter Election ID"
-                value={election_id}
-                placeholderTextColor="#000"
-                mode="outlined"
-                style={styles.textInput}
-                theme={{ colors: { primary: "#1995AD" } }}
-                keyboardType="numeric"
-                onChangeText={(text) => {
-                    // Filter non-numeric characters
-                    const cleanedText = text.replace(/[^0-9]/g, '');
-                    setElectionID(cleanedText);
-                }}
-            />
-            <Button 
-                onPress={checkElectionID}
-                mode="contained"
-                style={styles.button}
-                labelStyle={styles.buttonLabel}
-                contentStyle={styles.buttonContent}
-            >
-                Enter Election ID
-            </Button>
+            <Text style={styles.heading}>Enter Election ID</Text>
+            <Text style={styles.subHeading}>
+                Please enter the Election ID of the ballot in the field below.
+            </Text>
+            <View style={styles.formGroup}>
+                <TextInput
+                    placeholder="Enter Election ID"
+                    value={election_id}
+                    placeholderTextColor="#000"
+                    style={styles.textInput}
+                    keyboardType="numeric"
+                    onChangeText={(text) => {
+                        // Filter non-numeric characters
+                        const cleanedText = text.replace(/[^0-9]/g, '');
+                        setElectionID(cleanedText);
+                    }}
+                />
+                <Button 
+                    onPress={checkElectionID}
+                    mode="contained"
+                    style={styles.button}
+                    labelStyle={styles.buttonLabel}
+                    contentStyle={styles.buttonContent}
+                >
+                    Submit Election ID
+                </Button>
+            </View>
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      paddingHorizontal: 15,
-      paddingTop: 20,
-      backgroundColor: "#f5f5f5", // Changed from #F2F7FC to match target style
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingVertical: 30,
+        backgroundColor: "#f5f5f5",
+        justifyContent: "center",
     },
-    headerText: {
-      fontSize: 22, // Reduced from 30 to match target style
-      fontWeight: "bold",
-      color: "#6200ea", // Changed from #4A90E2 to purple theme
-      textAlign: "center",
-      marginBottom: 25,
-      letterSpacing: 1, // Slightly reduced from original
+    heading: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#6200ea",
+        textAlign: "center",
+        marginBottom: 10,
     },
-    marker: {
-      borderColor: '#6200ea', // Updated to purple theme
-      borderWidth: 2,
-      // Added shadow effects for depth
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
+    subHeading: {
+        fontSize: 16,
+        color: "#444",
+        textAlign: "center",
+        marginBottom: 20,
+    },
+    formGroup: {
+        backgroundColor: "#fff",
+        paddingHorizontal: 20,
+        paddingVertical: 30,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 5,
+    },
+    textInput: {
+        borderWidth: 1,
+        borderColor: '#6200ea',
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        fontSize: 18,
+        color: '#000',
+        marginBottom: 20,
     },
     button: {
-      marginTop: 25, // Increased from 20
-      paddingVertical: 14, // Increased from 12
-      borderRadius: 25,
-      backgroundColor: "#6200ea", // Changed to purple theme
-      // Enhanced shadow effects
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 5, // Increased from 4
+        backgroundColor: "#6200ea",
+        borderRadius: 8,
     },
     buttonLabel: {
-      color: '#FFFFFF',
-      fontSize: 16,
-      fontWeight: "bold",
-      textAlign: "center",
-      textTransform: "uppercase", // Added to match target style
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: "bold",
     },
-    alert: {
-      fontSize: 16,
-      textAlign: "center",
-      color: "#444", // Changed from #333 to softer color
-      fontStyle: "italic", // Added for emphasis
+    buttonContent: {
+        paddingVertical: 10,
     },
-  });
-  
+});
 
 export default ElectionId;

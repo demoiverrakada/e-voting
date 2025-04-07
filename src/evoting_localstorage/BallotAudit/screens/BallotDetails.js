@@ -1,43 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 export default function Scanner(props) {
+  const [lastScannedData, setLastScannedData] = useState(null);
 
   const checkSend = async (qrcodedata) => {
     try {
       console.log(qrcodedata);
-     Alert.alert(
-      "Encrypted candidate ID's scanned successfully",
-      "Scan Ballot ID next",
-      [{ text: 'OK', onPress: () => props.navigation.navigate("bid", { commitments: qrcodedata }) }],
-      { cancelable: false }
-    );
+      Alert.alert(
+        "Encrypted candidate ID's scanned successfully",
+        "Do you want to proceed or rescan?",
+        [
+          { text: 'Rescan', onPress: () => setLastScannedData(null) },
+          { text: 'Proceed', onPress: () => props.navigation.navigate("bid", { commitments: qrcodedata }) },
+        ],
+        { cancelable: false }
+      );
     } catch (err) {
-      console.log("some problem in posting", err);
+      console.log("Some problem in posting", err);
       Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
       props.navigation.navigate("start");
     }
-  }
+  };
 
   const isValidQRCode = (data) => {
-    if (data == undefined) {
-      return false;
-    } else {
-      return true;
-    }
+    return data !== undefined && data !== null;
   };
 
   return (
     <View style={styles.container}>
+      {/* App Heading */}
+      <Text style={styles.appHeading}>BALLOT AUDIT APP</Text>
+      
+      {/* Instruction Heading */}
       <Text style={styles.headerText}>Scan Encrypted Candidate ID's on the Receipt side of the Ballot</Text>
+      
+      {/* QR Code Scanner */}
       <QRCodeScanner
         onRead={async ({ data }) => {
           if (isValidQRCode(data)) {
+            setLastScannedData(data);
             await checkSend(data);
             console.log('Valid QR code detected:', data);
           } else {
             console.log('Invalid QR code detected:', data);
+            Alert.alert('Invalid QR Code', 'Please scan a valid QR code.', [{ text: 'OK' }], { cancelable: false });
           }
         }}
         showMarker={true}
@@ -45,7 +53,7 @@ export default function Scanner(props) {
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -61,6 +69,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 25,
     letterSpacing: 1, // Slightly reduced from original
+  },
+  appHeading: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#6200ea", // Purple theme for consistency
+    textAlign: "center",
+    marginBottom: 15, // Space below heading
+    letterSpacing: 2, // Slight spacing for better readability
+    textTransform: "uppercase", // Make it look bold and official
   },
   marker: {
     borderColor: '#6200ea', // Updated to purple theme

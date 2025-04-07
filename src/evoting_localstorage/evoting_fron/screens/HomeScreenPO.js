@@ -16,87 +16,91 @@ const makeFileReadOnly = async (filePath) => {
 
 const extractVotesToExternalStorage = async () => {
   try {
-    const initialHash = '12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126'; // Initial value for hash
+    const initialHash = '12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126';
 
-    // Check if the source file exists
+    // Check source file existence
     const fileExists = await RNFS.exists(writeFilePath);
     if (!fileExists) {
-      console.error('Source file does not exist:', writeFilePath);
+      const errorMsg = `Source file not found at: ${writeFilePath}`;
+      Alert.alert('File Error', errorMsg);
+      console.error(errorMsg);
       return;
     }
 
-    // Read the source file
-    const fileContents = await RNFS.readFile(writeFilePath, 'utf8');
+    // Read and parse file
+    let fileContents;
+    try {
+      fileContents = await RNFS.readFile(writeFilePath, 'utf8');
+    } catch (readError) {
+      const errorMsg = `Failed to read file: ${readError.message}`;
+      Alert.alert('Read Error', errorMsg);
+      console.error(errorMsg);
+      return;
+    }
+
     let votesData;
     try {
       votesData = JSON.parse(fileContents);
     } catch (parseError) {
-      console.error('Error parsing JSON file:', parseError);
+      const errorMsg = `Invalid JSON format: ${parseError.message}`;
+      Alert.alert('Parse Error', errorMsg);
+      console.error(errorMsg);
       return;
     }
 
-    // Ensure votesData is an array
     if (!Array.isArray(votesData)) {
-      console.error('Invalid data format: expected an array of votes.');
+      const errorMsg = 'Data format invalid: Expected array of votes';
+      Alert.alert('Data Error', errorMsg);
+      console.error(errorMsg);
       return;
     }
 
     let currentHash = initialHash;
-    for (const vote of votesData) {
-      // Create a copy of vote without hash_value
-      const voteWithoutHash = {
-        election_id: vote.election_id,
-        voter_id: vote.voter_id,
-        booth_num: vote.booth_num,
-        commitment: vote.commitment,
-        pref_id: vote.pref_id
-      };
-      const voteHash = sha256(JSON.stringify(voteWithoutHash));
-      currentHash = sha256(currentHash + voteHash);
-    }
-
-    // Apply the final hash to all votes
-    const finalUpdatedVotesData = votesData.map(vote => ({
-      election_id:vote.election_id,
-      voter_id: vote.voter_id,
-      booth_num: vote.booth_num,
-      commitment: vote.commitment,
-      pref_id: vote.pref_id,
-      hash_value: currentHash  // Assign the same final hash to all votes
-    }));
-
-    // Write the updated data to the external storage file
-    const destPath = `${RNFS.ExternalDirectoryPath}/updated_data.json`;
-    await RNFS.writeFile(destPath, JSON.stringify(finalUpdatedVotesData), 'utf8');
-
-    console.log(`File with final hash copied to: ${destPath}`);
-  } catch (err) {
-    console.error('Error copying file with final hash:', err);
-  }
-
-  try {
-    // Change 3: Ensure the file is copied to Downloads with the correct final hash
-    const sourcePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
-    const destPath = `${RNFS.DownloadDirectoryPath}/updated_data.json`;
-
-    // Check if the source file exists
-    const fileExists = await RNFS.exists(sourcePath);
-    if (!fileExists) {
-      Alert.alert('Error', 'Source file does not exist. Please ensure the file is created.');
+    try {
+      for (const vote of votesData) {
+        const voteWithoutHash = { /* ... */ };
+        const voteHash = sha256(JSON.stringify(voteWithoutHash));
+        currentHash = sha256(currentHash + voteHash);
+      }
+    } catch (hashError) {
+      const errorMsg = `Hashing failed: ${hashError.message}`;
+      Alert.alert('Security Error', errorMsg);
+      console.error(errorMsg);
       return;
     }
 
-    // Copy the file to the Downloads folder
-    await RNFS.copyFile(sourcePath, destPath);
-    await makeFileReadOnly(destPath);
-    Alert.alert('Success', 'File has been saved to your Downloads folder.');
+    // Write to external storage
+    const destPath = `${RNFS.ExternalDirectoryPath}/updated_data.json`;
+    try {
+      await RNFS.writeFile(destPath, JSON.stringify(finalUpdatedVotesData), 'utf8');
+    } catch (writeError) {
+      const errorMsg = `File write failed: ${writeError.message}`;
+      Alert.alert('Write Error', errorMsg);
+      console.error(errorMsg);
+      return;
+    }
+
+    // Copy to Downloads
+    try {
+      const downloadsDest = `${RNFS.DownloadDirectoryPath}/updated_data.json`;
+      await RNFS.copyFile(writeFilePath, downloadsDest);
+      await makeFileReadOnly(downloadsDest);
+      Alert.alert('Success', 'File saved to Downloads with read-only permissions');
+    } catch (copyError) {
+      const errorMsg = `Download failed: ${copyError.message}`;
+      Alert.alert('Download Error', errorMsg);
+      console.error(errorMsg);
+    }
+
   } catch (err) {
-    console.error('Hash error:', err);
+    const errorMsg = `Critical failure: ${err.message}\nStack: ${err.stack}`;
     Alert.alert(
-      'Failed to generate security hashes', 
-      err.message
-      [{ text: 'OK' }] // Optional button configuration
+      'Operation Failed',
+      errorMsg,
+      [{ text: 'OK' }],
+      { cancelable: false }
     );
+    console.error('Global Error:', errorMsg);
   }
 };
 

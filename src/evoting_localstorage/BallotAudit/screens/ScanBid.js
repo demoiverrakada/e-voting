@@ -1,32 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 export default function Scanner(props) {
   const commitments = props.route.params.commitments;
+  const [lastScannedData, setLastScannedData] = useState(null);
+
   const checkSend = async (qrcodedata) => {
     try {
       console.log(qrcodedata);
-      console.log("successfully submitted ballot_id login");
+      console.log("Successfully submitted ballot_id login");
       Alert.alert(
         "Ballot ID successfully identified",
-	"Enter Election ID next",
-        [{ text: 'OK', onPress: () => props.navigation.navigate("elect", { commitments: commitments, bid: qrcodedata }) }],
+        "Do you want to proceed or rescan?",
+        [
+          { text: 'Rescan', onPress: () => setLastScannedData(null) },
+          { text: 'Proceed', onPress: () => props.navigation.navigate("elect", { commitments: commitments, bid: qrcodedata }) },
+        ],
         { cancelable: false }
       );
     } catch (err) {
-      console.log("some problem in posting", err);
+      console.log("Some problem in posting", err);
       Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
       props.navigation.navigate("start");
     }
   };
 
   const isValidQRCode = (data) => {
-    if (data == undefined) {
-      return false;
-    } else {
-      return true;
-    }
+    return data !== undefined && data !== null;
   };
 
   return (
@@ -35,10 +36,12 @@ export default function Scanner(props) {
       <QRCodeScanner
         onRead={async ({ data }) => {
           if (isValidQRCode(data)) {
+            setLastScannedData(data);
             await checkSend(data);
             console.log('Valid QR code detected:', data);
           } else {
             console.log('Invalid QR code detected:', data);
+            Alert.alert('Invalid QR Code', 'Please scan a valid QR code.', [{ text: 'OK' }], { cancelable: false });
           }
         }}
         showMarker={true}
@@ -46,7 +49,7 @@ export default function Scanner(props) {
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
