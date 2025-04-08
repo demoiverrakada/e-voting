@@ -206,32 +206,68 @@ router.post('/upload', requireAuth, async (req, res) => {
     try {
         const jsonData = req.body;
 
-        // Batch processing for Bulletin
+        // Process in batches
         for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
             const batch = jsonData.slice(i, i + BATCH_SIZE);
-            const result = await Bulletin.insertMany(batch);
-
-            // Process receipts for each batch
-            await Promise.all(result.map(async (entry) => {
-                const { commitment } = entry;
-                const receipt = await Receipt.findOne({ enc_hash: commitment });
-                
-                if (receipt) {
-                    const { ov_hash } = receipt;
-                    const updatedReceipts = await Receipt.updateMany(
-                        { ov_hash },
-                        { accessed: true }
-                    );
-                    console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
+            
+            // Prepare bulk write operations
+            const bulkOps = batch.map(doc => ({
+                updateOne: {
+                    filter: { 
+                        voter_id: doc.voter_id,
+                        election_id: doc.election_id
+                    },
+                    update: {
+                        $setOnInsert: { ...doc, timestamp: new Date(doc.timestamp) }
+                    },
+                    upsert: true,
+                    // Only update if existing document has later timestamp
+                    hint: { voter_id: 1, election_id: 1 }
                 }
             }));
+
+            // Execute bulk write
+            const bulkResult = await Bulletin.bulkWrite(bulkOps, {
+                ordered: false,
+                bypassDocumentValidation: true
+            });
+
+            // Process successful inserts
+            const insertedIds = Object.values(bulkResult.upsertedIds || {});
+            if (insertedIds.length > 0) {
+                const insertedDocs = await Bulletin.find({
+                    _id: { $in: insertedIds }
+                });
+
+                // Update receipts for newly inserted documents
+                await Promise.all(insertedDocs.map(async (entry) => {
+                    const { commitment } = entry;
+                    const receipt = await Receipt.findOne({ enc_hash: commitment });
+                    
+                    if (receipt) {
+                        const { ov_hash } = receipt;
+                        const updatedReceipts = await Receipt.updateMany(
+                            { ov_hash },
+                            { accessed: true }
+                        );
+                        console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
+                    }
+                }));
+            }
         }
 
-        res.send({ status: 'OK', message: 'Upload process and receipt updates successful' });
+        res.send({ 
+            status: 'OK', 
+            message: 'Upload process completed with timestamp-based conflict resolution'
+        });
         requestStatus["upload"] = "success";
     } catch (err) {
         console.error(err);
-        res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
+        res.status(500).send({ 
+            status: 'Error', 
+            message: 'An error occurred while processing the request.',
+            detailedError: err.message
+        });
         requestStatus["upload"] = "failed";
     }
 });

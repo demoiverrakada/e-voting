@@ -222,6 +222,11 @@ const BulletinSchema=new mongoose.Schema({
     hash_value:{
         type:String,
         required:true
+    },
+    timestamp: {
+        type: Date,
+        required: true,
+        index: true  // Add index for efficient timestamp queries
     }
 
 });

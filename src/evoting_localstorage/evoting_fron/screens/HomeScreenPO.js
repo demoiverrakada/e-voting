@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Alert, StyleSheet, Linking, StatusBar } from 'react-native'; // Added StatusBar import
+import { View, Alert, StyleSheet, Linking, StatusBar } from 'react-native';
 import { Button } from 'react-native-paper';
 import RNFS from 'react-native-fs';
+import { sha256 } from 'react-native-sha256';
 
 const writeFilePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
+
 const makeFileReadOnly = async (filePath) => {
   try {
     // Change the file permissions to read-only (444)
@@ -17,6 +19,7 @@ const makeFileReadOnly = async (filePath) => {
 const extractVotesToExternalStorage = async () => {
   try {
     const initialHash = '12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126';
+    const fileGenerationTimestamp = new Date().toISOString(); // Timestamp for file generation
 
     // Check source file existence
     const fileExists = await RNFS.exists(writeFilePath);
@@ -58,9 +61,17 @@ const extractVotesToExternalStorage = async () => {
     let currentHash = initialHash;
     try {
       for (const vote of votesData) {
-        const voteWithoutHash = { /* ... */ };
-        const voteHash = sha256(JSON.stringify(voteWithoutHash));
-        currentHash = sha256(currentHash + voteHash);
+        // Include all vote properties including timestamp but excluding hash_value
+        const voteWithoutHash = {
+          election_id: vote.election_id,
+          voter_id: vote.voter_id,
+          booth_num: vote.booth_num,
+          commitment: vote.commitment,
+          pref_id: vote.pref_id,
+          timestamp: vote.timestamp // Include timestamp in hash calculation
+        };
+        const voteHash = await sha256(JSON.stringify(voteWithoutHash));
+        currentHash = await sha256(currentHash + voteHash);
       }
     } catch (hashError) {
       const errorMsg = `Hashing failed: ${hashError.message}`;
@@ -68,6 +79,21 @@ const extractVotesToExternalStorage = async () => {
       console.error(errorMsg);
       return;
     }
+
+    // Apply the final hash to all votes and add file generation timestamp
+    const finalUpdatedVotesData = {
+      votes: votesData.map(vote => ({
+        election_id: vote.election_id,
+        voter_id: vote.voter_id,
+        booth_num: vote.booth_num,
+        commitment: vote.commitment,
+        pref_id: vote.pref_id,
+        timestamp: vote.timestamp, // Preserve original vote timestamp
+        hash_value: currentHash // Assign the same final hash to all votes
+      })),
+      file_generation_timestamp: fileGenerationTimestamp, // Add file generation timestamp
+      final_hash: currentHash // Store the final hash at the top level
+    };
 
     // Write to external storage
     const destPath = `${RNFS.ExternalDirectoryPath}/updated_data.json`;
@@ -83,7 +109,7 @@ const extractVotesToExternalStorage = async () => {
     // Copy to Downloads
     try {
       const downloadsDest = `${RNFS.DownloadDirectoryPath}/updated_data.json`;
-      await RNFS.copyFile(writeFilePath, downloadsDest);
+      await RNFS.copyFile(destPath, downloadsDest); // Use destPath as source to include our changes
       await makeFileReadOnly(downloadsDest);
       Alert.alert('Success', 'File saved to Downloads with read-only permissions');
     } catch (copyError) {
@@ -103,7 +129,6 @@ const extractVotesToExternalStorage = async () => {
     console.error('Global Error:', errorMsg);
   }
 };
-
 
 function HomeScreenPO(props) {
   const check = () => {
@@ -165,3 +190,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreenPO;
+
