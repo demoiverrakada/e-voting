@@ -31,7 +31,7 @@ export default function Scanner(props) {
   return (
     <View style={styles.container}>
       {/* App Heading */}
-      <Text style={styles.appHeading}>BALLOT AUDIT APP</Text>
+      <Text style={styles.appHeading}>Ballot Audi App</Text>
       
       {/* Instruction Heading */}
       <Text style={styles.headerText}>Scan Encrypted Candidate ID's on the Receipt side of the Ballot</Text>
