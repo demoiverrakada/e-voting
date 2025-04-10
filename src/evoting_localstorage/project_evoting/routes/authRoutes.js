@@ -20,7 +20,7 @@ function callPythonFunction(functionName, ...params) {
     const pythonExecutable = 'python3';
     const args = [scriptPath, functionName, JSON.stringify(params)];
 
-    console.log(`Running: precomputing=0 ${pythonExecutable} ${args.join(' ')}`);
+    console.log(`Running: precomputing=1 ${pythonExecutable} ${args.join(' ')}`);
     const pythonProcess = spawnSync(pythonExecutable, args, {
         env: { ...process.env, precomputing: '0' },
         maxBuffer: 1024 * 1024 * 10
@@ -54,7 +54,7 @@ function callPythonFunction2(functionName, ...params){
 
     console.log(`Running: ${pythonExecutable} ${args.join(' ')}`);
     const pythonProcess = spawnSync(pythonExecutable, args, {
-        env: { ...process.env, precomputing: '0' },
+        env: { ...process.env, precomputing: '1' },
         maxBuffer: 1024 * 1024 * 10
     });
 
@@ -118,13 +118,12 @@ router.post('/generate', requireAuth, async (req, res) => {
     const outputDirectory = '/output';
 
     try {
-        // 1. Parallelize ballot generation and individual ZIP creation
-        const concurrencyLimit = Math.min(os.cpus().length, 20); // Adjust based on system capacity
+        const result =await callPythonFunction("generate",numBallots,numElections)
+        const concurrencyLimit = Math.min(os.cpus().length, 20);
         const electionIds = Array.from({ length: numElections }, (_, i) => i + 1);
 
         await async.eachLimit(electionIds, concurrencyLimit, async (i) => {
             // Generate ballots for this election
-            await callPythonFunction('generate', numBallots, i);
             console.log(`Ballots generated for election ${i}`);
 
             // Find PDFs for this election

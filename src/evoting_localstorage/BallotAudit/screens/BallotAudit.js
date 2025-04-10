@@ -52,7 +52,7 @@ export default function BallotAudit(props) {
         election_id: election_id
       };
 
-      const response = await fetch("http://10.194.4.166:7000/audit", {
+      const response = await fetch("http://10.208.21.185:7000/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),

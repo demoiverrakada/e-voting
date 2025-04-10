@@ -15,7 +15,7 @@ function LoginScreenPO(props) {
 
   const sendCred = async () => {
     try {
-      const data = await checkPO(email,password);
+      const data = await checkPO(email, password);
 
       if (data.message) {
         setEmail('');
@@ -80,84 +80,68 @@ function LoginScreenPO(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A1D6E2', // Calm pastel blue for the background
+    backgroundColor: '#A1D6E2',
     justifyContent: 'center',
-    alignItems: 'center', // Ensures the content is centered
-    padding: 20, // Slightly more padding for better spacing
+    alignItems: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 36, // Slightly larger for better emphasis
+    fontSize: 36,
     textAlign: 'center',
-    marginBottom: 16, // Reduced spacing for better layout balance
-    color: '#333', // Darker shade for better text contrast
+    marginBottom: 16,
+    color: '#333',
     fontWeight: 'bold',
   },
   underline: {
-    borderBottomColor: '#333', // Consistent with title text color
-    borderBottomWidth: 3, // Slightly thinner underline
-    borderRadius: 5, // Softer rounded edges
+    borderBottomColor: '#333',
+    borderBottomWidth: 3,
+    borderRadius: 5,
     alignSelf: 'center',
-    width: 120, // Increased width for a more balanced look
-    marginBottom: 20, // Matches spacing with other components
+    width: 120,
+    marginBottom: 20,
   },
   credentialsText: {
-    fontSize: 18, // Slightly smaller for better visual hierarchy
+    fontSize: 18,
     textAlign: 'center',
-    marginBottom: 24, // Increased spacing for readability
-    color: '#555', // Subtle gray for secondary text
+    marginBottom: 24,
+    color: '#555',
   },
   textInput: {
-    width: '90%', // Increased width to make it more horizontally prominent
-    height: 45, // Reduced height for a sleeker look
-    paddingHorizontal: 15, // Comfortable horizontal padding for typing
+    width: '100%', // Matches button width for consistency
+    height: 50, // Slightly taller for better usability
+    paddingHorizontal: 15,
     marginBottom: 20,
-    borderWidth: 1, // Adds a border for better visibility
-    borderColor: '#ccc', // Neutral gray border
-    borderRadius: 10, // Rounded corners for modern design
-    backgroundColor: '#fff', // White background for input fields
-    color: '#333', // Text color for readability
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 25, // Matches button border radius for consistency
+    backgroundColor: '#fff',
+    color: '#333',
     fontSize: 16,
-    shadowColor: '#000', // Shadow for focus effect
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1, // Light shadow for focus effect
-    shadowRadius: 4, // Slight blur on the shadow
-    elevation: 3, // Subtle elevation for depth
-  },
-  textInputFocused: {
-    borderColor: '#0278ae', // Highlighted border color on focus
-    shadowOpacity: 0.2, // Slightly stronger shadow on focus
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   button: {
-    width: '100%', // Standardized width for buttons
-    paddingVertical: 14, // Vertical padding for better touch feedback
-    borderRadius: 25,
-    backgroundColor: '#0278ae', // Slightly deeper blue for contrast
-    elevation: 4, // Enhanced elevation for a modern effect
-    alignItems: 'center', // Center the button label
-    marginBottom: 20, // Consistent spacing between buttons
-    shadowColor: '#0278ae', // Button shadow color for depth
+    width: '100%', // Matches input width for consistency
+    paddingVertical: 14, // Standardized padding
+    borderRadius: 25, // Matches input border radius for consistency
+    elevation: 4,
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#0278ae',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   buttonLabel: {
-    color: '#FFFFFF', // White text for better visibility
-    fontSize: 18, // Larger font for clarity
-    fontWeight: '600', // Slightly less bold for a refined look
-    letterSpacing: 1, // Adds modern spacing between letters
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    letterSpacing: 1,
   },
-  inputLabel: {
-    fontSize: 16, // Clear label text size
-    marginBottom: 8, // Margin to separate label from the input field
-    color: '#333', // Dark text for readability
-    textAlign: 'left', // Left-aligned for input labels
-    width: '100%',
-  },
-  formContainer: {
-    width: '100%',
-    marginBottom: 40, // Adds some space between the form fields and button
-  }
 });
 
-
 export default LoginScreenPO;
+

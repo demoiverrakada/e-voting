@@ -20,6 +20,7 @@ import ast
 from misc import serialize_wrapper, deserialize_wrapper,pprint
 from bbsig import bbbatchverify
 import pymongo
+from multiprocessing import Pool
 
 
 #g = group.init(ZR, 5564993445756101503206304700110936918638328897597942591925129910965597995003)
@@ -74,8 +75,9 @@ def setup(alpha,election_id):
         store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,election_id])
     print("Setup was done successful")
 
-def generate_ballots(num,election_id):
-    ballot_draft(num,election_id)
+def generate_ballots(num,numElections):
+
+    ballot_draft(num,numElections)
 
 
 

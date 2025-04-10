@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Alert, StyleSheet } from 'react-native';
+import { View, Text, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import checkReceipt2 from '../func/checkReceipt2.js';
 
 export default function Scanner(props) {
   const [scannedData, setScannedData] = useState(null);
   const [showScanner, setShowScanner] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // New state for loading indicator
 
   const checkSend = async (qrcodedata) => {
     try {
@@ -45,7 +46,12 @@ export default function Scanner(props) {
       }
     } catch (err) {
       console.log("Some problem in posting", err);
-      Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
+      Alert.alert(
+        'Error', 
+        'Data Upload unsuccessful, try again', 
+        [{ text: 'OK' }], 
+        { cancelable: false }
+      );
       props.navigation.navigate("homePO");
     }
   };
@@ -62,14 +68,27 @@ export default function Scanner(props) {
           text: 'Rescan',
           onPress: () => {
             setScannedData(null);
-            setShowScanner(true); // Show scanner again
+            // Show loading state
+            setIsLoading(true);
+            
+            // Add a delay before showing scanner again to allow camera to initialize
+            setTimeout(() => {
+              setIsLoading(false);
+              setShowScanner(true);
+            }, 1500); // 1.5 seconds delay for camera initialization
           }
         },
         {
           text: 'Proceed',
           onPress: async () => {
-            await checkSend(data);
-            setShowScanner(true); // Reset scanner after processing
+            await checkSend(data.data);
+            
+            // Reset scanner after processing with delay
+            setIsLoading(true);
+            setTimeout(() => {
+              setIsLoading(false);
+              setShowScanner(true);
+            }, 1500);
           }
         }
       ],
@@ -81,14 +100,24 @@ export default function Scanner(props) {
     <View style={styles.container}>
       <Text style={styles.headerText}>Scan Receipt QR Code</Text>
       
-      {showScanner && (
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#1995AD" />
+          <Text style={styles.loadingText}>Initializing camera...</Text>
+        </View>
+      ) : showScanner ? (
         <QRCodeScanner
-          key={scannedData} // Force re-render when rescanning
-          onRead={({ data }) => handleScan(data)}
+          key={Date.now()} // Use timestamp to force a complete re-render
+          onRead={handleScan}
           showMarker={true}
+          reactivate={false}
+          reactivateTimeout={0}
           markerStyle={styles.marker}
+          cameraStyle={styles.camera}
+          topViewStyle={styles.topView}
+          bottomViewStyle={styles.bottomView}
         />
-      )}
+      ) : null}
     </View>
   );
 }
@@ -117,18 +146,43 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   button: {
-    marginTop: 25, // Increased for better spacing from other components
-    marginHorizontal: 20, // Consistent horizontal margin
-    backgroundColor: '#D9534F', // Bold red for high visibility
-    borderRadius: 30, // More rounded corners for a modern design
-    elevation: 5, // Enhanced shadow for depth
-    paddingVertical: 12, // Increased padding for better usability
+    marginTop: 25,
+    marginHorizontal: 20,
+    backgroundColor: '#D9534F',
+    borderRadius: 30,
+    elevation: 5,
+    paddingVertical: 12,
   },
   buttonLabel: {
-    color: '#FFFFFF', // Pure white for excellent contrast
-    fontSize: 18, // Slightly larger font size for readability
-    fontWeight: '600', // Balanced boldness for an elegant appearance
-    textAlign: 'center', // Ensures alignment within the button
-    letterSpacing: 0.8, // Subtle spacing for a polished look
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    letterSpacing: 0.8,
+  },
+  // New styles
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 15,
+    fontSize: 18,
+    color: '#1995AD',
+    textAlign: 'center',
+  },
+  camera: {
+    height: '100%',
+  },
+  topView: {
+    flex: 0,
+    height: 0,
+  },
+  bottomView: {
+    flex: 0,
+    height: 0,
   },
 });
+

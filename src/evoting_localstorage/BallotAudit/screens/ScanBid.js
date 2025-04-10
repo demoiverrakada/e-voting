@@ -6,7 +6,7 @@ export default function Scanner(props) {
   const commitments = props.route.params.commitments;
   const [lastScannedData, setLastScannedData] = useState(null);
 
-  const checkSend = async (qrcodedata) => {
+  const checkSend = async (qrcodedata, scannerRef) => {
     try {
       console.log(qrcodedata);
       console.log("Successfully submitted ballot_id login");
@@ -14,14 +14,31 @@ export default function Scanner(props) {
         "Ballot ID successfully identified",
         "Do you want to proceed or rescan?",
         [
-          { text: 'Rescan', onPress: () => setLastScannedData(null) },
-          { text: 'Proceed', onPress: () => props.navigation.navigate("elect", { commitments: commitments, bid: qrcodedata }) },
+          {
+            text: 'Rescan',
+            onPress: () => {
+              setLastScannedData(null);
+              setTimeout(() => scannerRef?.reactivate(), 500); // Reactivate scanner after a short delay
+            },
+          },
+          {
+            text: 'Proceed',
+            onPress: () =>
+              props.navigation.navigate("elect", {
+                commitments: commitments,
+                bid: qrcodedata,
+              }),
+          },
         ],
         { cancelable: false }
       );
     } catch (err) {
       console.log("Some problem in posting", err);
-      Alert.alert('Data Upload unsuccessful, try again', [{ text: 'OK' }], { cancelable: false });
+      Alert.alert(
+        'Data Upload unsuccessful, try again',
+        [{ text: 'OK' }],
+        { cancelable: false }
+      );
       props.navigation.navigate("start");
     }
   };
@@ -30,22 +47,39 @@ export default function Scanner(props) {
     return data !== undefined && data !== null;
   };
 
+  let scannerRef = null; // Reference to QRCodeScanner
+
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Scan Ballot ID on the VVPAT side of the Ballot</Text>
+      {/* Instruction Header */}
+      <Text style={styles.headerText}>
+        Scan Ballot ID on the VVPAT side of the Ballot
+      </Text>
+
+      {/* QR Code Scanner */}
       <QRCodeScanner
+        ref={(node) => {
+          scannerRef = node; // Assign reference to scanner
+        }}
         onRead={async ({ data }) => {
           if (isValidQRCode(data)) {
             setLastScannedData(data);
-            await checkSend(data);
+            await checkSend(data, scannerRef);
             console.log('Valid QR code detected:', data);
           } else {
             console.log('Invalid QR code detected:', data);
-            Alert.alert('Invalid QR Code', 'Please scan a valid QR code.', [{ text: 'OK' }], { cancelable: false });
+            Alert.alert(
+              'Invalid QR Code',
+              'Please scan a valid QR code.',
+              [{ text: 'OK' }],
+              { cancelable: false }
+            );
+            setTimeout(() => scannerRef?.reactivate(), 500); // Reactivate scanner for invalid QR codes after a short delay
           }
         }}
         showMarker={true}
         markerStyle={styles.marker}
+        cameraStyle={styles.camera} // Added camera styling for better display
       />
     </View>
   );
@@ -75,29 +109,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
   },
-  button: {
-    marginTop: 25, // Increased from 20
-    paddingVertical: 14, // Increased from 12
-    borderRadius: 25,
-    backgroundColor: "#6200ea", // Changed to purple theme
-    // Enhanced shadow effects
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5, // Increased from 4
-  },
-  buttonLabel: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-    textTransform: "uppercase", // Added to match target style
-  },
-  alert: {
-    fontSize: 16,
-    textAlign: "center",
-    color: "#444", // Changed from #333 to softer color
-    fontStyle: "italic", // Added for emphasis
+  camera: {
+    height: '100%', // Ensures camera fills the screen properly
+    width: '100%',
+    alignSelf: 'center',
   },
 });

@@ -61,7 +61,7 @@ function GenerateBallot() {
       ) : (
         <form className="generate-form">
           <label>
-            Number of elections:
+            Number of elections to be conducted:
             <input
               type="number"
               value={electionId}
