@@ -191,7 +191,7 @@ const VerifyVVPAT = () => {
                 </p>
                 <p className="result-item">
                   <span className="label">Extended Vote:</span>
-                  <span className="value code">{result.extended_vote}</span>
+                  <span className="value code">{result.extended_vote.toString()}</span>
                 </p>
               </div>
             </>

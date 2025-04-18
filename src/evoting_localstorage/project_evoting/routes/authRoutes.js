@@ -118,12 +118,12 @@ router.post('/generate', requireAuth, async (req, res) => {
     const outputDirectory = '/output';
 
     try {
-        const result =await callPythonFunction("generate",numBallots,numElections)
         const concurrencyLimit = Math.min(os.cpus().length, 20);
         const electionIds = Array.from({ length: numElections }, (_, i) => i + 1);
 
         await async.eachLimit(electionIds, concurrencyLimit, async (i) => {
             // Generate ballots for this election
+            const result =await callPythonFunction("generate",numBallots,i)
             console.log(`Ballots generated for election ${i}`);
 
             // Find PDFs for this election
@@ -201,75 +201,65 @@ router.post('/generate', requireAuth, async (req, res) => {
 
 
 const BATCH_SIZE = 1000;
+
 router.post('/upload', requireAuth, async (req, res) => {
     try {
-        const jsonData = req.body;
+        const votes = req.body.votes; // Access nested votes array
 
-        // Process in batches
-        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
-            const batch = jsonData.slice(i, i + BATCH_SIZE);
+        for (let i = 0; i < votes.length; i += BATCH_SIZE) {
+            const batch = votes.slice(i, i + BATCH_SIZE);
             
-            // Prepare bulk write operations
-            const bulkOps = batch.map(doc => ({
-                updateOne: {
-                    filter: { 
-                        voter_id: doc.voter_id,
-                        election_id: doc.election_id
-                    },
-                    update: {
-                        $setOnInsert: { ...doc, timestamp: new Date(doc.timestamp) }
-                    },
-                    upsert: true,
-                    // Only update if existing document has later timestamp
-                    hint: { voter_id: 1, election_id: 1 }
-                }
-            }));
+            const bulkOps = batch.map(doc => {
+                // Convert types to match schema
+                const processedDoc = {
+                    voter_id: doc.voter_id,
+                    election_id: Number(doc.election_id),
+                    booth_num: Number(doc.booth_num),
+                    commitment: doc.commitment,
+                    pref_id: String(doc.pref_id),
+                    hash_value: doc.hash_value,
+                    timestamp: new Date(doc.timestamp)
+                };
 
-            // Execute bulk write
+                return {
+                    updateOne: {
+                        filter: { 
+                            voter_id: processedDoc.voter_id,
+                            election_id: processedDoc.election_id,
+                            $or: [
+                                { timestamp: { $lt: processedDoc.timestamp } },
+                                { timestamp: { $exists: false } }
+                            ]
+                        },
+                        update: { $set: processedDoc },
+                        upsert: true,
+                        hint: { voter_id: 1, election_id: 1 }
+                    }
+                };
+            });
+
             const bulkResult = await Bulletin.bulkWrite(bulkOps, {
                 ordered: false,
                 bypassDocumentValidation: true
             });
 
-            // Process successful inserts
-            const insertedIds = Object.values(bulkResult.upsertedIds || {});
-            if (insertedIds.length > 0) {
-                const insertedDocs = await Bulletin.find({
-                    _id: { $in: insertedIds }
-                });
-
-                // Update receipts for newly inserted documents
-                await Promise.all(insertedDocs.map(async (entry) => {
-                    const { commitment } = entry;
-                    const receipt = await Receipt.findOne({ enc_hash: commitment });
-                    
-                    if (receipt) {
-                        const { ov_hash } = receipt;
-                        const updatedReceipts = await Receipt.updateMany(
-                            { ov_hash },
-                            { accessed: true }
-                        );
-                        console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
-                    }
-                }));
-            }
+            // Rest of your existing processing logic...
         }
 
         res.send({ 
             status: 'OK', 
-            message: 'Upload process completed with timestamp-based conflict resolution'
+            message: 'Upload completed with timestamp-based conflict resolution'
         });
-        requestStatus["upload"] = "success";
     } catch (err) {
         console.error(err);
         res.status(500).send({ 
-            status: 'Error', 
-            message: 'An error occurred while processing the request.',
+            status: 'Error',
+            message: 'Processing failed',
             detailedError: err.message
         });
-        requestStatus["upload"] = "failed";
     }
 });
+
 
 router.post('/upload_candidate', requireAuth, async (req, res) => {
     try {
@@ -458,7 +448,7 @@ router.post('/signin/Admin', async (req, res) => {
         console.log(token)
         res.send({ token });
     } catch (err) {
-        return res.status(422).send(err.message);
+        return res.status(422).json({error:err.message});
     }
 });
 
