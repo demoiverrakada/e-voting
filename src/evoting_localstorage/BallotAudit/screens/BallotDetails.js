@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Scanner(props) {
-  const [lastScannedData, setLastScannedData] = useState(null);
+  const [isScannerActive, setIsScannerActive] = useState(true);
+  const scannerRef = useRef(null);
 
-  const checkSend = async (qrcodedata, scannerRef) => {
-    try {
-      console.log(qrcodedata);
+  useFocusEffect(
+    useCallback(() => {
+      setIsScannerActive(true);
+      return () => setIsScannerActive(false);
+    }, [])
+  );
+
+  const handleScan = async ({ data }) => {
+    if (!isScannerActive) return;
+
+    if (isValidQRCode(data)) {
+      setIsScannerActive(false);
       Alert.alert(
         "Encrypted candidate ID's scanned successfully",
         "Do you want to proceed or rescan?",
@@ -15,69 +26,55 @@ export default function Scanner(props) {
           {
             text: 'Rescan',
             onPress: () => {
-              setLastScannedData(null);
-              setTimeout(() => scannerRef?.reactivate(), 500); // Reactivate scanner for rescan
+              setIsScannerActive(true);
+              setTimeout(() => {
+                scannerRef.current?.reactivate();
+              }, 1000); // Changed to 1 second
             },
           },
           {
             text: 'Proceed',
-            onPress: () =>
-              props.navigation.navigate("bid", { commitments: qrcodedata }),
+            onPress: () => {
+              props.navigation?.navigate?.("bid", { commitments: data });
+            }
           },
         ],
         { cancelable: false }
       );
-    } catch (err) {
-      console.log("Some problem in posting", err);
+    } else {
       Alert.alert(
-        'Data Upload unsuccessful, try again',
-        [{ text: 'OK' }],
+        'Invalid QR Code',
+        'Please scan a valid QR code.',
+        [{ text: 'OK', onPress: () => {
+          setIsScannerActive(true);
+          setTimeout(() => {
+            scannerRef.current?.reactivate();
+          }, 1000); // Changed to 1 second
+        }}],
         { cancelable: false }
       );
-      props.navigation.navigate("start");
     }
   };
 
   const isValidQRCode = (data) => {
-    return data !== undefined && data !== null;
+    return typeof data === 'string' && data.trim() !== '';
   };
-
-  let scannerRef = null; // Reference to QRCodeScanner
 
   return (
     <View style={styles.container}>
-      {/* App Heading */}
       <Text style={styles.appHeading}>Ballot Audit App</Text>
-
-      {/* Instruction Heading */}
       <Text style={styles.headerText}>
         Scan Encrypted Candidate ID's on the Receipt side of the Ballot
       </Text>
 
-      {/* QR Code Scanner */}
-      <QRCodeScanner
-        ref={(node) => {
-          scannerRef = node; // Assign reference to scanner
-        }}
-        onRead={async ({ data }) => {
-          if (isValidQRCode(data)) {
-            setLastScannedData(data);
-            await checkSend(data, scannerRef);
-            console.log('Valid QR code detected:', data);
-          } else {
-            console.log('Invalid QR code detected:', data);
-            Alert.alert(
-              'Invalid QR Code',
-              'Please scan a valid QR code.',
-              [{ text: 'OK' }],
-              { cancelable: false }
-            );
-            scannerRef?.reactivate(); // Reactivate scanner for invalid QR codes
-          }
-        }}
-        showMarker={true}
-        markerStyle={styles.marker}
-      />
+      {isScannerActive && (
+        <QRCodeScanner
+          ref={scannerRef}
+          onRead={handleScan}
+          showMarker={true}
+          markerStyle={styles.marker}
+        />
+      )}
     </View>
   );
 }

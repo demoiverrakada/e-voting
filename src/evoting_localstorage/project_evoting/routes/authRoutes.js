@@ -23,7 +23,7 @@ function callPythonFunction(functionName, ...params) {
     console.log(`Running: precomputing=1 ${pythonExecutable} ${args.join(' ')}`);
     const pythonProcess = spawnSync(pythonExecutable, args, {
         env: { ...process.env, precomputing: '0' },
-        maxBuffer: 1024 * 1024 * 10
+        maxBuffer: 1024 * 1024 * 1000
     });
 
     if (pythonProcess.error) {
@@ -118,12 +118,11 @@ router.post('/generate', requireAuth, async (req, res) => {
     const outputDirectory = '/output';
 
     try {
+        const result =await callPythonFunction("generate",numBallots,numElections)
         const concurrencyLimit = Math.min(os.cpus().length, 20);
         const electionIds = Array.from({ length: numElections }, (_, i) => i + 1);
-
         await async.eachLimit(electionIds, concurrencyLimit, async (i) => {
             // Generate ballots for this election
-            const result =await callPythonFunction("generate",numBallots,i)
             console.log(`Ballots generated for election ${i}`);
 
             // Find PDFs for this election
@@ -201,87 +200,185 @@ router.post('/generate', requireAuth, async (req, res) => {
 
 
 const BATCH_SIZE = 1000;
-
 router.post('/upload', requireAuth, async (req, res) => {
     try {
-        const votes = req.body.votes; // Access nested votes array
+        const jsonData = req.body;
 
-        for (let i = 0; i < votes.length; i += BATCH_SIZE) {
-            const batch = votes.slice(i, i + BATCH_SIZE);
+        // Process in batches
+        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
+            const batch = jsonData.slice(i, i + BATCH_SIZE);
             
-            const bulkOps = batch.map(doc => {
-                // Convert types to match schema
-                const processedDoc = {
-                    voter_id: doc.voter_id,
-                    election_id: Number(doc.election_id),
-                    booth_num: Number(doc.booth_num),
-                    commitment: doc.commitment,
-                    pref_id: String(doc.pref_id),
-                    hash_value: doc.hash_value,
-                    timestamp: new Date(doc.timestamp)
-                };
+            // Prepare bulk write operations
+            const bulkOps = batch.map(doc => ({
+                updateOne: {
+                    filter: { 
+                        voter_id: doc.voter_id,
+                        election_id: doc.election_id
+                    },
+                    update: {
+                        $setOnInsert: { ...doc, timestamp: new Date(doc.timestamp) }
+                    },
+                    upsert: true,
+                    // Only update if existing document has later timestamp
+                    hint: { voter_id: 1, election_id: 1 }
+                }
+            }));
 
-                return {
-                    updateOne: {
-                        filter: { 
-                            voter_id: processedDoc.voter_id,
-                            election_id: processedDoc.election_id,
-                            $or: [
-                                { timestamp: { $lt: processedDoc.timestamp } },
-                                { timestamp: { $exists: false } }
-                            ]
-                        },
-                        update: { $set: processedDoc },
-                        upsert: true,
-                        hint: { voter_id: 1, election_id: 1 }
-                    }
-                };
-            });
-
+            // Execute bulk write
             const bulkResult = await Bulletin.bulkWrite(bulkOps, {
                 ordered: false,
                 bypassDocumentValidation: true
             });
 
-            // Rest of your existing processing logic...
+            // Process successful inserts
+            const insertedIds = Object.values(bulkResult.upsertedIds || {});
+            if (insertedIds.length > 0) {
+                const insertedDocs = await Bulletin.find({
+                    _id: { $in: insertedIds }
+                });
+
+                // Update receipts for newly inserted documents
+                await Promise.all(insertedDocs.map(async (entry) => {
+                    const { commitment } = entry;
+                    const receipt = await Receipt.findOne({ enc_hash: commitment });
+                    
+                    if (receipt) {
+                        const { ov_hash } = receipt;
+                        const updatedReceipts = await Receipt.updateMany(
+                            { ov_hash },
+                            { accessed: true }
+                        );
+                        console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
+                    }
+                }));
+            }
         }
 
         res.send({ 
             status: 'OK', 
-            message: 'Upload completed with timestamp-based conflict resolution'
+            message: 'Upload process completed with timestamp-based conflict resolution'
         });
+        requestStatus["upload"] = "success";
     } catch (err) {
         console.error(err);
         res.status(500).send({ 
-            status: 'Error',
-            message: 'Processing failed',
+            status: 'Error', 
+            message: 'An error occurred while processing the request.',
             detailedError: err.message
+        });
+        requestStatus["upload"] = "failed";
+    }
+  });
+
+
+// Updated upload route
+router.post('/upload_candidate', requireAuth, async (req, res) => {
+    try {
+        const jsonData = req.body;
+        const BATCH_SIZE = 1000;
+
+        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
+            const batch = jsonData.slice(i, i + BATCH_SIZE);
+            
+            // 1. Insert main candidates
+            await Candidate.insertMany(batch, { ordered: false });
+
+            // 2. Process NOTA candidates for this batch
+            const electionMap = new Map();
+            
+            // Get unique elections and their names
+            batch.forEach(candidate => {
+                if (!electionMap.has(candidate.election_id)) {
+                    electionMap.set(candidate.election_id, {
+                        name: candidate.election_name,
+                        maxId: -1
+                    });
+                }
+            });
+
+            // Get all election IDs from current batch
+            const electionIds = Array.from(electionMap.keys());
+
+            // Find maximum cand_id for each election (existing + new)
+            const aggregation = await Candidate.aggregate([
+                { $match: { election_id: { $in: electionIds } } },
+                {
+                    $addFields: {
+                        numeric_id: { $toInt: "$cand_id" }
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$election_id",
+                        maxId: { $max: "$numeric_id" },
+                        election_name: { $first: "$election_name" }
+                    }
+                }
+            ]);
+
+            // Update electionMap with max IDs from aggregation
+            aggregation.forEach(result => {
+                if (electionMap.has(result._id)) {
+                    electionMap.get(result._id).maxId = result.maxId;
+                }
+            });
+
+            // Check current batch for higher IDs
+            batch.forEach(candidate => {
+                const election = electionMap.get(candidate.election_id);
+                const currentId = parseInt(candidate.cand_id, 10);
+                if (currentId > election.maxId) {
+                    election.maxId = currentId;
+                }
+            });
+
+            // Generate NOTA candidates
+            const notaCandidates = [];
+            for (const [electionId, data] of electionMap) {
+                // Check if NOTA already exists
+                const existingNota = await Candidate.findOne({
+                    election_id: electionId,
+                    name: 'NOTA'
+                });
+
+                if (!existingNota) {
+                    const nextId = data.maxId + 1;
+                    notaCandidates.push({
+                        election_id: electionId,
+                        election_name: data.name,
+                        name: 'NOTA',
+                        cand_id: nextId.toString()
+                    });
+                }
+            }
+
+            // Insert new NOTA candidates
+            if (notaCandidates.length > 0) {
+                await Candidate.insertMany(notaCandidates, { ordered: false });
+            }
+        }
+
+        return res.status(200).send({ 
+            status: 'OK', 
+            message: 'Candidates uploaded successfully with sequential NOTA entries'
+        });
+        
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send({ 
+            status: 'Error', 
+            message: err.code === 11000 
+                ? 'Duplicate candidate detected' 
+                : 'Processing failed'
         });
     }
 });
 
-
-router.post('/upload_candidate', requireAuth, async (req, res) => {
-    try {
-        const jsonData = req.body;
-
-        // Batch insert candidates
-        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
-            const batch = jsonData.slice(i, i + BATCH_SIZE);
-            await Candidate.insertMany(batch);
-        }
-
-        return res.status(200).send({ status: 'OK', message: 'Candidates uploaded successfully' });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
-    }
-});
 
 router.post('/upload_PO', requireAuth, async (req, res) => {
     try {
         const jsonData = req.body;
-
+        const BATCH_SIZE = 1000;
         // Batch insert polling officers
         for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
             const batch = jsonData.slice(i, i + BATCH_SIZE);
@@ -349,55 +446,50 @@ router.get('/bulletin', async (req, res) => {
 
 router.get('/getVotes', async (req, res) => {
     try {
-      // Fetch all Decs documents
       const decs = await Dec.find().lean();
-  
-      // Fetch all candidates
       const candidates = await Candidate.find().lean();
   
-      // Group votes by election_id
-      const groupedVotes = decs.reduce((acc, dec) => {
-        const electionId = dec.election_id;
-  
-        // Ensure the election_id exists in the accumulator
-        if (!acc[electionId]) {
-          acc[electionId] = [];
-        }
-  
-        // Extract vote data from msgs_out_dec
-        if (Array.isArray(dec.msgs_out_dec) && dec.msgs_out_dec.length > 1) {
-          const voteData = dec.msgs_out_dec[1]; // Second element contains the vote data
-          voteData.forEach(item => {
-            if (Array.isArray(item) && item.length >= 2) {
-              acc[electionId].push(item[1]); // Push the candidate index (vote)
-            }
-          });
-        }
-  
+      // Create election ID (string) to name mapping
+      const electionNameMap = candidates.reduce((acc, candidate) => {
+        acc[candidate.election_id.toString()] = candidate.election_name;
         return acc;
       }, {});
   
-      // Process votes for each election
+      // Group votes by election_id (string)
+      const groupedVotes = decs.reduce((acc, dec) => {
+        const electionId = dec.election_id.toString();
+        if (!acc[electionId]) acc[electionId] = [];
+        
+        if (Array.isArray(dec.msgs_out_dec) && dec.msgs_out_dec.length > 1) {
+          dec.msgs_out_dec[1].forEach(item => {
+            if (Array.isArray(item) && item.length >= 2) {
+              acc[electionId].push(item[1]);
+            }
+          });
+        }
+        return acc;
+      }, {});
+  
+      // Prepare response with string keys
       const response = Object.keys(groupedVotes).reduce((acc, electionId) => {
-        // Filter candidates for this election
-        const electionCandidates = candidates.filter(c => c.election_id == electionId);
-  
-        // Initialize a vote counts array based on the number of candidates in this election
+        const electionCandidates = candidates.filter(c => 
+          c.election_id.toString() === electionId
+        );
+        
         const voteCounts = new Array(electionCandidates.length).fill(0);
-  
-        // Increment vote counts based on groupedVotes for this election
         groupedVotes[electionId].forEach(vote => {
-          if (voteCounts[vote] !== undefined) {
-            voteCounts[vote] += 1;
+          if (vote >= 0 && vote < voteCounts.length) {
+            voteCounts[vote]++;
           }
         });
   
-        // Map candidates to their names and vote counts
-        acc[electionId] = electionCandidates.map((candidate, index) => ({
-          name: candidate.name,
-          votes: voteCounts[index]
-        }));
-  
+        acc[electionId] = {
+          election_name: electionNameMap[electionId] || "Unknown Election",
+          candidates: electionCandidates.map((candidate, index) => ({
+            name: candidate.name,
+            votes: voteCounts[index] || 0
+          }))
+        };
         return acc;
       }, {});
   
@@ -407,6 +499,7 @@ router.get('/getVotes', async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   });
+  
   
       
 
@@ -448,7 +541,7 @@ router.post('/signin/Admin', async (req, res) => {
         console.log(token)
         res.send({ token });
     } catch (err) {
-        return res.status(422).json({error:err.message});
+        return res.status(422).send(err.message);
     }
 });
 

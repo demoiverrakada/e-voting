@@ -337,7 +337,7 @@ router.post('/pf_zksm_verf', async (req, res) => {
         return res.send(allElectionResults);
     } catch (err) {
         console.error(err);
-        res.status(500).json({error:err.message});
+        res.status(500).send(err.message);
         requestStatus["decryption_sm"] = "failed"
     }
 });
@@ -390,7 +390,7 @@ router.post('/pf_zkrsm_verf', async (req, res) => {
     
         } catch (err) {
             console.error(err);
-            res.status(500).json({error:err.message});
+            res.status(500).send(err.message);
             requestStatus["decryption_rsm"] = "failed"
         }
 });
@@ -479,45 +479,36 @@ router.post('/audit', async (req, res) => {
         }
     });
 
-    router.post('/vvpat', async (req, res) => {
+router.post('/vvpat', async (req, res) => {
         try {
-            const { bid, electionId } = req.body;
+            const { bid,electionId } = req.body;
+    
+            // Validate input
             if (!bid) {
                 return res.status(400).json({ error: "Ballot id is required." });
             }
     
-            // Use JSON-bigint parser for Python response
-            const JSONbig = require('json-bigint')({ storeAsString: true });
-            
-            // Call Python function
-            const pythonResponse = await callPythonFunction("vvpat", JSONbig.parse(bid)[0], electionId);
-            
-            // Parse with bigint handling
-            const result = JSONbig.parse(pythonResponse);
+            // Call the Python function with the bid
+            const result = await callPythonFunction("vvpat",(JSONbig.parse(bid)[0]),electionId);
     
-            console.log("Parsed result:", result);
-    
+            // Handle the result
             if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
-                requestStatus["vvpatverf"] = "failed";
+                requestStatus["vvpatverf"] = "failed"
                 return res.json({ results: result });
-            } else if (result && typeof result === "object" && result.cand_name && result.extended_vote) {
-                requestStatus["vvpatverf"] = "success";
-                // Return as string to preserve precision
-                return res.json({ 
-                    cand_name: result.cand_name,
-                    extended_vote: result.extended_vote.toString() 
-                });
+            } else if (typeof result === "object" && result.cand_name &&result.extended_vote) {
+                requestStatus["vvpatverf"] = "success"
+                return res.json({ cand_name: result.cand_name ,extended_vote:result.extended_vote});
             } else {
-                requestStatus["vvpatverf"] = "failed";
-                return res.status(500).json({ error: "Unexpected response format" });
+                // Handle unexpected response from Python function
+                requestStatus["vvpatverf"] = "failed"
+                return res.status(500).json({ error: "Unexpected response from verification process." });
             }
         } catch (err) {
-            console.error("VVPAT verification error:", err);
-            requestStatus["vvpatverf"] = "failed";
-            return res.status(500).json({ error: err.message });
+            console.error("Error during VVPAT verification:", err.message);
+            requestStatus["vvpatverf"] = "failed"
+            return res.status(500).json({ error: "Internal server error." });
         }
     });
-    
     
 
 router.post('/runBuild2', async(req, res) => {

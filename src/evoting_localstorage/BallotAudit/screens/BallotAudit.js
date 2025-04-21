@@ -52,7 +52,7 @@ export default function BallotAudit(props) {
         election_id: election_id
       };
 
-      const response = await fetch("http://10.194.27.33:7000/audit", {
+      const response = await fetch("http://10.208.21.185:7000/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -92,8 +92,11 @@ export default function BallotAudit(props) {
     </Card>
   );
 
-  const back = async () => {
-    props.navigation.navigate("scanner");
+  const back = () => {
+    setResults([]);
+    setLoading(false);
+    setAuditCompleted(false);
+    props.navigation.replace("scanner");
   };
 
   return (

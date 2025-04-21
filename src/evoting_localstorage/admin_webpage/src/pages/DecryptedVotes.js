@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import './DecryptedVotes.css';
 import Navigation from '../Navigation';
 import FinalVotes from './FinalVotes';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 function DecryptedVotes() {
   const navigate = useNavigate();
@@ -19,18 +19,35 @@ function DecryptedVotes() {
     }
   }, [navigate]);
 
+  // Helper: Download CSV
+  const downloadCSV = (votesData) => {
+    let csvContent = "Election Name,Candidate Name,Votes\r\n";
+    Object.values(votesData).forEach(election => {
+      (election.candidates || []).forEach(candidate => {
+        // Escape commas in names if needed
+        const electionName = `"${(election.election_name || '').replace(/"/g, '""')}"`;
+        const candidateName = `"${(candidate.name || '').replace(/"/g, '""')}"`;
+        csvContent += `${electionName},${candidateName},${candidate.votes}\r\n`;
+      });
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'election_results.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   const handleDecryptVotes = async () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('access_token');
-      const response = await axios.post(
+      await axios.post(
         'http://localhost:5000/mix',
         {},
-        {
-          headers: { authorization: `Bearer ${token}` }
-        },
+        { headers: { authorization: `Bearer ${token}` } }
       );
-      console.log('Decrypted votes:', response.data);
       alert('Votes decrypted successfully.');
       // Automatically fetch the updated votes
       await handleGetDcrpVotes();
@@ -44,14 +61,24 @@ function DecryptedVotes() {
     setLoading(true);
     try {
       const response = await axios.get('http://localhost:5000/getVotes');
-      const votesData = response.data;
+      const votesData = response.data || {};
       setDecryptedVotes(votesData);
-      setElectionIds(Object.keys(votesData));
-      if (Object.keys(votesData).length > 0) {
-        setSelectedElection(Object.keys(votesData)[0]);
+
+      // Build array of {id, name}
+      const elections = Object.entries(votesData).map(([id, data]) => ({
+        id: id.toString(),
+        name: data.election_name || `Election ${id}`
+      }));
+      setElectionIds(elections);
+
+      if (elections.length > 0) {
+        setSelectedElection(elections[0].id);
+      } else {
+        setSelectedElection('');
       }
       localStorage.setItem("decryptedVotes", JSON.stringify(votesData));
-      console.log("Decrypted votes fetched:", votesData);
+      // Download CSV
+      downloadCSV(votesData);
     } catch (err) {
       console.error("Failed to fetch decrypted votes:", err);
       alert(`Failed to fetch decrypted votes: ${err.message}`);
@@ -63,6 +90,9 @@ function DecryptedVotes() {
   const handleElectionChange = (event) => {
     setSelectedElection(event.target.value);
   };
+
+  // Get the currently selected election's data safely
+  const selectedElectionData = decryptedVotes[selectedElection] || {};
 
   return (
     <div className="decrypted-container">
@@ -77,7 +107,7 @@ function DecryptedVotes() {
         ) : (
           <>
             <button onClick={handleDecryptVotes}>Decrypt Votes</button>
-            <button onClick={handleGetDcrpVotes}>Fetch Decrypted Votes</button>
+            <button onClick={handleGetDcrpVotes}>Fetch Decrypted Votes (Download CSV)</button>
           </>
         )}
       </div>
@@ -90,34 +120,36 @@ function DecryptedVotes() {
             value={selectedElection} 
             onChange={handleElectionChange}
           >
-            {electionIds.map((id) => (
-              <option key={id} value={id}>Election {id}</option>
+            {electionIds.map((election) => (
+              <option key={election.id} value={election.id}>{election.name}</option>
             ))}
           </select>
         </div>
       )}
 
-{selectedElection && decryptedVotes[selectedElection] && (
-  <div className="votes-table-wrapper">
-    <h3 className="table-header">Election Results</h3>
-    <table className="votes-table">
-      <thead>
-        <tr>
-          <th>Candidate Name</th>
-          <th>Vote Count</th>
-        </tr>
-      </thead>
-      <tbody>
-        {decryptedVotes[selectedElection].map((vote, index) => (
-          <tr key={index}>
-            <td>{vote.name}</td>
-            <td>{vote.votes}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+      {selectedElection && selectedElectionData && Array.isArray(selectedElectionData.candidates) && (
+        <div className="votes-table-wrapper">
+          <h3 className="table-header">
+            {selectedElectionData.election_name || `Election ${selectedElection}`} Results
+          </h3>
+          <table className="votes-table">
+            <thead>
+              <tr>
+                <th>Candidate Name</th>
+                <th>Vote Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedElectionData.candidates.map((vote, index) => (
+                <tr key={`${selectedElection}-${index}`}>
+                  <td>{vote.name}</td>
+                  <td>{vote.votes}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <Routes>
         <Route path="/final_votes" element={<FinalVotes />} />
@@ -129,3 +161,5 @@ function DecryptedVotes() {
 }
 
 export default DecryptedVotes;
+
+

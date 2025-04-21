@@ -21,7 +21,16 @@ from misc import serialize_wrapper, deserialize_wrapper,pprint
 from bbsig import bbbatchverify
 import pymongo
 from multiprocessing import Pool
+import traceback
+import logging
+from multiprocessing import cpu_count
+from concurrent.futures import ProcessPoolExecutor
+import subprocess
+import os
+import multiprocessing
 
+# Set spawn method for Docker compatibility
+# multiprocessing.set_start_method('spawn')
 
 #g = group.init(ZR, 5564993445756101503206304700110936918638328897597942591925129910965597995003)
 #h = group.init(ZR, 12653160894039224234691306368807880269056474991426613178779481321437840969124)
@@ -74,11 +83,6 @@ def setup(alpha,election_id):
         
         store("setup",[alpha, pai_pk, _pai_sklist, pai_pklist_single, _pai_sklist_single, elg_pk, _elg_sklist,election_id])
     print("Setup was done successful")
-
-def generate_ballots(num,numElections):
-
-    ballot_draft(num,numElections)
-
 
 
 def mixer():
@@ -220,6 +224,143 @@ def pf_zkrsm(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands,election_id):
         dpk_bbsplussig_pfs = dpk_bbsplussig_nizkproofs(mix_data["msgs_out"],blsigs_S,blsigs_c,blsigs_r,verfpk,setup_data["alpha"],_blshares_S,_blshares_c,_blshares_r,election_id)
     result= [str(serialize_wrapper(dpk_bbsplussig_pfs)),str(serialize_wrapper(blsigs_rev))]  
     print(json.dumps(result))
+
+
+# Configure logging to track errors
+logging.basicConfig(
+    filename='election_errors.log',
+    level=logging.ERROR,
+    format='%(asctime)s - %(message)s'
+)
+
+# def ballot_draft(num_ballots, election_id):
+#     try:
+#         output_dir = f"/output/election_{election_id}"
+#         os.makedirs(output_dir, exist_ok=True)  # Ensure directory exists
+        
+#         # Generate ballots in parallel within each election
+#         with Pool(processes=8) as inner_pool:
+#             args = [(i+1, election_id) for i in range(num_ballots)]
+#             inner_pool.starmap(create_single_ballot, args)
+            
+#         return True
+#     except Exception as e:
+#         logging.error(f"Election {election_id} failed: {str(e)}\n{traceback.format_exc()}")
+#         return False
+
+# def create_single_ballot(ballot_num, election_id):
+#     try:
+#         # Your existing ballot creation logic here
+#         pdf_path = f"/output/election_{election_id}/ballot_{ballot_num}.pdf"
+#         # ... (PDF generation code) ...
+#         if not os.path.exists(pdf_path):
+#             raise FileNotFoundError(f"Failed to generate {pdf_path}")
+#     except Exception as e:
+#         logging.error(f"Ballot {ballot_num} in election {election_id} failed: {str(e)}")
+#         raise
+
+def generate_ballots(num, numElections):
+    # Get the directory of THIS script (api.py)
+    f = io.StringIO()
+    with contextlib.redirect_stdout(f):
+        # for eid in range(1, numElections+1):
+        #     ballot_draft(num, eid)
+        # def process_batch(batch):
+        #     processes = []
+        #     for eid in batch:
+        #         p = multiprocessing.Process(target=ballot_draft, args=(num, eid))
+        #         processes.append(p)
+        #         p.start()
+        #     for p in processes:
+        #         p.join()
+
+        for i in range(1, numElections+1):
+            ballot_draft(num, i)
+        # election_ids = list(range(1, numElections + 1))
+        # for i in range(1, numElections+1, 4):
+        #     # processes = []
+        #     p1 = multiprocessing.Process(target=ballot_draft, args=(num, i))
+        #     p2 = multiprocessing.Process(target=ballot_draft, args=(num, i+1))
+        #     p3 = multiprocessing.Process(target=ballot_draft, args=(num, i+2))
+        #     p4 = multiprocessing.Process(target=ballot_draft, args=(num, i+3))
+        #     p1.start()
+        #     p2.start()
+        #     p3.start()
+        #     p4.start()
+        #     p1.join()
+        #     p2.join()
+        #     p3.join()
+        #     p4.join()
+            # for eid in range(i, m+1):
+            #     p = multiprocessing.Process(target=ballot_draft, args=(num, eid))
+            #     p.start()
+            #     processes.append(p)
+            # for p in processes:
+            #     p.join()
+        # Process in batches with automatic boundary checking
+        # for start_idx in range(0, len(election_ids), batch_size):
+        #     end_idx = min(start_idx + batch_size, len(election_ids))
+        #     current_batch = election_ids[start_idx:end_idx]
+        #     process_batch(current_batch)
+    print("all elections processed")
+    # p1 = multiprocessing.Process(target=ballot_draft, args=(num, 1))
+    # p2 = multiprocessing.Process(target=ballot_draft, args=(num, 2))
+    # p1.start()
+    # p2.start()
+
+    # p1.join()
+    # p2.join()
+    # script_dir = os.path.dirname(os.path.abspath(__file__))
+    # ballot_draft_path = os.path.join(script_dir, "ballot_draft.py")
+    # p = subprocess.Popen(
+    #             ["python3", ballot_draft_path, str(num), str(1)],
+    #             cwd=script_dir  # Critical for relative imports
+    #         )
+    # p = subprocess.Popen(
+    #             ["python3", ballot_draft_path, str(num), str(2)],
+    #             cwd=script_dir  # Critical for relative imports
+            # )
+    # batch_size = 7
+    # for i in range(1, numElections + 1, batch_size):
+    #     processes = []
+    #     # Process IDs for this batch (e.g., 1-7, 8-14, etc.)
+    #     batch = range(i, min(i + batch_size, numElections + 1))
+        
+    #     for eid in batch:
+    #         # Full path to ballot_draft.py in the same directory
+    #         ballot_draft_path = os.path.join(script_dir, "ballot_draft.py")
+    #         print(ballot_draft_path)
+    #         # Start subprocess
+    #         p = subprocess.Popen(
+    #             ["python3", ballot_draft_path, str(num), str(eid)],
+    #             cwd=script_dir  # Critical for relative imports
+    #         )
+    #         processes.append(p)
+        
+    #     # Wait for current batch to finish
+    #     for p in processes:
+    #         p.wait()
+    # try:
+    #     with Pool(processes=8) as pool:
+    #         # Create 70 election IDs (1-70)
+    #         # election_ids = range(1, num_elections + 1)
+            
+    #         # Process elections in parallel using 8 cores
+    #         print(f"num_ballots={num_ballots}, num_elections={num_elections}")
+    #         pool.starmap(ballot_draft, [(num_ballots, eid) for eid in range(1, num_elections + 1)])
+    #     # with Pool(processes=8) as outer_pool:  # Prevent overloading
+    #     #     results = outer_pool.starmap(
+    #     #         ballot_draft,
+    #     #         [(num_ballots, eid) for eid in range(1, num_elections+1)]
+    #     #     )
+            
+    #     # failed = [eid+1 for eid, status in enumerate(results) if not status]
+    #     # if failed:
+    #     #     raise RuntimeError(f"Failed elections: {failed}")
+            
+    # except Exception as e:
+    #     logging.critical(f"Global failure: {str(e)}")
+    #     raise
 
 
 

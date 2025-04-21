@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 export default function Scanner(props) {
   const commitments = props.route.params.commitments;
   const [lastScannedData, setLastScannedData] = useState(null);
+  const scannerRef = useRef(null);
 
-  const checkSend = async (qrcodedata, scannerRef) => {
+  const checkSend = async (qrcodedata) => {
     try {
-      console.log(qrcodedata);
-      console.log("Successfully submitted ballot_id login");
       Alert.alert(
         "Ballot ID successfully identified",
         "Do you want to proceed or rescan?",
@@ -18,22 +17,20 @@ export default function Scanner(props) {
             text: 'Rescan',
             onPress: () => {
               setLastScannedData(null);
-              setTimeout(() => scannerRef?.reactivate(), 500); // Reactivate scanner after a short delay
+              setTimeout(() => scannerRef.current?.reactivate(), 1000); // Changed to 1 second
             },
           },
           {
             text: 'Proceed',
-            onPress: () =>
-              props.navigation.navigate("elect", {
-                commitments: commitments,
-                bid: qrcodedata,
-              }),
+            onPress: () => props.navigation.navigate("elect", {
+              commitments: commitments,
+              bid: qrcodedata,
+            }),
           },
         ],
         { cancelable: false }
       );
     } catch (err) {
-      console.log("Some problem in posting", err);
       Alert.alert(
         'Data Upload unsuccessful, try again',
         [{ text: 'OK' }],
@@ -43,43 +40,22 @@ export default function Scanner(props) {
     }
   };
 
-  const isValidQRCode = (data) => {
-    return data !== undefined && data !== null;
-  };
-
-  let scannerRef = null; // Reference to QRCodeScanner
-
   return (
     <View style={styles.container}>
-      {/* Instruction Header */}
       <Text style={styles.headerText}>
         Scan Ballot ID on the VVPAT side of the Ballot
       </Text>
 
-      {/* QR Code Scanner */}
       <QRCodeScanner
-        ref={(node) => {
-          scannerRef = node; // Assign reference to scanner
-        }}
-        onRead={async ({ data }) => {
-          if (isValidQRCode(data)) {
+        ref={scannerRef}
+        onRead={({ data }) => {
+          if (data) {
             setLastScannedData(data);
-            await checkSend(data, scannerRef);
-            console.log('Valid QR code detected:', data);
-          } else {
-            console.log('Invalid QR code detected:', data);
-            Alert.alert(
-              'Invalid QR Code',
-              'Please scan a valid QR code.',
-              [{ text: 'OK' }],
-              { cancelable: false }
-            );
-            setTimeout(() => scannerRef?.reactivate(), 500); // Reactivate scanner for invalid QR codes after a short delay
+            checkSend(data);
           }
         }}
         showMarker={true}
         markerStyle={styles.marker}
-        cameraStyle={styles.camera} // Added camera styling for better display
       />
     </View>
   );

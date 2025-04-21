@@ -70,3 +70,5 @@ RUN ln -s /root/.nvm/versions/node/v22.3.0/bin/node /usr/bin/node && \
 # Fix permissions
 RUN chmod -R 755 /app/evoting_localstorage/demo/node_modules/.bin/ && \
     find /app/evoting_localstorage/demo/node_modules/.bin/ -type f -exec chmod +x {} \;
+
+

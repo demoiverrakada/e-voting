@@ -21,6 +21,8 @@ from misc import serialize_wrapper, deserialize_wrapper
 import sys
 from db import load,store
 import zipfile
+import logging
+from time import sleep
 #import pyqrcode
 #from pyzbar.pyzbar import decode
 
@@ -95,7 +97,7 @@ def generate_qr_code(data, filename):
     img.save(filename)
 
 
-def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk,election_id):
+def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk,election_id,election_name):
     # Call the functions to add content to both halves
     gamma_booth = G2_part1(election_id)
     print(gamma_booth)
@@ -143,21 +145,24 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
 
     # Headings
     election_text = f"Election ID: {election_id}"
+    election_name_text=f"Election Name: {election_name}"
     # Left side (VVPAT side)
     election_id_x_left = int(0.2 * bw)  # Position near the start of the VVPAT side
     election_id_y = int(0.03 * bh)  # Slightly below the top margin
     draw.text((election_id_x_left, election_id_y), election_text, font=subtitlefont, fill='black')
+    draw.text((election_id_x_left, election_id_y + 40), election_name_text, font=subtitlefont, fill='black')
 
     # Right side (Receipt side)
     election_id_x_right = center_x + int(0.2 * bw)  # Position near the start of the Receipt side
     draw.text((election_id_x_right, election_id_y), election_text, font=subtitlefont, fill='black')
-    draw.text((int(0.2 * bh), 0.07 * bh), "VVPAT side", font=titlefont, fill='black')
-    draw.text((int(0.2 * bh), 0.07 * bh + 100), "(Drop into the ballot box)", font=subtitlefont, fill='black')
-    draw.text((int(0.2 * bh), 0.07 * bh + 140), "Mark your choice on BOTH sides", font=smallfont, fill='black')
+    draw.text((election_id_x_right, election_id_y + 40), election_name_text, font=subtitlefont, fill='black')
+    draw.text((int(0.2 * bh), 0.08 * bh), "VVPAT side", font=titlefont, fill='black')
+    draw.text((int(0.2 * bh), 0.08 * bh + 100), "(Drop into the ballot box)", font=subtitlefont, fill='black')
+    draw.text((int(0.2 * bh), 0.08 * bh + 150), "Mark your choice on BOTH sides", font=smallfont, fill='black')
 
-    draw.text((center_x + int(0.2 * bh), 0.07 * bh), "Receipt side", font=titlefont, fill='black')
-    draw.text((center_x + int(0.2 * bh), 0.07 * bh + 100), "(Bring back for scanning)", font=subtitlefont, fill='black')
-    draw.text((center_x + int(0.2 * bh), 0.07 * bh + 140), "Take this side with you", font=smallfont, fill='black')
+    draw.text((center_x + int(0.2 * bh), 0.08 * bh), "Receipt side", font=titlefont, fill='black')
+    draw.text((center_x + int(0.2 * bh), 0.08 * bh + 100), "(Bring back for scanning)", font=subtitlefont, fill='black')
+    draw.text((center_x + int(0.2 * bh), 0.08 * bh + 150), "Take this side with you", font=smallfont, fill='black')
 
     # QR code containing encrypted votes
     qr_code2 = "qr_updated.png"
@@ -494,40 +499,59 @@ def load2(election_id):
     return result
 
 def ballot_draft(num,election_id):
-    num_ballots = num
+    # Initialize process-specific logging
+    logger = logging.getLogger(f"Election_{election_id}")
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler(f"election_{election_id}.log")
+    logger.addHandler(handler)
+    try:
+        logger.info(f"Starting ballot generation for Election {election_id}")
+        ballots_generated = 0
+        num_ballots = num
 
-    db=init()
-    collect=db['candidates']
-    # Get the candidate names
-    candidates = []
-    documents=collect.find({"election_id":election_id})
-    for document in documents:
-        candidates.append(document["name"])    
-    #pai_sklist, pai_pk_optthpaillier = optthpaillier.pai_th_keygen(len(candidates))
-    #pai_sk, pai_pk = optpaillier.pai_keygen()
-    # Connect to MongoDB
-    m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2(election_id).values()
-    
-    #print("a")
-    #print(m)
-    #print("b")
-    #print(pai_pk)
-    #print("c")
-    #print(pai_sk)
-    #m = 2
-    #print(m)
-    #print(pai_sklist)
-    collection = connect_to_mongodb()
-    pdf_files=[]
-    output_dir="/output"
-    for i in range(num_ballots):
-        pdf_filename = f"election_id_{election_id}_ballot_{i+1}.pdf"
-        pdf_path = os.path.join(output_dir, pdf_filename)
-        create_pdf(m, collection, pdf_path, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk, election_id)
-        if os.path.exists("/output/"+f"election_id_{election_id}_ballot_{i+1}.pdf"):
-            pdf_files.append(pdf_path)
-            print(f"PDF {pdf_filename} created successfully!")
+        db=init()
+        collect=db['candidates']
+        # Get the candidate names
+        candidates = []
+        election_name = "Unknown Election"
+        documents = collect.find({"election_id": election_id})
+        for document in documents:
+            candidates.append(document["name"])
+            if election_name == "Unknown Election":
+                election_name = document["election_name"]   
+        #pai_sklist, pai_pk_optthpaillier = optthpaillier.pai_th_keygen(len(candidates))
+        #pai_sk, pai_pk = optpaillier.pai_keygen()
+        # Connect to MongoDB
+        m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2(election_id).values()
+        
+        #print("a")
+        #print(m)
+        #print("b")
+        #print(pai_pk)
+        #print("c")
+        #print(pai_sk)
+        #m = 2
+        #print(m)
+        #print(pai_sklist)
+        collection = connect_to_mongodb()
+        pdf_files=[]
+        output_dir="/output"
+        for i in range(num_ballots):
+            pdf_filename = f"election_id_{election_id}_ballot_{i+1}.pdf"
+            pdf_path = os.path.join(output_dir, pdf_filename)
+            create_pdf(m, collection, pdf_path, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk, election_id,election_name)
+            if os.path.exists("/output/"+f"election_id_{election_id}_ballot_{i+1}.pdf"):
+                pdf_files.append(pdf_path)
+                print(f"PDF {pdf_filename} created successfully!")
+            sleep(0.01)  # Simulate work
+            ballots_generated += 1
+        logger.info(f"Success: {ballots_generated}/{num} ballots for Election {election_id}")
 
+    except Exception as e:
+        logger.error(f"Failed: {str(e)}")
+    finally:
+        handler.close()
+        logger.removeHandler(handler)
 
     # Prepare arguments for threading
     #args_list = [(i, m, collection, f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk) for i in range(num_ballots)]
@@ -536,3 +560,12 @@ def ballot_draft(num,election_id):
     #with concurrent.futures.ThreadPoolExecutor() as executor:
     #    executor.map(create_pdf_worker, args_list)
 
+# if __name__ == "__main__":
+#     import sys
+#     try:
+#         num = int(sys.argv[1])
+#         election_id = int(sys.argv[2])
+#         ballot_draft(num, election_id)
+#     except (IndexError, ValueError):
+#         print("Usage: python ballot_draft.py <num> <electionId>")
+#         sys.exit(1)

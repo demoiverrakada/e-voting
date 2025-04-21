@@ -1,3 +1,4 @@
+
 services:
   ea-server:
     build: .
@@ -10,6 +11,10 @@ services:
     volumes:
     - ./output:/output
     - /app/evoting_localstorage/project_evoting/node_modules
+    cpu_count: 8  # Explicit core allocation
+    cpus: 8.0     # Alternative: 8.0 = 8 cores (100% per core)
+    cpu_shares: 1024  # Default priority
+    mem_limit: 32G
   
   ea-db:
     image: mongo:latest
@@ -51,7 +56,7 @@ services:
       command: /root/.nvm/versions/node/v22.3.0/bin/npm start
       ports:
         - "7001:3000" 
-
+        
   demo:
     build: .
     working_dir: /app/evoting_localstorage/demo
