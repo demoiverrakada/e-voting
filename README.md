@@ -21,33 +21,12 @@ An E2E Verifiable voting system based on [OpenVoting: Recoverability from Failur
     cd e-voting
     ```
 
-2. **Find the IP address of your local machine**:
-    - **Linux**:
-      ```bash
-      ifconfig
-      ```
-    - **Windows**:
-      ```bash
-      ipconfig
-      ```
-
-3. **Update the IP address** in the following files:
-    - **BallotAudit**:
-        - [src/evoting_localstorage/BallotAudit/screens/BallotAudit.js](#)
-        - [src/evoting_localstorage/BallotAudit/android/app/src/main/res/xml/network_security_config.xml](#)
-    - **VoterVerification**:
-        - [src/evoting_localstorage/VoterVerification/screens/ScanPref.js](#)
-        - [src/evoting_localstorage/VoterVerification/android/app/src/main/res/xml/network_security_config.xml](#)
-    - **VVPATverification**:
-        - [src/evoting_localstorage/VVPATverification/screens/VVPATverify.js](#)
-        - [src/evoting_localstorage/VVPATverification/android/app/src/main/res/xml/network_security_config.xml](#)
-
-4. **Build the system** (recommended to use an HPC or cloud shell to run this command):
+2. **Build the system** (recommended to use an HPC or cloud shell to run this command):
     ```bash
     docker-compose build
     ```
 
-5. **Run the election system**:
+3. **Run the election system**:
     ```bash
     docker-compose up
     ```
