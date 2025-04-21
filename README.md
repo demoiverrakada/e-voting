@@ -66,6 +66,13 @@ Once the system is up and running, you can access the following services:
 - **Verification Webpage**: Access the verification webpage at [http://localhost:7001](http://localhost:7001).
 - **Public Bulletin Board**: Access the public bulletin board at [http://localhost:5001](http://localhost:5001).
 
+## 📹 Video Tutorials
+
+- [Admin Functionality Demo](https://youtu.be/P9ToASLbzZY)
+- [Understanding the Dual Voting System](https://youtu.be/L27QxlRhvZg)
+- [Polling Officer and Voter Demo](https://youtu.be/QfPLc7e9b-g)
+- [Ballot Audit Demo](https://youtube.com/watch/HkftKxaBcEI?feature=share)
+
 ## Features
 - Secure voting system with encryption.
 - Voter identity verification and authentication.
