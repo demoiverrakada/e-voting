@@ -1,5 +1,20 @@
 
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-ev
+    ports:
+      - "80:80"
+    depends_on:
+      - admin-webpage
+      - ea-server
+      - verif-server
+      - bulletin
+      - verification-webpage
+      - demo
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
   ea-server:
     build: .
     working_dir: /app/evoting_localstorage/project_evoting

@@ -202,46 +202,63 @@ router.post('/generate', requireAuth, async (req, res) => {
 const BATCH_SIZE = 1000;
 router.post('/upload', requireAuth, async (req, res) => {
     try {
-        const jsonData = req.body;
+        // 1. Validate and extract 'votes' array from payload
+        const { votes } = req.body;
+        if (!Array.isArray(votes) || votes.length === 0) {
+            return res.status(400).json({
+                status: 'Error',
+                message: "Payload must contain a non-empty 'votes' array."
+            });
+        }
 
-        // Process in batches
-        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
-            const batch = jsonData.slice(i, i + BATCH_SIZE);
-            
-            // Prepare bulk write operations
+        let totalInserted = 0;
+        let totalMatched = 0;
+        let totalModified = 0;
+
+        // 2. Process in batches
+        for (let i = 0; i < votes.length; i += BATCH_SIZE) {
+            const batch = votes.slice(i, i + BATCH_SIZE);
+
+            // 3. Prepare bulk write operations
             const bulkOps = batch.map(doc => ({
                 updateOne: {
-                    filter: { 
+                    filter: {
                         voter_id: doc.voter_id,
                         election_id: doc.election_id
                     },
                     update: {
-                        $setOnInsert: { ...doc, timestamp: new Date(doc.timestamp) }
+                        $setOnInsert: {
+                            ...doc,
+                            timestamp: new Date(doc.timestamp)
+                        }
                     },
                     upsert: true,
-                    // Only update if existing document has later timestamp
                     hint: { voter_id: 1, election_id: 1 }
                 }
             }));
 
-            // Execute bulk write
+            // 4. Execute bulk write
             const bulkResult = await Bulletin.bulkWrite(bulkOps, {
                 ordered: false,
                 bypassDocumentValidation: true
             });
 
-            // Process successful inserts
+            totalInserted += bulkResult.upsertedCount || 0;
+            totalMatched += bulkResult.matchedCount || 0;
+            totalModified += bulkResult.modifiedCount || 0;
+
+            // 5. Process successful inserts (if any)
             const insertedIds = Object.values(bulkResult.upsertedIds || {});
             if (insertedIds.length > 0) {
                 const insertedDocs = await Bulletin.find({
                     _id: { $in: insertedIds }
                 });
 
-                // Update receipts for newly inserted documents
+                // 6. Update receipts for newly inserted documents
                 await Promise.all(insertedDocs.map(async (entry) => {
                     const { commitment } = entry;
                     const receipt = await Receipt.findOne({ enc_hash: commitment });
-                    
+
                     if (receipt) {
                         const { ov_hash } = receipt;
                         const updatedReceipts = await Receipt.updateMany(
@@ -254,22 +271,26 @@ router.post('/upload', requireAuth, async (req, res) => {
             }
         }
 
-        res.send({ 
-            status: 'OK', 
-            message: 'Upload process completed with timestamp-based conflict resolution'
+        res.send({
+            status: 'OK',
+            message: 'Upload process completed with timestamp-based conflict resolution.',
+            insertedCount: totalInserted,
+            matchedCount: totalMatched,
+            modifiedCount: totalModified
         });
         requestStatus["upload"] = "success";
     } catch (err) {
         console.error(err);
-        res.status(500).send({ 
-            status: 'Error', 
+        res.status(500).send({
+            status: 'Error',
             message: 'An error occurred while processing the request.',
             detailedError: err.message
         });
         requestStatus["upload"] = "failed";
     }
-  });
+});
 
+module.exports = router;
 
 // Updated upload route
 router.post('/upload_candidate', requireAuth, async (req, res) => {

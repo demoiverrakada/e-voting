@@ -38,7 +38,7 @@ function UploadDefault() {
         const jsonData = JSON.parse(e.target.result);
         const token = sessionStorage.getItem('access_token');
 
-        const response = await axios.post('http://localhost:5000/upload', jsonData, {
+        const response = await axios.post('/api/upload', jsonData, {
           headers: {
             authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

@@ -44,7 +44,7 @@ function DecryptedVotes() {
     try {
       const token = sessionStorage.getItem('access_token');
       await axios.post(
-        'http://localhost:5000/mix',
+        '/api/mix',
         {},
         { headers: { authorization: `Bearer ${token}` } }
       );
@@ -60,7 +60,7 @@ function DecryptedVotes() {
   const handleGetDcrpVotes = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/getVotes');
+      const response = await axios.get('/api/getVotes');
       const votesData = response.data || {};
       setDecryptedVotes(votesData);
 

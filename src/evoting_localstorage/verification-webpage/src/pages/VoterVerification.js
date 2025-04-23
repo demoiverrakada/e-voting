@@ -18,7 +18,7 @@ function VoterVerificationApp() {
     try {
       const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
-        'http://localhost:7000/runBuild3',
+        '/verif/api/runBuild3',
         {},
         {
           headers: { authorization: `Bearer ${token}` },

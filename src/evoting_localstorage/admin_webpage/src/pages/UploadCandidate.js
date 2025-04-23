@@ -39,7 +39,7 @@ function UploadCandidate() {
         console.log(jsonData)
         const token = sessionStorage.getItem('access_token');
 
-        const response = await axios.post('http://localhost:5000/upload_candidate', jsonData, {
+        const response = await axios.post('/api/upload_candidate', jsonData, {
           headers: {
             authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

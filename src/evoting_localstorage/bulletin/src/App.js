@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/bulletin")
+      .get("/api/bulletin")
       .then((response) => {
         // Sort the users array by election_id
         const sortedUsers = response.data.sort((a, b) => a.election_id - b.election_id);

@@ -142,9 +142,8 @@ const extractVotesToExternalStorage = async () => {
       try {
         // First try Downloads directory (with unique filename)
         const downloadsDir = RNFS.DownloadDirectoryPath;
-        destPath = await getUniqueFilename(downloadsDir, 'updated_data', '.json');
-        
-        // Write to Downloads directory
+        destPath = `${downloadsDir}/updated_data.json`; // Overwrite the file every time
+
         await RNFS.writeFile(destPath, JSON.stringify(finalUpdatedVotesData), 'utf8');
         console.log(`File saved successfully to: ${destPath}`);
         Alert.alert('Success', `File saved to Downloads: ${destPath.split('/').pop()}`);

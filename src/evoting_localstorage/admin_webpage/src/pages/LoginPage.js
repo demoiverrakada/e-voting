@@ -15,7 +15,7 @@ function LoginPage() {
     }),
     onSubmit: async (values) => {
       try {
-        const res = await axios.post('http://localhost:5000/signin/admin', values);
+        const res = await axios.post('/api/signin/admin', values);
         sessionStorage.setItem('access_token', res.data.token);
         navigate('/options');
       } catch (err) {

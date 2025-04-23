@@ -21,12 +21,33 @@ An E2E Verifiable voting system based on [OpenVoting: Recoverability from Failur
     cd e-voting
     ```
 
-2. **Build the system** (recommended to use an HPC or cloud shell to run this command):
+2. **Find the IP address of your local machine**:
+    - **Linux**:
+      ```bash
+      ifconfig
+      ```
+    - **Windows**:
+      ```bash
+      ipconfig
+      ```
+
+3. **Update the IP address** in the following files:
+    - **BallotAudit**:
+        - [src/evoting_localstorage/BallotAudit/screens/BallotAudit.js](#)
+        - [src/evoting_localstorage/BallotAudit/android/app/src/main/res/xml/network_security_config.xml](#)
+    - **VoterVerification**:
+        - [src/evoting_localstorage/VoterVerification/screens/ScanPref.js](#)
+        - [src/evoting_localstorage/VoterVerification/android/app/src/main/res/xml/network_security_config.xml](#)
+    - **VVPATverification**:
+        - [src/evoting_localstorage/VVPATverification/screens/VVPATverify.js](#)
+        - [src/evoting_localstorage/VVPATverification/android/app/src/main/res/xml/network_security_config.xml](#)
+
+4. **Build the system** (recommended to use an HPC or cloud shell to run this command):
     ```bash
     docker-compose build
     ```
 
-3. **Run the election system**:
+5. **Run the election system**:
     ```bash
     docker-compose up
     ```
@@ -44,13 +65,6 @@ Once the system is up and running, you can access the following services:
 - **Admin Webpage**: Access the admin webpage at [http://localhost:3000](http://localhost:3000).
 - **Verification Webpage**: Access the verification webpage at [http://localhost:7001](http://localhost:7001).
 - **Public Bulletin Board**: Access the public bulletin board at [http://localhost:5001](http://localhost:5001).
-
-## 📹 Video Tutorials
-
-- [Admin Functionality Demo](https://youtu.be/P9ToASLbzZY)
-- [Understanding the Dual Voting System](https://youtu.be/L27QxlRhvZg)
-- [Polling Officer and Voter Demo](https://youtu.be/QfPLc7e9b-g)
-- [Ballot Audit Demo](https://youtube.com/watch/HkftKxaBcEI?feature=share)
 
 ## Features
 - Secure voting system with encryption.

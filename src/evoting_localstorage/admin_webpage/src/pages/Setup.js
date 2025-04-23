@@ -27,7 +27,7 @@ function Setup() {
     try {
       const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
-        'http://localhost:5000/setup',
+        '/api/setup',
         { alpha, electionId }, // Include both alpha and election_id
         {
           headers: {

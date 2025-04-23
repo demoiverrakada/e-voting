@@ -24,7 +24,7 @@ function EvotingApp() {
     try {
       const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
-        'http://localhost:5000/runBuild1',
+        '/api/runBuild1',
         {},
         {
           headers: { authorization: `Bearer ${token}` },

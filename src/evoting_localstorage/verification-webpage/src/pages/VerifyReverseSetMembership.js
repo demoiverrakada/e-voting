@@ -16,7 +16,7 @@ const VerifyReverseSetMembership = () => {
     setResults(null);  // Reset to plural
 
     try {
-      const response = await axios.post("http://localhost:7000/pf_zkrsm_verf", {}, {
+      const response = await axios.post("/verif/api/pf_zkrsm_verf", {}, {
         headers: { "Content-Type": "application/json" },
       });
 

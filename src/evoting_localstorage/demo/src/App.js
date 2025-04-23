@@ -38,8 +38,8 @@ const Dashboard = () => {
     const fetchStatus = async () => {
       try {
         const [res5000, res7000] = await Promise.all([
-          axios.get('http://localhost:5000/status'),
-          axios.get('http://localhost:7000/status'),
+          axios.get('/api/status'),
+          axios.get('/verif/api/status'),
         ]);
 
         setStatus5000(res5000.data);

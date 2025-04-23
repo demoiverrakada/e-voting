@@ -93,7 +93,7 @@ const VerifyVVPAT = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:7000/vvpat",
+        "/verif/api/vvpat",
         { bid, electionId },
         { headers: { "Content-Type": "application/json" } }
       );
