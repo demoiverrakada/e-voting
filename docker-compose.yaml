@@ -35,9 +35,8 @@ services:
     image: mongo:latest
     hostname: eadb
     environment:
-      - MONGO_INITDB_DATABASE=EA_DB
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=pass
+    - MONGO_INITDB_ROOT_USERNAME=root
+    - MONGO_INITDB_ROOT_PASSWORD=pass
     ports:
       - 27017:27017
   

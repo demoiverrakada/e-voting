@@ -8,7 +8,7 @@ const readFilePath = `${RNFS.DocumentDirectoryPath}/data.json`;
 
 const postVote = async (preference, commitments, booth_num, election_id) => {
   try {
-    Alert.alert('Booth Number', `The booth number is: ${booth_num}`);
+    //Alert.alert('Booth Number', `The booth number is: ${booth_num}`);
     const timestamp = new Date().toISOString(); // Generate timestamp
 
     const fileContents = await RNFS.readFile(readFilePath, 'utf8');

@@ -1,10 +1,19 @@
+<<<<<<< HEAD
+import React, { useState, useRef } from 'react';
+=======
 import React, { useState } from 'react';
+>>>>>>> 8b5c03011b5d6d989dbffc491af37e58aeecaf89
 import { View, Text, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import checkReceipt2 from '../func/checkReceipt2.js';
 
 export default function Scanner(props) {
   const [scannedData, setScannedData] = useState(null);
+<<<<<<< HEAD
+  const [isLoading, setIsLoading] = useState(false);
+  const scannerRef = useRef(null);
+
+=======
   const [showScanner, setShowScanner] = useState(false); // Start with scanner hidden
   const [isLoading, setIsLoading] = useState(true); // Initial loading state
   const [isInitialized, setIsInitialized] = useState(false);
@@ -18,6 +27,7 @@ export default function Scanner(props) {
 
     return () => clearTimeout(initTimeout);
   }, []);
+>>>>>>> 8b5c03011b5d6d989dbffc491af37e58aeecaf89
   const checkSend = async (qrcodedata) => {
     try {
       const { voter_id, election_id, remainingElections, currentIndex } = props.route.params;
@@ -67,68 +77,56 @@ export default function Scanner(props) {
   };
 
   const handleScan = (data) => {
-    if (!isInitialized) return; // Prevent immediate scanning
-    
-    setShowScanner(false);
     setScannedData(data);
+    
+    Alert.alert(
+      'Confirm Scan',
+      'Is this scan correct?',
+      [
+        {
+          text: 'Rescan',
+          onPress: () => {
+            setScannedData(null);
+            setIsLoading(true);
 
-    // Add scan confirmation delay
-    setTimeout(() => {
-      Alert.alert(
-        'Confirm Scan',
-        'Is this scan correct?',
-        [
-          {
-            text: 'Rescan',
-            onPress: () => {
-              setScannedData(null);
-              setIsLoading(true);
-              setTimeout(() => {
-                setIsLoading(false);
-                setShowScanner(true);
-              }, 1000);
-            }
-          },
-          {
-            text: 'Proceed',
-            onPress: async () => {
-              await checkSend(data.data);
-              setIsLoading(true);
-              setTimeout(() => {
-                setIsLoading(false);
-                setShowScanner(true);
-              }, 1000);
-            }
+            setTimeout(() => {
+              setIsLoading(false);
+              scannerRef.current?.reactivate(); // Correct way to trigger rescan
+            }, 1000);
           }
-        ],
-        { cancelable: false }
-      );
-    }, 500); // 0.5-second delay before showing alert
+        },
+        {
+          text: 'Proceed',
+          onPress: async () => {
+            await checkSend(data);
+          }
+        }
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Scan Receipt QR Code</Text>
-      
+
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#1995AD" />
-          <Text style={styles.loadingText}>Initializing scanner...</Text>
+          <Text style={styles.loadingText}>Initializing camera...</Text>
         </View>
-      ) : showScanner ? (
+      ) : (
         <QRCodeScanner
-          key={Date.now()}
-          onRead={handleScan}
+          ref={scannerRef}
+          onRead={({ data }) => handleScan(data)}
           showMarker={true}
-          reactivate={true} // Enable reactivation
-          reactivateTimeout={2500} // Longer reactivation timeout
+          reactivate={false}
           markerStyle={styles.marker}
           cameraStyle={styles.camera}
           topViewStyle={styles.topView}
           bottomViewStyle={styles.bottomView}
-          fadeIn={true} // Enable fade-in animation
         />
-      ) : null}
+      )}
     </View>
   );
 }
@@ -171,7 +169,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0.8,
   },
+<<<<<<< HEAD
+=======
   // New styles
+>>>>>>> 8b5c03011b5d6d989dbffc491af37e58aeecaf89
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -195,4 +196,8 @@ const styles = StyleSheet.create({
     flex: 0,
     height: 0,
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 8b5c03011b5d6d989dbffc491af37e58aeecaf89

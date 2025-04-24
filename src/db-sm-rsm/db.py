@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from misc import serialize_wrapper, deserialize_wrapper
+import os
 import ast
 function_map = {
         "setup": 'keys',
@@ -12,6 +13,7 @@ function_map = {
 
 
 def init():
+    def init():
     client = MongoClient('mongodb://root:pass@eadb:27017')
     db = client['test']
     return db

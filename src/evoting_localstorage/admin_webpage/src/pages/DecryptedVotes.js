@@ -21,22 +21,53 @@ function DecryptedVotes() {
 
   // Helper: Download CSV
   const downloadCSV = (votesData) => {
-    let csvContent = "Election Name,Candidate Name,Votes\r\n";
-    Object.values(votesData).forEach(election => {
+    // Windows-compatible CSV with BOM and CRLF
+    let csvContent = '\uFEFF'; // UTF-8 BOM for Excel compatibility
+    csvContent += "Election ID,Election Name,Candidate Entry,Candidate Name,Votes\r\n\r\n";
+  
+    Object.entries(votesData).forEach(([electionId, election], index) => {
+      // Add election header
+      csvContent += `"Election ID:","${electionId.replace(/"/g, '""')}"\r\n`;
+      csvContent += `"Election Name:","${(election.election_name || 'Untitled').replace(/"/g, '""')}"\r\n\r\n`;
+      
+      // Add candidate headers
+      csvContent += "Entry Number,Candidate Name,Votes\r\n";
+  
+      // Add candidate data
       (election.candidates || []).forEach(candidate => {
-        // Escape commas in names if needed
-        const electionName = `"${(election.election_name || '').replace(/"/g, '""')}"`;
-        const candidateName = `"${(candidate.name || '').replace(/"/g, '""')}"`;
-        csvContent += `${electionName},${candidateName},${candidate.votes}\r\n`;
+        const entry = `"${(candidate.entry_number || '').toString().replace(/"/g, '""')}"`;
+        const name = `"${(candidate.name || '').replace(/"/g, '""')}"`;
+        const votes = `"${(candidate.votes || 0).toString().replace(/"/g, '""')}"`;
+        csvContent += `${entry},${name},${votes}\r\n`;
       });
+  
+      // Add spacing between elections (2 empty lines)
+      if (index < Object.entries(votesData).length - 1) {
+        csvContent += "\r\n\r\n";
+      }
     });
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'election_results.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
+  
+    // Create Blob with explicit MIME type
+    const blob = new Blob([csvContent], { 
+      type: 'text/csv;charset=utf-8;' 
+    });
+    
+    // Create download link
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', 'election_results.csv');
+    
+    // For MS Edge
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, 'election_results.csv');
+    } else {
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    
+    URL.revokeObjectURL(url);
   };
 
   const handleDecryptVotes = async () => {
@@ -62,26 +93,29 @@ function DecryptedVotes() {
     try {
       const response = await axios.get('/api/getVotes');
       const votesData = response.data || {};
-      setDecryptedVotes(votesData);
-
-      // Build array of {id, name}
+      
+      // Process data first
       const elections = Object.entries(votesData).map(([id, data]) => ({
         id: id.toString(),
         name: data.election_name || `Election ${id}`
       }));
+  
+      // Update state together
+      setDecryptedVotes(votesData);
       setElectionIds(elections);
-
-      if (elections.length > 0) {
-        setSelectedElection(elections[0].id);
-      } else {
-        setSelectedElection('');
-      }
+      setSelectedElection(elections[0]?.id || '');
+      
+      // Save to localStorage
       localStorage.setItem("decryptedVotes", JSON.stringify(votesData));
-      // Download CSV
-      downloadCSV(votesData);
+      
+      // Delay download until state updates complete
+      setTimeout(() => {
+        downloadCSV(votesData);
+      }, 50);
+  
     } catch (err) {
-      console.error("Failed to fetch decrypted votes:", err);
-      alert(`Failed to fetch decrypted votes: ${err.message}`);
+      console.error("Fetch failed:", err);
+      alert(`Error: ${err.response?.data?.error || err.message}`);
     } finally {
       setLoading(false);
     }

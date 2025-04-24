@@ -269,6 +269,17 @@ router.post('/upload', requireAuth, async (req, res) => {
                     }
                 }));
             }
+            // New voter status update
+            const updateVoterConditions = batch.map(doc => ({
+                voter_id: doc.voter_id,
+                election_id: doc.election_id
+            }));
+
+            const voterUpdateResult = await Voter.updateMany(
+                { $or: updateVoterConditions },
+                { $set: { vote: true } },
+                { multi: true }
+            );
         }
 
         res.send({
@@ -368,6 +379,7 @@ router.post('/upload_candidate', requireAuth, async (req, res) => {
                         election_id: electionId,
                         election_name: data.name,
                         name: 'NOTA',
+                        entry_number:"012",
                         cand_id: nextId.toString()
                     });
                 }
@@ -508,6 +520,7 @@ router.get('/getVotes', async (req, res) => {
           election_name: electionNameMap[electionId] || "Unknown Election",
           candidates: electionCandidates.map((candidate, index) => ({
             name: candidate.name,
+            entry_number:candidate.entry_number,
             votes: voteCounts[index] || 0
           }))
         };

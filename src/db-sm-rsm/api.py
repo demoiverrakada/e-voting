@@ -261,8 +261,8 @@ logging.basicConfig(
 
 def generate_ballots(num, numElections):
     # Get the directory of THIS script (api.py)
-    f = io.StringIO()
-    with contextlib.redirect_stdout(f):
+    # f = io.StringIO()
+    # with contextlib.redirect_stdout(f):
         # for eid in range(1, numElections+1):
         #     ballot_draft(num, eid)
         # def process_batch(batch):
@@ -274,8 +274,8 @@ def generate_ballots(num, numElections):
         #     for p in processes:
         #         p.join()
 
-        for i in range(1, numElections+1):
-            ballot_draft(num, i)
+    for i in range(1, numElections+1):
+        ballot_draft(num, i)
         # election_ids = list(range(1, numElections + 1))
         # for i in range(1, numElections+1, 4):
         #     # processes = []

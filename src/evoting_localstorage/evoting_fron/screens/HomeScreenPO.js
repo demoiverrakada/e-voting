@@ -10,29 +10,31 @@ const writeFilePath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
 const requestStoragePermission = async () => {
   try {
     if (Platform.OS === 'android') {
-      if (Platform.Version >= 33) { // Android 13+
-        const permissions = [
-          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-          PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
-          PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
-        ];
-        
-        const granted = await PermissionsAndroid.requestMultiple(permissions);
-        return Object.values(granted).every(
-          status => status === PermissionsAndroid.RESULTS.GRANTED
+      if (Platform.Version >= 33) {
+        // Android 13+ — only necessary if dealing with media files (not needed for Downloads JSON)
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES, // or skip entirely
+          {
+            title: 'Storage Permission Required',
+            message: 'App needs permission to access storage to save files.',
+            buttonPositive: 'Grant',
+          }
         );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
       } else {
+        // Android 12 and below
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
           {
             title: 'Storage Permission Required',
-            message: 'Application needs access to your storage to download files',
-            buttonPositive: 'Grant Permission',
+            message: 'App needs permission to access storage to save files.',
+            buttonPositive: 'Grant',
           }
         );
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       }
     }
+    // iOS or other platforms
     return true;
   } catch (err) {
     console.error('Permission request error:', err);
@@ -40,85 +42,57 @@ const requestStoragePermission = async () => {
   }
 };
 
-// Function to get a unique filename if file already exists
-const getUniqueFilename = async (basePath, baseName, extension) => {
-  let counter = 0;
-  let filePath = `${basePath}/${baseName}${extension}`;
-  
-  while (await RNFS.exists(filePath)) {
-    counter++;
-    filePath = `${basePath}/${baseName}(${counter})${extension}`;
-  }
-  
-  return filePath;
-};
-
 const extractVotesToExternalStorage = async () => {
   try {
-    // First request permissions
-    const hasPermission = await requestStoragePermission();
-    if (!hasPermission) {
-      Alert.alert(
-        'Permission Denied',
-        'Storage permissions are required to save files.'
-      );
-      return;
-    }
-
     const initialHash = '12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126';
     const fileGenerationTimestamp = new Date().toISOString();
 
-    // Check source file existence
+    // Check permissions first
+    const hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      console.warn('Storage permission not granted. Attempting fallback...');
+    }
+
+    // Ensure the votes file exists
     const fileExists = await RNFS.exists(writeFilePath);
     if (!fileExists) {
-      // Create an empty array if file doesn't exist (to prevent errors)
       await RNFS.writeFile(writeFilePath, JSON.stringify([]), 'utf8');
       console.log("Created empty votes file since it didn't exist");
     }
 
-    // Read and parse file
-    let fileContents;
+    // Read file safely
+    let fileContents = JSON.stringify([]);
     try {
       fileContents = await RNFS.readFile(writeFilePath, 'utf8');
     } catch (readError) {
-      // If read fails, create an empty array
-      fileContents = JSON.stringify([]);
-      console.warn(`Failed to read file: ${readError.message}. Using empty data.`);
+      console.warn(`Failed to read file: ${readError.message}. Using empty array.`);
     }
 
-    let votesData;
+    // Parse JSON
+    let votesData = [];
     try {
-      votesData = JSON.parse(fileContents);
-      // Ensure votesData is always an array
-      if (!Array.isArray(votesData)) {
-        votesData = [];
-      }
+      const parsed = JSON.parse(fileContents);
+      if (Array.isArray(parsed)) votesData = parsed;
     } catch (parseError) {
-      votesData = [];
-      console.warn(`Invalid JSON format: ${parseError.message}. Using empty data.`);
+      console.warn(`Invalid JSON format: ${parseError.message}. Using empty array.`);
     }
 
+    // Recompute hash
     let currentHash = initialHash;
-    try {
-      for (const vote of votesData) {
-        // Include all vote properties including timestamp but excluding hash_value
-        const voteWithoutHash = {
-          election_id: vote.election_id || '',
-          voter_id: vote.voter_id || '',
-          booth_num: vote.booth_num || '',
-          commitment: vote.commitment || '',
-          pref_id: vote.pref_id || '',
-          timestamp: vote.timestamp || new Date().toISOString()
-        };
-        const voteHash = await sha256(JSON.stringify(voteWithoutHash));
-        currentHash = await sha256(currentHash + voteHash);
-      }
-    } catch (hashError) {
-      console.warn(`Hashing failed: ${hashError.message}. Using initial hash.`);
-      // Continue with initial hash if hashing fails
+    for (const vote of votesData) {
+      const voteWithoutHash = {
+        election_id: vote.election_id || '',
+        voter_id: vote.voter_id || '',
+        booth_num: vote.booth_num || '',
+        commitment: vote.commitment || '',
+        pref_id: vote.pref_id || '',
+        timestamp: vote.timestamp || new Date().toISOString(),
+      };
+      const voteHash = await sha256(JSON.stringify(voteWithoutHash));
+      currentHash = await sha256(currentHash + voteHash);
     }
 
-    // Apply the final hash to all votes and add file generation timestamp
+    // Prepare data to write
     const finalUpdatedVotesData = {
       votes: votesData.map(vote => ({
         election_id: vote.election_id || '',
@@ -127,65 +101,69 @@ const extractVotesToExternalStorage = async () => {
         commitment: vote.commitment || '',
         pref_id: vote.pref_id || '',
         timestamp: vote.timestamp || new Date().toISOString(),
-        hash_value: currentHash
+        hash_value: currentHash,
       })),
       file_generation_timestamp: fileGenerationTimestamp,
-      final_hash: currentHash
+      final_hash: currentHash,
     };
 
-    // Determine which directory to use
-    // For Android 10+ we need to use ExternalDirectoryPath
-    // (app-specific external storage)
-    let destPath;
-    
+    let destPath = '';
+    let writeSuccess = false;
+
     if (Platform.OS === 'android') {
+      // Try Downloads directory first
       try {
-        // First try Downloads directory (with unique filename)
         const downloadsDir = RNFS.DownloadDirectoryPath;
+<<<<<<< HEAD
+        destPath = `${downloadsDir}/updated_data.json`;
+=======
         destPath = `${downloadsDir}/updated_data.json`; // Overwrite the file every time
 
+>>>>>>> 8b5c03011b5d6d989dbffc491af37e58aeecaf89
         await RNFS.writeFile(destPath, JSON.stringify(finalUpdatedVotesData), 'utf8');
-        console.log(`File saved successfully to: ${destPath}`);
-        Alert.alert('Success', `File saved to Downloads: ${destPath.split('/').pop()}`);
-        return;
-      } catch (writeError) {
-        console.warn(`Could not write to Downloads: ${writeError.message}. Trying app directory.`);
-        
-        // Fall back to app-specific external directory
+        Alert.alert('Success', `File saved in Downloads: ${destPath.split('/').pop()}`);
+        writeSuccess = true;
+      } catch (err1) {
+        console.warn(`Downloads write failed: ${err1.message}`);
+        // Try external app directory
         try {
           const externalDir = RNFS.ExternalDirectoryPath;
-          destPath = await getUniqueFilename(externalDir, 'updated_data', '.json');
+          destPath = `${externalDir}/updated_data.json`;
           await RNFS.writeFile(destPath, JSON.stringify(finalUpdatedVotesData), 'utf8');
-          console.log(`File saved successfully to app directory: ${destPath}`);
-          Alert.alert('Success', `File saved to app directory. You can find it in your file manager at Android/data/[your-app-package]/files`);
-          return;
-        } catch (appDirError) {
-          console.error(`Failed to write to app directory: ${appDirError.message}`);
-          throw appDirError;
+          Alert.alert(
+            'Success',
+            'File saved to app directory. Locate it in: Android/data/[your-app-package]/files'
+          );
+          writeSuccess = true;
+        } catch (err2) {
+          console.error('App directory write failed:', err2.message);
         }
       }
     } else {
-      // iOS handling
+      // iOS or other platform
       destPath = `${RNFS.DocumentDirectoryPath}/updated_data.json`;
       await RNFS.writeFile(destPath, JSON.stringify(finalUpdatedVotesData), 'utf8');
       Alert.alert('Success', 'File saved successfully');
+      writeSuccess = true;
+    }
+
+    if (!writeSuccess) {
+      Alert.alert('Download Error', 'Failed to save file to storage.');
     }
 
   } catch (err) {
-    const errorMsg = `Operation failed: ${err.message}`;
+    console.error('Global Error:', err.message);
     Alert.alert(
       'Download Error',
-      errorMsg,
+      `Unexpected failure: ${err.message}`,
       [{ text: 'OK' }],
       { cancelable: false }
     );
-    console.error('Global Error:', errorMsg);
   }
 };
 
 function HomeScreenPO(props) {
   useEffect(() => {
-    // Request permissions when component mounts
     requestStoragePermission();
   }, []);
 
@@ -248,5 +226,6 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreenPO;
+
 
 

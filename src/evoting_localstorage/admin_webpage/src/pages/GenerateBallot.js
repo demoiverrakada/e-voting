@@ -41,7 +41,7 @@ function GenerateBallot() {
       const url = URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `election_id_${electionId}_ballots.zip`; // Use electionId in filename
+      link.download = `all_elections_ballots.zip`; // Use electionId in filename
       link.click();
 
       alert('Ballots generated successfully!');

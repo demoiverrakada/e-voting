@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import hashlib
 import json
 from collections import defaultdict
+import os
 
 def compute_hash(input_string):
     return hashlib.sha256(input_string.encode('utf-8')).hexdigest()

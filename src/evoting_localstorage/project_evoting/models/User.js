@@ -157,6 +157,10 @@ const CandidateSchema = new mongoose.Schema({
         type: String,
         required: true          
     },
+    entry_number:{
+        type:String,
+        required:true
+    },
     cand_id: {
         type: String,
         required: true

@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 import json
+import os
+
 
 def process_bulletins(election_id):
     client = MongoClient('mongodb://root:pass@eadb:27017')
