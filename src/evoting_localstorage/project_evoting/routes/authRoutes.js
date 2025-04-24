@@ -579,6 +579,38 @@ router.post('/signin/Admin', async (req, res) => {
     }
 });
 
+router.post('/update-password', requireAuth,async (req, res) => {
+    const { email, oldPassword, newPassword } = req.body;
+
+    // Validate request body
+    if (!email || !oldPassword || !newPassword) {
+        return res.status(400).send({ error: "Please provide email, old password, and new password." });
+    }
+
+    try {
+        // Find the admin
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(404).send({ error: "Admin not found." });
+        }
+
+        // Compare old password
+        const isMatch = await admin.comparePassword(oldPassword);
+        if (!isMatch) {
+            return res.status(401).send({ error: "Old password is incorrect." });
+        }
+
+        // Set new password (will trigger pre-save hook to hash it)
+        admin.password = newPassword;
+        await admin.save();
+
+        res.send({ message: "Password changed successfully." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Internal server error." });
+    }
+});
+
 router.post('/runBuild1', async (req, res) => {
     try {
         // Paths to the APK and JSON files
