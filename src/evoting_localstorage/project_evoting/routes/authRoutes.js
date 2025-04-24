@@ -370,7 +370,7 @@ router.post('/upload_candidate', requireAuth, async (req, res) => {
                 // Check if NOTA already exists
                 const existingNota = await Candidate.findOne({
                     election_id: electionId,
-                    name: 'NOTA'
+                    name: 'NAFS'
                 });
 
                 if (!existingNota) {
@@ -378,7 +378,7 @@ router.post('/upload_candidate', requireAuth, async (req, res) => {
                     notaCandidates.push({
                         election_id: electionId,
                         election_name: data.name,
-                        name: 'NOTA',
+                        name: 'NAFS',
                         entry_number:"012",
                         cand_id: nextId.toString()
                     });
