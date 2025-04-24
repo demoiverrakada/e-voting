@@ -13,7 +13,6 @@ function_map = {
 
 
 def init():
-    def init():
     client = MongoClient('mongodb://root:pass@eadb:27017')
     db = client['test']
     return db
