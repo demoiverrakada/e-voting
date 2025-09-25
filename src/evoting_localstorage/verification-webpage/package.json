@@ -17,7 +17,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest --config ../../../tests/jest.config.js --selectProjects react-web",
+    "test:coverage": "jest --config ../../../tests/jest.config.js --selectProjects react-web --coverage",
+    "test:ci": "jest --config ../../../tests/jest.config.js --selectProjects react-web --coverage --watchAll=false",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

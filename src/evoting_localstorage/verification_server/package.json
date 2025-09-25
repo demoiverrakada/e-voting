@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --config ../../../tests/jest.config.js --selectProjects backend",
+    "test:watch": "jest --config ../../../tests/jest.config.js --selectProjects backend --watch",
+    "test:coverage": "jest --config ../../../tests/jest.config.js --selectProjects backend --coverage",
+    "test:ci": "jest --config ../../../tests/jest.config.js --selectProjects backend --coverage --watchAll=false"
   },
   "author": "RDT",
   "license": "ISC",
@@ -19,5 +22,30 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.4",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/__tests__/**/*.js", "**/?(*.)+(spec|test).js"],
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**",
+      "!**/__tests__/**",
+      "!jest.config.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html", "json"],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    }
   }
 }
