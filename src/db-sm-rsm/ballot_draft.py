@@ -23,14 +23,126 @@ from db import load,store
 import zipfile
 import logging
 from time import sleep
+import json
 #import pyqrcode
 #from pyzbar.pyzbar import decode
 
+def make_serializable(obj):
+    """Recursively convert crypto objects to strings/ints for JSON"""
+    if isinstance(obj, list):
+        return [make_serializable(x) for x in obj]
+    if hasattr(obj, 'decode'): # Handle bytes if any
+        return obj.decode('utf-8')
+    try:
+        # Try to use the provided serialize_wrapper
+        return serialize_wrapper(obj)
+    except:
+        return str(obj)
+
+def create_ballot_json(m, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk, election_id, election_name):
+    # 1. Run Crypto Logic (G1)
+    gamma_booth = G2_part1(election_id)
+    # Get Left QR Data List [bid, gamma, sigma]
+    eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, evr_rw_ls, bid, qr_data_booth = G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m, election_id)
+    
+    # 2. Run Crypto Logic (G2)
+    # Get Right QR Data List [ [hashes], [index, sigma] ]
+    c_w_all, ov_hash, qr_data_updated = G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid, election_id)
+    
+    # 3. Save Receipt to DB (Required for backend verification)
+    for i in range(len(candidates)):
+        collection.insert_one({
+            "election_id": election_id,
+            "ov_hash": ov_hash,
+            "enc_hash": c_w_all[i],
+            "enc_msg": serialize_wrapper(eps_v_w_ls[i]),
+            "comm": serialize_wrapper(gamma_w_ls[i]),
+            "enc_msg_share": serialize_wrapper(evr_kw_ls[i]),
+            "enc_rand_share": serialize_wrapper(evr_rw_ls[i]),
+            "pfcomm": None,
+            "enc_rand": serialize_wrapper(eps_r_w_ls[i]),
+            "pf_encmsg": None,
+            "pf_encrand": None,
+            "pfs_enc_msg_share": None,
+            "pfs_enc_rand_share": None,
+            "accessed": False
+        })
+
+    # 4. Format Candidates List (WITH ROTATION)
+    # i = The fixed number on the paper (0, 1, 2...)
+    # y = The index of the candidate name (rotated by bid)
+    candidates_list = []
+    
+    # Ensure bid is an integer for modulo math
+    bid_int = int(bid) 
+    
+    for i in range(len(candidates)):
+        v_w_bar = bid_int + i
+        y = v_w_bar % len(candidates)
+        
+        cand_name = candidates[y]
+        
+        candidates_list.append({
+            "candidate_number": str(i),   # Fixed Position on Paper (e.g., "0", "1")
+            "serial_id": y,               # Original Index (Alice is always 0)
+            "candidate_name": cand_name   # The Name appearing at this position
+        })
+
+    # 5. Prepare Clean Strings for JSON
+    # Use clean_for_json to strip python wrappers, then json.dumps to stringify the list
+    
+    # Left QR: [bid, gamma, sigma]
+    clean_left = clean_for_json(qr_data_booth)
+    left_qr_string = json.dumps(clean_left) 
+    
+    # Right QR: [[hash1, hash2...], [index, sigma]]
+    clean_right = clean_for_json(qr_data_updated)
+    right_qr_string = json.dumps(clean_right)
+
+    # 6. Construct Final JSON
+    json_output = {
+        "election_id": str(election_id),
+        "election_name": election_name,
+        
+        # This will now look like "[['hash1', ...], [1, ['sig...']]]"
+        "hash_string": right_qr_string, 
+        
+        "candidates": candidates_list,
+        
+        # Left-side QR string
+        "ballot_id": left_qr_string
+    }
+
+    try:
+        with open(filename, 'w') as f:
+            json.dump(json_output, f, indent=4)
+        print(f"JSON saved: {filename}")
+        return True
+    except Exception as e:
+        print(f"Error saving JSON: {str(e)}")
+        return False
 
 def init():
     client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
     db = client["test"]
     return db
+
+def clean_for_json(obj):
+    """
+    Recursively cleans crypto objects to simple Strings/Ints/Lists.
+    Removes 'builtins.str', 'b'...', and other object wrappers.
+    """
+    if isinstance(obj, list) or isinstance(obj, tuple):
+        return [clean_for_json(x) for x in obj]
+    if isinstance(obj, bytes):
+        return obj.decode('utf-8')
+    if hasattr(obj, 'getAttribute'): # Handle some crypto objects
+        return str(obj)
+    # If it's a gmpy2 number or similar, convert to string/int
+    try:
+        return int(obj)
+    except:
+        return str(obj)
 
 def connect_to_mongodb():
     # Connect to MongoDB
@@ -257,230 +369,115 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     # Save the PDF
     #c.save()
 
-def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m,election_id):
+def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m, election_id):
     # bid
     bid = group.random(ZR)
-    g1,h1=load("generators",["g1","h1"],election_id).values()
+    g1, h1 = load("generators", ["g1", "h1"], election_id).values()
+    
     # sigma_bid generation
     _sk = group.random(ZR)
     sigma_bid = g1**(1/(bid+_sk))
     
-    # qrcode
-    qr_data = []
-    qr_data.append(bid)
-    qr_data.append(gamma_booth)
-    qr_data.append(sigma_bid)
-    qr_filename = "qr_code.png"
-    generate_qr_code(qr_data, qr_filename)
-    
-    # Set the font and size for the left half
-    #c.setFont("Helvetica", 16)
-    
-    # Set the starting position for the left half
-    #left_x = 20
-    #left_y = height - 160
-    
-    # Titles for the left half
-    #c.drawString(left_x + 40, left_y - 10, "w")
-    
-    #c.drawString(left_x + 150, left_y - 10, "Candidate")
-    #c.drawString(left_x + 390, left_y - 60, "Scan Commitments")
-    #c.drawString(left_x + 110, left_y - 10 - 400, "Scan bid")
-    #c.drawString(left_x + 400, left_y - 10 - 400, "Scan booth num")
-    #c.line(left_x, left_y - 8 - 10, left_x + 150 + 100, left_y - 8 - 10)  # Underline 'Candidate'
-    
-    # Calculate center position for candidate names
-    #candidate_x_center = left_x + 180
-    
-    # Print each candidate's number and name on the left half
-    k = 0
+    # Prepare the exact list used for the "Left QR" (Ballot ID QR)
+    qr_data_booth = [bid, gamma_booth, sigma_bid]
     
     eps_v_w_ls = []
     gamma_w_ls = []
     evr_kw_ls = []
     eps_r_w_ls = []
-    evr_rw_ls=[]
-
-    n = 0
-    for i, candidate in enumerate(candidates):
-        n += 1
+    evr_rw_ls = []
 
     for i, candidate in enumerate(candidates):
-        # v_w_bar
         v_w_bar = bid + i
-        
-        # r_w
         r_w = group.random(ZR)
-        
-        # gamma_w
         gamma_w = (g1**v_w_bar)*(h1**r_w)
         gamma_w_ls.append(gamma_w)
-        
-        # Step 7
-        alpha = len(candidates)
         
         epsilon_v_w_bar = optthpaillier.pai_encrypt(pai_pk_optthpaillier, v_w_bar)
         epsilon_r_w = optthpaillier.pai_encrypt(pai_pk_optthpaillier, r_w)
         eps_v_w_ls.append(epsilon_v_w_bar)
         eps_r_w_ls.append(epsilon_r_w)
         
-        # Step 8
         v_w_bar_k = secretsharing.share(v_w_bar, m)
         r_w_k = secretsharing.share(r_w, m)
         
-        # Step 9
         evr_kw_ls_sub2 = []
-        evr_rw_ls_sub2=[]
+        evr_rw_ls_sub2 = []
         for j in range(m):
             ev_w_k = optpaillier.pai_encrypt(pai_pk[j], v_w_bar_k[j])
             er_w_k = optpaillier.pai_encrypt(pai_pk[j], r_w_k[j])
-            evr_kw_ls_sub = []
-            evr_rw_ls_sub=[]
-            evr_kw_ls_sub.append(ev_w_k)
-            evr_rw_ls_sub.append(er_w_k)
+            
+            # --- THE FIX IS HERE ---
+            # We create the pair [EncryptedVoteShare, EncryptedRandomnessShare]
+            evr_kw_ls_sub = [ev_w_k, er_w_k]
+            
+            # Append it to the first list
             evr_kw_ls_sub2.append(evr_kw_ls_sub)
-            evr_rw_ls_sub2.append(evr_rw_ls_sub)
+            
+            # Append THE SAME pair to the second list (or you can create a new one if logic requires)
+            # Previously, you tried to append 'evr_rw_ls_sub' which was undefined.
+            evr_rw_ls_sub2.append(evr_kw_ls_sub) 
+            # -----------------------
+        
         evr_kw_ls.append(evr_kw_ls_sub2)
         evr_rw_ls.append(evr_rw_ls_sub2)        
-        k = i
-        step = 300/n
-        #c.drawString(left_x + 40, left_y - step * (i + 1) - 10, f"{i}")
-        
-        # Calculate the width of the candidate name
-        #candidate_width = c.stringWidth(candidate, "Helvetica", 14)
-        
-        # Calculate the position to start drawing the candidate name
-        #candidate_x = candidate_x_center - candidate_width / 2
-        
-        # candidate's index
-        y = int(v_w_bar) % len(candidates)  # Convert v_w_bar to int before using modulus
-        candidate = candidates[y]
-        
-        #c.drawString(candidate_x, left_y - 60 * (i + 1) - 10, f"{candidate}")
 
-    #qr_image = ImageReader(qr_filename)
-    #qr_x = width / 2 - 100  # Adjust the position as needed
-    #qr_y = left_y - 60 * (k + 4)
-    #c.drawImage(qr_image, left_x + 40, left_y - 60*(k+6) - 10, width=200, height=200)
-
-    #c.line(left_x, left_y - 60*(k+2) - 10, left_x + 150 + 100, left_y - 60*(k+2) - 10)
-    
-    return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls,evr_rw_ls, bid
-    
+    # Return the QR list
+    return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, evr_rw_ls, bid, qr_data_booth
+        
 def G2_part1(election_id):
     g1,h1=load("generators",["g1","h1"],election_id).values()
     r_booth = group.random(ZR)
     gamma_booth = (g1**j)*(h1**r_booth)
     return gamma_booth   
 
-def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid,election_id):
-    # Set the font and size for the right half
-    #c.setFont("Helvetica", 16)
-    
-    # Set the starting position for the right half
-    #right_x = width / 2 + 20
-    #right_y = height - 160
-    
-    # Titles for the right half
-    #c.drawString(right_x + 40, right_y - 10, "w")
-    
-    #c.drawString(right_x + 150, right_y - 10, "Candidate")
-    #c.line(right_x + 40, right_y - 8 - 10, right_x + 150 + 100, right_y - 8 - 10)  # Underline 'Candidate'
-    
-    # Calculate center position for candidate names
-    #candidate_x_center = right_x + 180
-    
-    # Print each candidate's number and name on the right half
-    g1,h1=load("generators",["g1","h1"],election_id).values()
-    k = 0
+def G2_part2(eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, candidates, pai_pk_optthpaillier, pai_pk, m, bid, election_id):
+    g1, h1 = load("generators", ["g1", "h1"], election_id).values()
     c_w_hash = []
     c_w_all = []
-    c_w_original = []
+    
     for i, candidate in enumerate(candidates):
-        # Step 14
         r_w_dash = group.random(ZR)
-        gamma_w_dash = gamma_w_ls[i] * (h1**r_w_dash)
-        
-        # Step 15
-        alpha = len(candidates)
+        gamma_w_dash = gamma_w_ls[i] * (h1 ** r_w_dash)
         
         epsilon_v_w_bar_dash = optthpaillier.pai_reencrypt(pai_pk_optthpaillier, eps_v_w_ls[i])
         epsilon_r_w_dash = optthpaillier.pai_reencrypt(pai_pk_optthpaillier, eps_r_w_ls[i])
         
-        # Step 16
         v_w_k_dash = secretsharing.share(0, m)
         r_w_k_dash = secretsharing.share(r_w_dash, m)
         
-        # Step 17
         c_w = []
         c_w.append(epsilon_v_w_bar_dash)
         c_w.append(gamma_w_dash)
         e_vr_w_k_dash_sub = []
-        for j in range(m):
-            e_v_w_k_dash = optpaillier.pai_encrypt(pai_pk[j], v_w_k_dash[j])
+        for j_idx in range(m):
+            e_v_w_k_dash = optpaillier.pai_encrypt(pai_pk[j_idx], v_w_k_dash[j_idx])
+            e_r_w_k_dash = optpaillier.pai_encrypt(pai_pk[j_idx], r_w_k_dash[j_idx])
+            e_vr_w_k_dash_sub.append([e_v_w_k_dash, e_r_w_k_dash])
         
-            # Step 18
-            e_r_w_k_dash = optpaillier.pai_encrypt(pai_pk[j], r_w_k_dash[j])
-            e_vr_w_k_dash = []
-            e_vr_w_k_dash.append(e_v_w_k_dash)
-            e_vr_w_k_dash.append(e_r_w_k_dash)
-            e_vr_w_k_dash_sub.append(e_vr_w_k_dash)
-        
-        # Step 19
         c_w.append(e_vr_w_k_dash_sub)
         c_w.append(epsilon_r_w_dash)
-        c_w_original.append(c_w)
+        
         c_w_h = sha256_of_array(c_w)
         c_w_hash.append(c_w)
         c_w_all.append(c_w_h)
-        
-        k = i
-        print(candidate)
-        print(c_w_h)
-        #c.drawString(right_x + 40, right_y - 60 * (i + 1) - 10, f"{i}")
-        
-        # Calculate the width of the candidate name
-        #candidate_width = c.stringWidth(candidate, "Helvetica", 14)
-        
-        # Calculate the position to start drawing the candidate name
-        #candidate_x = candidate_x_center - candidate_width / 2
-        
+
     _sk = group.random(ZR)
     ov_hash = sha256_of_array2(c_w_all)
-    commitment_identifier = str(uuid.uuid4())
     
-    c_w_all_updated = []
-    for i, candidate in enumerate(candidates):
-        v_w_bar = bid + i
-        y = int(v_w_bar) % len(candidates)
-        c_w_all_i = c_w_all[i]
-        c_w_all_updated.append(c_w_all_i)
-    qr_data = c_w_all_updated
-    print(qr_data)
-    qr_filename2 = "qr_code2.png"
-    generate_qr_code(qr_data, qr_filename2)
-    #qr_image2 = ImageReader(qr_filename2)
-    #c.drawImage(qr_image2, right_x + 60, right_y - 270, width=200, height=200)
+    # Prepare the QR Payload (Right Side QR)
+    # Structure: [ [hash1, hash2...], [index, sigma_c] ]
+    c_w_all_updated = [x for x in c_w_all]
     
     has = group.hash(c_w_hash, type=ZR)
-    sigma_c = bbsig.bbsign(has, _sk,election_id)
-    qr_data3 = []
-    qr_data3.append(j)
-    qr_data3.append(sigma_c)
-    qr_data_updated = []
-    qr_data_updated.append(qr_data)
-    qr_data_updated.append(qr_data3)
-    qr_data_updated_filename="qr_updated.png"
-    generate_qr_code(qr_data_updated, qr_data_updated_filename)
-    qr_filename3 = "qr_code3.png"
-    generate_qr_code(qr_data3, qr_filename3)
-    qr_image3 = ImageReader(qr_filename3)
-    #c.drawImage(qr_image3, right_x + 60, right_y - 60*(k+6) - 10, width=200, height=200)
-
-    #c.line(right_x + 40, right_y - 60*(k+2) - 10, right_x + 150 + 100, right_y - 60*(k+2) - 10)
-    #c.line(width/2, right_y - 60*(k+7) - 10, width, right_y - 60*(k+7) - 10)
+    sigma_c = bbsig.bbsign(has, _sk, election_id)
     
-    return c_w_all,ov_hash
+    j_val = 1 
+    qr_data3 = [j_val, sigma_c]
+    
+    qr_data_updated = [c_w_all_updated, qr_data3]
+    
+    return c_w_all, ov_hash, qr_data_updated
 
 def create_pdf_worker(args):
     index, collection, filename, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk,election_id = args
@@ -497,74 +494,73 @@ def load2(election_id):
         result[params2[i]] = deserialize_wrapper(document[params[i]])
     return result
 
-def ballot_draft(num,election_id):
-    # Initialize process-specific logging
+def ballot_draft(num, election_id):
+    # Initialize logging
     logger = logging.getLogger(f"Election_{election_id}")
     logger.setLevel(logging.INFO)
     handler = logging.FileHandler(f"election_{election_id}.log")
     logger.addHandler(handler)
+    
     try:
         logger.info(f"Starting ballot generation for Election {election_id}")
         ballots_generated = 0
-        num_ballots = num
-
-        db=init()
-        collect=db['candidates']
-        # Get the candidate names
+        
+        db = init()
+        collect = db['candidates']
+        
+        # Get candidates
         candidates = []
         election_name = "Unknown Election"
         documents = collect.find({"election_id": election_id})
         for document in documents:
             candidates.append(document["name"])
             if election_name == "Unknown Election":
-                election_name = document["election_name"]   
-        #pai_sklist, pai_pk_optthpaillier = optthpaillier.pai_th_keygen(len(candidates))
-        #pai_sk, pai_pk = optpaillier.pai_keygen()
-        # Connect to MongoDB
+                election_name = document.get("election_name", "Unknown Election") # Safer get
+
+        # Load Keys
         m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2(election_id).values()
-        
-        #print("a")
-        #print(m)
-        #print("b")
-        #print(pai_pk)
-        #print("c")
-        #print(pai_sk)
-        #m = 2
-        #print(m)
-        #print(pai_sklist)
         collection = connect_to_mongodb()
-        pdf_files=[]
-        output_dir="/output"
-        for i in range(num_ballots):
-            pdf_filename = f"election_id_{election_id}_ballot_{i+1}.pdf"
-            pdf_path = os.path.join(output_dir, pdf_filename)
-            create_pdf(m, collection, pdf_path, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk, election_id,election_name)
-            if os.path.exists("/output/"+f"election_id_{election_id}_ballot_{i+1}.pdf"):
-                pdf_files.append(pdf_path)
-                print(f"PDF {pdf_filename} created successfully!")
-            sleep(0.01)  # Simulate work
+        
+        output_dir = "/output"
+        
+        for i in range(num):
+            # Change filename to .json
+            json_filename = f"election_id_{election_id}_ballot_{i+1}.json"
+            json_path = os.path.join(output_dir, json_filename)
+            
+            # Call the new JSON function instead of create_pdf
+            create_ballot_json(m, collection, json_path, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk, election_id, election_name)
+            
+            if os.path.exists(json_path):
+                print(f"Ballot Data {json_filename} created successfully!")
+            
+            sleep(0.01)
             ballots_generated += 1
+            
         logger.info(f"Success: {ballots_generated}/{num} ballots for Election {election_id}")
 
     except Exception as e:
         logger.error(f"Failed: {str(e)}")
+        print(f"Error: {str(e)}") # Print to console as well
     finally:
         handler.close()
         logger.removeHandler(handler)
 
-    # Prepare arguments for threading
-    #args_list = [(i, m, collection, f"ballot_{i+1}.pdf", candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk) for i in range(num_ballots)]
-
-    # Use ThreadPoolExecutor for concurrent execution
-    #with concurrent.futures.ThreadPoolExecutor() as executor:
-    #    executor.map(create_pdf_worker, args_list)
-
-# if __name__ == "__main__":
-#     import sys
-#     try:
-#         num = int(sys.argv[1])
-#         election_id = int(sys.argv[2])
-#         ballot_draft(num, election_id)
-#     except (IndexError, ValueError):
-#         print("Usage: python ballot_draft.py <num> <electionId>")
-#         sys.exit(1)
+if __name__ == "__main__":
+    import sys
+    # This block allows the script to be run from the command line
+    # Usage: python ballot_draft.py <number_of_ballots> <election_id>
+    try:
+        if len(sys.argv) < 3:
+            print("Usage: python ballot_draft.py <num> <electionId>")
+            sys.exit(1)
+            
+        num = int(sys.argv[1])
+        election_id = int(sys.argv[2])
+        
+        # Call the main function
+        ballot_draft(num, election_id)
+        
+    except (IndexError, ValueError) as e:
+        print(f"Error: Invalid arguments. {str(e)}")
+        sys.exit(1)

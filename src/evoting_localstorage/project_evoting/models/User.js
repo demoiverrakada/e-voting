@@ -67,8 +67,9 @@ PollingSchema.methods.comparePassword = function (candidatePassword) {
             if (err) {
                 return reject(err); 
             }
+            // CHANGED: We resolve with false instead of rejecting
             if (!isMatch) {
-                return reject(null); 
+                return resolve(false); 
             }
             resolve(true); 
         });
@@ -112,10 +113,11 @@ AdminSchema.methods.comparePassword = function (candidatePassword) {
     return new Promise((resolve, reject) => {
         bcrypt.compare(candidatePassword, user.password, (err, isMatch) => {
             if (err) {
-                return reject(err);
+                return reject(err); 
             }
+            // CHANGED: We resolve with false instead of rejecting
             if (!isMatch) {
-                return reject(null);
+                return resolve(false); 
             }
             resolve(true); 
         });

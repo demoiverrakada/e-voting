@@ -111,6 +111,7 @@ router.post('/setup', requireAuth, async (req, res) => {
 });
 
 // Generate ballots for multiple elections
+// Generate ballots for multiple elections
 router.post('/generate', requireAuth, async (req, res) => {
     const { n, electionId } = req.body;
     const numBallots = Number(n);
@@ -118,19 +119,22 @@ router.post('/generate', requireAuth, async (req, res) => {
     const outputDirectory = '/output';
 
     try {
-        const result =await callPythonFunction("generate",numBallots,numElections)
+        // 1. Run the Python script (which now generates JSONs)
+        const result = await callPythonFunction("generate", numBallots, numElections);
+        
         const concurrencyLimit = Math.min(os.cpus().length, 20);
         const electionIds = Array.from({ length: numElections }, (_, i) => i + 1);
+
         await async.eachLimit(electionIds, concurrencyLimit, async (i) => {
-            // Generate ballots for this election
             console.log(`Ballots generated for election ${i}`);
 
-            // Find PDFs for this election
+            // --- THE FIX IS HERE --- 
+            // CHANGED: .endsWith('.pdf') -> .endsWith('.json')
             const electionFiles = fs.readdirSync(outputDirectory)
-                .filter(file => file.startsWith(`election_id_${i}_`) && file.endsWith('.pdf'));
+                .filter(file => file.startsWith(`election_id_${i}_`) && file.endsWith('.json'));
 
             if (electionFiles.length === 0) {
-                console.warn(`No PDFs found for election ${i}`);
+                console.warn(`No JSON files found for election ${i}`);
                 return;
             }
 
@@ -158,12 +162,12 @@ router.post('/generate', requireAuth, async (req, res) => {
             });
         });
 
-        // 2. Create master ZIP
+        // 2. Create master ZIP (This logic stays the same, it zips the zips)
         const zipFiles = fs.readdirSync(outputDirectory)
             .filter(file => file.startsWith('election_id_') && file.endsWith('_ballots.zip'));
 
         if (zipFiles.length === 0) {
-            return res.status(404).json({ error: 'No ballots generated' });
+            return res.status(404).json({ error: 'No ballots generated to download' });
         }
 
         const masterZipName = 'all_elections_combined.zip';
@@ -550,7 +554,10 @@ router.post('/signin/PO', async (req, res) => {
             return res.status(422).send({ error: "Polling Officer doesn't exist with this email" });
         }
 
-        await newPO.comparePassword(password);
+        const isMatch = await newPO.comparePassword(password);
+        if (!isMatch) {
+            return res.status(422).send({ error: "Invalid password" });
+        }
         const token = jwt.sign({ userId: newPO._id }, jwtkey);
         res.send({ token });
     } catch (err) {
@@ -561,20 +568,30 @@ router.post('/signin/PO', async (req, res) => {
 
 // for signing in Admin
 router.post('/signin/Admin', async (req, res) => {
+    console.log("---------------- DEBUG START ----------------");
     const { email, password } = req.body;
+    console.log("1. Login Attempt for:", email);
+    console.log("2. Password Length:", password ? password.length : "Missing");
     if (!email || !password) {
+        console.log("3. ERROR: Missing credentials");
         return res.status(422).send({ error: "Must provide email or password" });
     }
     const newAdmin = await Admin.findOne({ email });
     if (!newAdmin) {
+        console.log("4. ERROR: Admin doesn't exist with this email");
         return res.status(422).send({ error: "Admin doesn't exist with this email" });
     }
     try {
-        await newAdmin.comparePassword(password);
+        const isMatch = await newAdmin.comparePassword(password);
+        if (!isMatch) {
+            console.log("5. ERROR: Invalid password");
+            return res.status(422).send({ error: "Invalid password" });
+        }
         const token = jwt.sign({ userId: newAdmin._id }, jwtkey);
-        console.log(token)
+        console.log(token);
         res.send({ token });
     } catch (err) {
+        console.log("6. ERROR: error");
         return res.status(422).send(err.message);
     }
 });
