@@ -72,20 +72,20 @@ def create_ballot_json(m, collection, filename, candidates, pai_sklist, pai_pk_o
     # i = The fixed number on the paper (0, 1, 2...)
     # y = The index of the candidate name (rotated by bid)
     candidates_list = []
-    
-    # Ensure bid is an integer for modulo math
     bid_int = int(bid) 
     
-    for i in range(len(candidates)):
+    num_candidates = len(candidates)
+    for i in range(num_candidates):
         v_w_bar = bid_int + i
-        y = v_w_bar % len(candidates)
+        y = v_w_bar % num_candidates
         
-        cand_name = candidates[y]
+        # candidates[y] is now a dict: {"name": "...", "entry_number": "..."}
+        target_cand = candidates[y]
         
-        candidates_list.append({
-            "candidate_number": str(i),   # Fixed Position on Paper (e.g., "0", "1")
-            "serial_id": y,               # Original Index (Alice is always 0)
-            "candidate_name": cand_name   # The Name appearing at this position
+        candidates_list.append({  # Fixed Position on Paper
+            "serial_id": str(i),          # Original Index
+            "entry_number": target_cand["entry_number"], # <--- NEW FIELD
+            "candidate_name": target_cand["name"]        # <--- UPDATED
         })
 
     # 5. Prepare Clean Strings for JSON
@@ -509,13 +509,17 @@ def ballot_draft(num, election_id):
         collect = db['candidates']
         
         # Get candidates
-        candidates = []
+        candidates_data = [] # Changed from simple list to list of dicts
         election_name = "Unknown Election"
         documents = collect.find({"election_id": election_id})
+        
         for document in documents:
-            candidates.append(document["name"])
+            candidates_data.append({
+                "name": document["name"],
+                "entry_number": document.get("entry_number", "N/A")
+            })
             if election_name == "Unknown Election":
-                election_name = document.get("election_name", "Unknown Election") # Safer get
+                election_name = document.get("election_name", "Unknown Election")
 
         # Load Keys
         m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2(election_id).values()
@@ -524,12 +528,11 @@ def ballot_draft(num, election_id):
         output_dir = "/output"
         
         for i in range(num):
-            # Change filename to .json
             json_filename = f"election_id_{election_id}_ballot_{i+1}.json"
             json_path = os.path.join(output_dir, json_filename)
             
-            # Call the new JSON function instead of create_pdf
-            create_ballot_json(m, collection, json_path, candidates, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk, election_id, election_name)
+            # Pass candidates_data instead of just names
+            create_ballot_json(m, collection, json_path, candidates_data, pai_sklist, pai_pk_optthpaillier, pai_sk, pai_pk, election_id, election_name)
             
             if os.path.exists(json_path):
                 print(f"Ballot Data {json_filename} created successfully!")
