@@ -10,30 +10,16 @@ from db_sm_rsm import check_encs, mix, check_verfsigs, get_blsigs, dpk_bbsig_niz
 from pok import dpk_bbsplussig_nizkproofs,dpk_bbsig_nizkverifs,dpk_bbsplussig_nizkverifs
 import sys
 import json
-from db import store,load,init
-from bulletin_to_votes import process_bulletins
+from db import store,load,init,process_bulletins
+#from bulletin_to_votes import process_bulletins
 from ballot_draft import ballot_draft
 from misc import timer
 from elgamal import elgamal_th_keygen,elgamal_encrypt
 from optpaillier import pai_decrypt as pai_decrypt_single
 import ast
 from misc import serialize_wrapper, deserialize_wrapper,pprint
-from bbsig import bbbatchverify
 import pymongo
-from multiprocessing import Pool
-import traceback
 import logging
-from multiprocessing import cpu_count
-from concurrent.futures import ProcessPoolExecutor
-import subprocess
-import os
-import multiprocessing
-
-# Set spawn method for Docker compatibility
-# multiprocessing.set_start_method('spawn')
-
-#g = group.init(ZR, 5564993445756101503206304700110936918638328897597942591925129910965597995003)
-#h = group.init(ZR, 12653160894039224234691306368807880269056474991426613178779481321437840969124)
 
 import io
 import contextlib
@@ -174,6 +160,68 @@ def mixer():
                 continue
     print("Mixing and decryption was successful")
 
+#time complexity analysis O(n*t)
+#also do for set and reverse set membership
+def count_process(election_id):
+    candidate_data = load("load", [], election_id)
+    votes_data = load("mix", ["msgs_out_dec"], election_id)
+    n = len(votes_data)
+    k = len(candidate_data[0].split(","))  # number of preferences from first combination name
+    # "A,B" → ["A","B"] , "NAFS,NAFS" → ["NAFS","NAFS"]
+    # each parsed[i] will always have exactly k elements
+    parsed = [candidate_data[cand_id].split(",") for cand_id in votes_data]
+    all_candidates = set()
+    for combo in candidate_data:
+        for name in combo.split(","):
+            all_candidates.add(name)
+    active_candidates = set(all_candidates)
+    rounds = []
+    round_number = 1
+    curr_pref_level = [0] * n
+    while len(active_candidates) > 2:
+        vote_counts = {c: 0 for c in active_candidates}
+        for i in range(n):
+            prefs = parsed[i]
+            for level in range(curr_pref_level[i], k):
+                pref = prefs[level]
+                if pref in active_candidates:
+                    vote_counts[pref] += 1
+                    curr_pref_level[i] = level
+                    break
+        min_candidate = min(active_candidates, key=lambda c: vote_counts[c])
+        rounds.append({
+            "round": round_number,
+            "vote_counts": dict(vote_counts),
+            "eliminated": min_candidate
+        })
+        round_number += 1
+        active_candidates.remove(min_candidate)
+        for i in range(n):
+            level = curr_pref_level[i]
+            if level < k and parsed[i][level] == min_candidate:
+                curr_pref_level[i] += 1
+    final_counts = {c: 0 for c in active_candidates}
+    for i in range(n):
+        prefs = parsed[i]
+        for level in range(curr_pref_level[i], k):  # respect k here too
+            pref = prefs[level]
+            if pref in active_candidates:
+                final_counts[pref] += 1
+                break
+    winner = max(active_candidates, key=lambda c: final_counts[c])
+    rounds.append({
+        "round": round_number,
+        "vote_counts": dict(final_counts),
+        "eliminated": None
+    })
+
+    return {
+        "election_id": election_id,
+        "winner": winner,
+        "total_voters": n,
+        "total_rounds": round_number,
+        "rounds": rounds
+    }
 
 def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
     """ZK proofs for encrypted votes across all elections"""
@@ -371,7 +419,8 @@ if __name__ == "__main__":
         "mix": mixer,
         "pf_zksm": pf_zksm,
         "pf_zkrsm": pf_zkrsm,
-        "generate":generate_ballots
+        "generate":generate_ballots,
+        "count":count_process
     }
 
     func_name = sys.argv[1]

@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from misc import serialize_wrapper, deserialize_wrapper
 import os
 import ast
+import json
 function_map = {
         "setup": 'keys',
         "mix": 'decs',
@@ -90,14 +91,22 @@ def load(funcs, params, election_id):
         elif collection_name == 'votes':
             result = {}
             for param in params:
-                #print(param)
                 result[param] = []
-                # Create a fresh cursor for each parameter
-                parameter_documents = collection.find({"election_id": election_id})
-                for doc in parameter_documents:
-                    deserialized = deserialize_wrapper(doc[param])
-                    result[param].append(deserialized)
-        
+            documents = collection.find({"election_id": election_id})
+            for doc in documents:
+                vote_blocks = doc.get("votes", [])
+                if not isinstance(vote_blocks, list) or len(vote_blocks) == 0:
+                    continue
+                grouped = {param: [] for param in params}
+                for vote in vote_blocks:
+                    for param in params:
+                        if param in vote:
+                            val = deserialize_wrapper(vote[param])
+                            grouped[param].append(val)
+                        else:
+                            print(f"Missing {param} in {doc.get('_id')}")
+                for param in params:
+                    result[param].append(grouped[param])
         elif collection_name == 'candidates':
             result=[]
             documents = collection.find({"election_id": election_id})
@@ -126,3 +135,67 @@ def load(funcs, params, election_id):
         print(f"Error loading data: {str(e)}")
         return {}
     return result
+
+
+def process_bulletins(election_id):
+    db=init()
+    bulletins_collection = db['bulletins']
+    receipts_collection = db['receipts']
+    votes_collection = db['votes']
+
+    for bulletin in bulletins_collection.find({"election_id": election_id}):
+        try:
+            commitments = bulletin.get("commitment", [])
+            receipts = list(receipts_collection.find({
+                "enc_hash": {"$in": commitments},
+                "election_id": election_id
+            }))
+            if len(receipts) != len(commitments):
+                print(f"Missing receipts for bulletin {bulletin.get('_id')}")
+                continue
+            ov_hash = receipts[0]["ov_hash"]
+            encrypted_votes = []
+            for r in receipts:
+                ev = {
+                    "enc_hash": r["enc_hash"],
+                    "enc_msg": r["enc_msg"],
+                    "comm": r["comm"],
+                    "enc_msg_share": r["enc_msg_share"],
+                    "enc_rand_share": r["enc_rand_share"],
+                    "pfcomm": r["pfcomm"],
+                    "enc_rand": r["enc_rand"],
+                    "pf_encmsg": r["pf_encmsg"],
+                    "pf_encrand": r["pf_encrand"],
+                    "pfs_enc_msg_share": r["pfs_enc_msg_share"],
+                    "pfs_enc_rand_share": r["pfs_enc_rand_share"]
+                }
+                encrypted_votes.append(ev)
+
+            # Convert string fields to arrays using JSON parsing
+            vote_doc = {
+                "election_id": bulletin["election_id"],
+                "voter_id": bulletin["voter_id"],
+                "ov_hash": ov_hash,
+                "votes": encrypted_votes
+            }
+
+            # Insert into votes collection
+            votes_collection.update_one(
+                        {
+                            "voter_id": bulletin["voter_id"],
+                            "election_id": bulletin["election_id"]
+                        },
+                        {"$setOnInsert": vote_doc},
+                        upsert=True
+            )
+            #print(f"Processed voter {bulletin['voter_id']} in election {bulletin['election_id']}")
+
+        except KeyError as e:
+            print(f"Missing field {str(e)} in bulletin {bulletin.get('_id')}")
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error in bulletin {bulletin.get('_id')}: {str(e)}")
+        except Exception as e:
+            print(f"Error processing bulletin {bulletin.get('_id')}: {str(e)}")
+
+    print("Bulletin processing completed")
+    

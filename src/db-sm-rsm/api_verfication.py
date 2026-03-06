@@ -25,9 +25,7 @@ def verifier_signature_zksm():
     """Generate verifier signatures for all elections"""
     db=init()
     election_ids = db.keys.distinct("election_id")
-    
     all_results = {}
-
     for election_id in election_ids:
         try:
             f = io.StringIO()

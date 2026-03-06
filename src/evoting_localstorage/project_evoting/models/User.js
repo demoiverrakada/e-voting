@@ -122,7 +122,6 @@ AdminSchema.methods.comparePassword = function (candidatePassword) {
     });
 };
 
-// Schema to store votes on server
 const VotesSchema = new mongoose.Schema({
     election_id:{type:Number,required:true},
     voter_id: {
@@ -164,7 +163,15 @@ const CandidateSchema = new mongoose.Schema({
     cand_id: {
         type: String,
         required: true
-    }    
+    },
+    election_type:{
+        type:String,
+        required:true
+    },
+    number_of_preferences:{
+        type:Number,
+        required:true
+    }   
 });
 CandidateSchema.index({ election_id: 1, cand_id: 1 }, { unique: true });
 // Schema for voters
@@ -185,6 +192,15 @@ const VoterSchema = new mongoose.Schema({
     election_id:{
         type:Number,
         required:true
+    },
+    token_id:{
+        type:String,
+        default:"",
+        required:true
+    },
+    time_stamp: {
+        type: Date,
+        index: true 
     }
 });
 

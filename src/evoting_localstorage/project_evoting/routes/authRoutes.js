@@ -302,106 +302,146 @@ router.post('/upload', requireAuth, async (req, res) => {
 });
 
 module.exports = router;
+async function generateAndInsertCombinations({
+    electionId,
+    election_name,
+    election_type,
+    number_of_preferences,
+    candidateObjects
+}) {
+    const INSERT_BATCH = 5000;
+    let buffer = [];
+    let nextId = 0;
+    const NAFS = { name: "NAFS", entry_number: "012" };
+    async function flushIfNeeded() {
+        if (buffer.length >= INSERT_BATCH) {
+            await Candidate.insertMany(buffer, { ordered: false });
+            buffer = [];
+        }
+    }
+    function makeRecord(path) {
+        return {
+            election_id: electionId,
+            election_name,
+            election_type,
+            number_of_preferences,
+            name: path.map(c => c.name).join(","),
+            entry_number: path.map(c => c.entry_number).join(","),
+            cand_id: (nextId++).toString()
+        };
+    }
+    async function backtrack(path, used) {
+        if (path.length === number_of_preferences) {
+            buffer.push(makeRecord(path));
+            await flushIfNeeded();
+            return;
+        }
+        for (let i = 0; i < candidateObjects.length; i++) {
+            if (!used[i]) {
+                used[i] = true;
+                path.push(candidateObjects[i]);
+                await backtrack(path, used);
+                path.pop();
+                used[i] = false;
+            }
+        }
+    }
+    await backtrack([], new Array(candidateObjects.length).fill(false));
+    buffer.push(makeRecord(new Array(number_of_preferences).fill(NAFS)));
+    await flushIfNeeded();
+    for (const candidate of candidateObjects) {
+        for (let nafsPos = 0; nafsPos < number_of_preferences; nafsPos++) {
+            const path = [];
+            for (let slot = 0; slot < number_of_preferences; slot++) {
+                path.push(slot === nafsPos ? NAFS : candidate);
+            }
+            buffer.push(makeRecord(path));
+            await flushIfNeeded();
+        }
+    }
+    if (buffer.length > 0) {
+        await Candidate.insertMany(buffer, { ordered: false });
+    }
+}
+
 
 // Updated upload route
 router.post('/upload_candidate', requireAuth, async (req, res) => {
     try {
         const jsonData = req.body;
         const BATCH_SIZE = 1000;
-
         for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
             const batch = jsonData.slice(i, i + BATCH_SIZE);
-            
-            // 1. Insert main candidates
-            await Candidate.insertMany(batch, { ordered: false });
-
-            // 2. Process NOTA candidates for this batch
+            // Group by election_id
             const electionMap = new Map();
-            
-            // Get unique elections and their names
             batch.forEach(candidate => {
                 if (!electionMap.has(candidate.election_id)) {
-                    electionMap.set(candidate.election_id, {
-                        name: candidate.election_name,
-                        maxId: -1
-                    });
+                    electionMap.set(candidate.election_id, []);
                 }
+                electionMap.get(candidate.election_id).push(candidate);
             });
+            for (const [electionId, candidates] of electionMap) {
+                const {
+                    election_name,
+                    election_type,
+                    number_of_preferences
+                } = candidates[0];
+                if (election_type !== "preferential") {
+                    await Candidate.insertMany(candidates, { ordered: false });
 
-            // Get all election IDs from current batch
-            const electionIds = Array.from(electionMap.keys());
-
-            // Find maximum cand_id for each election (existing + new)
-            const aggregation = await Candidate.aggregate([
-                { $match: { election_id: { $in: electionIds } } },
-                {
-                    $addFields: {
-                        numeric_id: { $toInt: "$cand_id" }
-                    }
-                },
-                {
-                    $group: {
-                        _id: "$election_id",
-                        maxId: { $max: "$numeric_id" },
-                        election_name: { $first: "$election_name" }
-                    }
-                }
-            ]);
-
-            // Update electionMap with max IDs from aggregation
-            aggregation.forEach(result => {
-                if (electionMap.has(result._id)) {
-                    electionMap.get(result._id).maxId = result.maxId;
-                }
-            });
-
-            // Check current batch for higher IDs
-            batch.forEach(candidate => {
-                const election = electionMap.get(candidate.election_id);
-                const currentId = parseInt(candidate.cand_id, 10);
-                if (currentId > election.maxId) {
-                    election.maxId = currentId;
-                }
-            });
-
-            // Generate NOTA candidates
-            const notaCandidates = [];
-            for (const [electionId, data] of electionMap) {
-                // Check if NOTA already exists
-                const existingNota = await Candidate.findOne({
-                    election_id: electionId,
-                    name: 'NAFS'
-                });
-
-                if (!existingNota) {
-                    const nextId = data.maxId + 1;
-                    notaCandidates.push({
+                    // Add NAFS
+                    const maxId = Math.max(
+                        ...candidates.map(c => parseInt(c.cand_id))
+                    );
+                    await Candidate.insertMany([{
                         election_id: electionId,
-                        election_name: data.name,
-                        name: 'NAFS',
-                        entry_number:"012",
-                        cand_id: nextId.toString()
+                        election_name,
+                        election_type,
+                        number_of_preferences,
+                        name: "NAFS",
+                        entry_number: "012",
+                        cand_id: (maxId + 1).toString()
+                    }], { ordered: false });
+                }
+                else {
+                    const candidateObjects = candidates.map(c => ({
+                        name: c.name,
+                        entry_number: c.entry_number
+                    }));
+                    const n = candidateObjects.length;
+                    const k = number_of_preferences;
+                    if (k > n) {
+                        return res.status(400).send({
+                            status: 'Error',
+                            message: `number_of_preferences (${k}) cannot exceed candidate count (${n})`
+                        });
+                    }
+                    if (n > 10 || k > 5) {
+                        return res.status(400).send({
+                            status: 'Error',
+                            message: `Maximum allowed: 10 candidates and 5 preferences. Got n=${n}, k=${k}`
+                        });
+                    }
+                    await generateAndInsertCombinations({
+                        electionId,
+                        election_name,
+                        election_type,
+                        number_of_preferences,
+                        candidateObjects
                     });
                 }
-            }
-
-            // Insert new NOTA candidates
-            if (notaCandidates.length > 0) {
-                await Candidate.insertMany(notaCandidates, { ordered: false });
             }
         }
-
-        return res.status(200).send({ 
-            status: 'OK', 
-            message: 'Candidates uploaded successfully with sequential NOTA entries'
+        return res.status(200).send({
+            status: 'OK',
+            message: 'Candidates processed successfully'
         });
-        
     } catch (err) {
         console.error(err);
-        return res.status(500).send({ 
-            status: 'Error', 
-            message: err.code === 11000 
-                ? 'Duplicate candidate detected' 
+        return res.status(500).send({
+            status: 'Error',
+            message: err.code === 11000
+                ? 'Duplicate candidate detected'
                 : 'Processing failed'
         });
     }
@@ -479,60 +519,87 @@ router.get('/bulletin', async (req, res) => {
 
 router.get('/getVotes', async (req, res) => {
     try {
-      const decs = await Dec.find().lean();
-      const candidates = await Candidate.find().lean();
-  
-      // Create election ID (string) to name mapping
-      const electionNameMap = candidates.reduce((acc, candidate) => {
-        acc[candidate.election_id.toString()] = candidate.election_name;
-        return acc;
-      }, {});
-  
-      // Group votes by election_id (string)
-      const groupedVotes = decs.reduce((acc, dec) => {
-        const electionId = dec.election_id.toString();
-        if (!acc[electionId]) acc[electionId] = [];
-        
-        if (Array.isArray(dec.msgs_out_dec) && dec.msgs_out_dec.length > 1) {
-          dec.msgs_out_dec[1].forEach(item => {
-            if (Array.isArray(item) && item.length >= 2) {
-              acc[electionId].push(item[1]);
+        const decs = await Dec.find().lean();
+        const candidates = await Candidate.find().lean();
+        // Create election ID to name mapping
+        const electionNameMap = candidates.reduce((acc, candidate) => {
+            acc[candidate.election_id.toString()] = candidate.election_name;
+            return acc;
+        }, {});
+        // Create election ID to type mapping
+        const electionTypeMap = candidates.reduce((acc, candidate) => {
+            acc[candidate.election_id.toString()] = candidate.election_type;
+            return acc;
+        }, {});
+        // Group votes by election_id
+        const groupedVotes = decs.reduce((acc, dec) => {
+            const electionId = dec.election_id.toString();
+            if (!acc[electionId]) acc[electionId] = [];
+
+            if (Array.isArray(dec.msgs_out_dec) && dec.msgs_out_dec.length > 1) {
+                dec.msgs_out_dec[1].forEach(item => {
+                    if (Array.isArray(item) && item.length >= 2) {
+                        acc[electionId].push(item[1]);
+                    }
+                });
             }
-          });
+            return acc;
+        }, {});
+        const response = {};
+        for (const electionId of Object.keys(groupedVotes)) {
+            const electionType = electionTypeMap[electionId];
+            const electionName = electionNameMap[electionId] || "Unknown Election";
+            const electionCandidates = candidates
+                .filter(c => c.election_id.toString() === electionId)
+                .sort((a, b) => parseInt(a.cand_id) - parseInt(b.cand_id)); // must be sorted by cand_id
+            if (electionType === "preferential") {
+                try {
+                    const rawResult = await callPythonFunction("count", electionId);
+                    const preferentialResult = JSON.parse(rawResult);
+                    response[electionId] = {
+                        election_name: electionName,
+                        election_type: electionType,
+                        is_preferential: true,
+                        winner: preferentialResult.winner,
+                        total_voters: preferentialResult.total_voters,
+                        total_rounds: preferentialResult.total_rounds,
+                        rounds: preferentialResult.rounds
+                    };
+                } catch (parseErr) {
+                    console.error(`Failed to parse preferential result for election ${electionId}:`, parseErr);
+                    response[electionId] = {
+                        election_name: electionName,
+                        election_type: electionType,
+                        is_preferential: true,
+                        error: "Failed to process preferential vote count"
+                    };
+                }
+            }
+            else {
+                const voteCounts = new Array(electionCandidates.length).fill(0);
+                groupedVotes[electionId].forEach(vote => {
+                    if (vote >= 0 && vote < voteCounts.length) {
+                        voteCounts[vote]++;
+                    }
+                });
+                response[electionId] = {
+                    election_name: electionName,
+                    election_type: electionType,
+                    is_preferential: false,
+                    candidates: electionCandidates.map((candidate, index) => ({
+                        name: candidate.name,
+                        entry_number: candidate.entry_number,
+                        votes: voteCounts[index] || 0
+                    }))
+                };
+            }
         }
-        return acc;
-      }, {});
-  
-      // Prepare response with string keys
-      const response = Object.keys(groupedVotes).reduce((acc, electionId) => {
-        const electionCandidates = candidates.filter(c => 
-          c.election_id.toString() === electionId
-        );
-        
-        const voteCounts = new Array(electionCandidates.length).fill(0);
-        groupedVotes[electionId].forEach(vote => {
-          if (vote >= 0 && vote < voteCounts.length) {
-            voteCounts[vote]++;
-          }
-        });
-  
-        acc[electionId] = {
-          election_name: electionNameMap[electionId] || "Unknown Election",
-          candidates: electionCandidates.map((candidate, index) => ({
-            name: candidate.name,
-            entry_number:candidate.entry_number,
-            votes: voteCounts[index] || 0
-          }))
-        };
-        return acc;
-      }, {});
-  
-      res.json(response);
+        res.json(response);
     } catch (err) {
-      console.error('Error fetching data:', err);
-      res.status(500).json({ error: err.message });
+        console.error('Error fetching data:', err);
+        res.status(500).json({ error: err.message });
     }
-  });
+});
   
   
       
