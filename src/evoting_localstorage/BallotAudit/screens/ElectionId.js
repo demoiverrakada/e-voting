@@ -3,7 +3,7 @@ import { View, TextInput, Text, Alert, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
 const ElectionId = (props) => {
-    const commitments = props.route.params.commitments;
+    const commitment = props.route.params.commitment;
     const bid = props.route.params.bid;
     const [election_id, setElectionID] = useState(''); // Initialize as string for input handling
 
@@ -19,9 +19,8 @@ const ElectionId = (props) => {
                 {
                     text: 'Proceed',
                     onPress: () => {
-                        // Navigate to the next screen with the election_id
                         props.navigation.navigate('audit', {
-                            commitments: commitments,
+                            commitment: commitment,
                             bid: bid,
                             election_id: parseInt(election_id),
                         });

@@ -7,48 +7,18 @@ export default function BallotAudit(props) {
   const [loading, setLoading] = useState(false);
   const [auditCompleted, setAuditCompleted] = useState(false);
 
-  const parseStringToArray = (str) => {
-    return str
-      .slice(1, -1)
-      .split(",")
-      .map((item) => item.trim().replace(/^['"]|['"]$/g, ''));
-  };
-
-  let firstArray = '';
-  let z = 0;
-  for (let i = 1; i < props.route.params.commitments.length; i++) {
-    const char = props.route.params.commitments[i];
-    if (char === ']') {
-      firstArray += char;
-      z = i;
-      break;
-    }
-    firstArray += char;
-  }
-  firstArray = parseStringToArray(firstArray);
-  
-  let booth_num = '';
-  for (let i = z + 3; i < props.route.params.commitments.length; i++) {
-    const char = props.route.params.commitments[i];
-    if (char === '[') continue;
-    if (char === ',') break;
-    booth_num += char;
-  }
+  const commitment = props.route.params.commitment;
+  const bid = props.route.params.bid;
+  const election_id = props.route.params.election_id;
 
   const checkSend = async () => {
-    const commitment = firstArray;
-    const boothNum = booth_num;
-    const bid = parseStringToArray(props.route.params.bid);
-    const election_id = props.route.params.election_id;
-    
     setLoading(true);
     setAuditCompleted(false);
 
     try {
       const requestBody = {
         commitment: commitment,
-        booth_num: boothNum,
-        bid: bid[0],
+        bid: bid,
         election_id: election_id
       };
 

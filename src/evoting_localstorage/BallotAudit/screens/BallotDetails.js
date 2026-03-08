@@ -3,6 +3,31 @@ import { View, Text, StyleSheet, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useFocusEffect } from '@react-navigation/native';
 
+/**
+ * Parses the QR data string in format: [['hash1', 'hash2', ...], bid]
+ * Returns { commitment: string[], bid: string } or null on failure.
+ */
+function parseQRData(rawData) {
+  try {
+    // Extract 64-char hex hashes
+    const hashRegex = /['"]([a-f0-9]{64})['"]/g;
+    const commitment = [];
+    let match;
+    while ((match = hashRegex.exec(rawData)) !== null) {
+      commitment.push(match[1]);
+    }
+
+    // Extract bid: the large number after the hash array closes, i.e. after '], '
+    const bidMatch = rawData.match(/\],\s*(\d+)\s*\]/);
+    const bid = bidMatch ? bidMatch[1] : null;
+
+    if (commitment.length === 0 || !bid) return null;
+    return { commitment, bid };
+  } catch {
+    return null;
+  }
+}
+
 export default function Scanner(props) {
   const [isScannerActive, setIsScannerActive] = useState(true);
   const scannerRef = useRef(null);
@@ -14,29 +39,30 @@ export default function Scanner(props) {
     }, [])
   );
 
+  const reactivateScanner = () => {
+    setIsScannerActive(true);
+    setTimeout(() => scannerRef.current?.reactivate(), 1000);
+  };
+
   const handleScan = async ({ data }) => {
     if (!isScannerActive) return;
 
-    if (isValidQRCode(data)) {
+    const parsed = parseQRData(data);
+    if (parsed) {
       setIsScannerActive(false);
       Alert.alert(
-        "Encrypted candidate ID's scanned successfully",
+        "Ballot QR scanned successfully",
         "Do you want to proceed or rescan?",
         [
-          {
-            text: 'Rescan',
-            onPress: () => {
-              setIsScannerActive(true);
-              setTimeout(() => {
-                scannerRef.current?.reactivate();
-              }, 1000); // Changed to 1 second
-            },
-          },
+          { text: 'Rescan', onPress: reactivateScanner },
           {
             text: 'Proceed',
             onPress: () => {
-              props.navigation?.navigate?.("bid", { commitments: data });
-            }
+              props.navigation?.navigate?.("elect", {
+                commitment: parsed.commitment,
+                bid: parsed.bid,
+              });
+            },
           },
         ],
         { cancelable: false }
@@ -44,27 +70,18 @@ export default function Scanner(props) {
     } else {
       Alert.alert(
         'Invalid QR Code',
-        'Please scan a valid QR code.',
-        [{ text: 'OK', onPress: () => {
-          setIsScannerActive(true);
-          setTimeout(() => {
-            scannerRef.current?.reactivate();
-          }, 1000); // Changed to 1 second
-        }}],
+        'Could not parse ballot data from QR code.',
+        [{ text: 'OK', onPress: reactivateScanner }],
         { cancelable: false }
       );
     }
-  };
-
-  const isValidQRCode = (data) => {
-    return typeof data === 'string' && data.trim() !== '';
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.appHeading}>Ballot Audit App</Text>
       <Text style={styles.headerText}>
-        Scan Encrypted Candidate ID's on the Receipt side of the Ballot
+        Scan the Ballot QR Code
       </Text>
 
       {isScannerActive && (
@@ -84,29 +101,28 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 15,
     paddingTop: 20,
-    backgroundColor: "#f5f5f5", // Changed from #F2F7FC to match target style
+    backgroundColor: "#f5f5f5",
   },
   headerText: {
-    fontSize: 22, // Reduced from 30 to match target style
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#6200ea", // Changed from #4A90E2 to purple theme
+    color: "#6200ea",
     textAlign: "center",
     marginBottom: 25,
-    letterSpacing: 1, // Slightly reduced from original
+    letterSpacing: 1,
   },
   appHeading: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#6200ea", // Purple theme for consistency
+    color: "#6200ea",
     textAlign: "center",
-    marginBottom: 15, // Space below heading
-    letterSpacing: 2, // Slight spacing for better readability
-    textTransform: "uppercase", // Make it look bold and official
+    marginBottom: 15,
+    letterSpacing: 2,
+    textTransform: "uppercase",
   },
   marker: {
-    borderColor: '#6200ea', // Updated to purple theme
+    borderColor: '#6200ea',
     borderWidth: 2,
-    // Added shadow effects for depth
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,

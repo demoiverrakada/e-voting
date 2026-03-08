@@ -153,7 +153,7 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands, dpk_bbspl
 
 
 
-def audit(commitment, booth_num, bid, election_id):
+def audit(commitment, bid, election_id):
     f = io.StringIO()
     election_id=int(election_id)
     g12, h12 = load("generators", ["g1", "h1"], election_id).values()
@@ -162,7 +162,7 @@ def audit(commitment, booth_num, bid, election_id):
         result = load("receipt", [commitment[i], "accessed"],election_id)
         accessed = result.get("accessed")
         if accessed is True:
-            print(f"The ballot for election {election_id} has already been audited or used to cast a vote.")
+            print("The ballot has already been audited or the ballot has been used to cast a vote.")
             return
 
     with contextlib.redirect_stdout(f):

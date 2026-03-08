@@ -430,17 +430,19 @@ router.post('/fetch', async (req, res) => {
     
 router.post('/audit', async (req, res) => {
         try {
-            // Corrected request body extraction
-            const { commitment, booth_num, bid ,election_id} = req.body; 
+            const { commitment, bid, election_id } = req.body; 
     
+            if (!commitment || !bid || !election_id) {
+                return res.status(400).json({ error: "commitment, bid, and election_id are required." });
+            }
+
             console.log("Received audit request");
             console.log(commitment)
-            console.log(booth_num)
             console.log(bid)
             console.log(election_id)
             // Call the Python function
-            const result = await callPythonFunction("audit", commitment, booth_num, bid,election_id);
-            if(result==="The ballot has already been audited or the ballot has been used to cast a vote."){
+            const result = await callPythonFunction("audit", commitment, bid, election_id);
+            if(result.includes("already been audited")){
                 return res.json({results:"The ballot has already been audited or the ballot has been used to cast a vote."})
             }
             const parsedResult = typeof result === "string" ? JSON.parse(result) : result;
