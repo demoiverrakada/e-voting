@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { jwtkey } = require('../keys');
 const router = express.Router();
 const requireAuth = require('../middelware/requireToken');
-const { PO, Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,Verf,VerfP} = require('../models/User');
+const { PO, Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey} = require('../models/User');
 const cors = require('cors');
 const { spawnSync } = require('child_process');
 const fs = require('fs');
@@ -46,7 +46,16 @@ function callPythonFunction(functionName, ...params) {
         throw error;
     }
 }
-
+const upload = multer({ 
+    dest: '/tmp/uploads/',
+    fileFilter: (req, file, cb) => {
+        if (file.originalname.endsWith('.enc.json')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only .enc.json files are accepted'), false);
+        }
+    }
+});
 function callPythonFunction2(functionName, ...params){
     const scriptPath = join(__dirname, '../../../db-sm-rsm/data_generation.py');
     const pythonExecutable = 'python3';
@@ -78,7 +87,48 @@ function callPythonFunction2(functionName, ...params){
         throw error;
     }
 }
-
+function callPythonEncrypt() {
+    const scriptPath = join(__dirname, '../../../db-sm-rsm/encrypt_json.py');
+    const pythonExecutable = 'python3';
+    console.log(`Running: ${pythonExecutable} ${scriptPath}`);
+    const pythonProcess = spawnSync(pythonExecutable, [scriptPath], {
+        cwd: '/',   // <-- so ./output resolves to /output and ./encrypted_output to /encrypted_output
+        env: { ...process.env, precomputing: '1' },
+        maxBuffer: 1024 * 1024 * 10
+    });
+    if (pythonProcess.error) {
+        throw pythonProcess.error;
+    }
+    const stdout = pythonProcess.stdout.toString().trim();
+    const stderr = pythonProcess.stderr.toString().trim();
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+    console.log("Python output:", stdout);
+    return stdout;
+}
+function callPythonDecrypt(encryptedFilePath) {
+    const scriptPath = join(__dirname, '../../../db-sm-rsm/decrypt_json.py');
+    const pythonExecutable = 'python3';
+    console.log(`Running: ${pythonExecutable} ${scriptPath} ${encryptedFilePath}`);
+    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, encryptedFilePath], {
+        cwd: '/',
+        env: { ...process.env },
+        maxBuffer: 1024 * 1024 * 50
+    });
+    if (pythonProcess.error) {
+        throw pythonProcess.error;
+    }
+    const stderr = pythonProcess.stderr.toString().trim();
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+    if (pythonProcess.status !== 0) {
+        throw new Error(`Decryption failed with exit code ${pythonProcess.status}: ${stderr}`);
+    }
+    const stdout = pythonProcess.stdout.toString().trim();
+    return JSON.parse(stdout);
+}
 let requestStatus = {"generate":"pending","upload":"pending","decryption":"pending"};
 
 
@@ -116,59 +166,83 @@ router.post('/generate', requireAuth, async (req, res) => {
     const numBallots = Number(n);
     const numElections = Number(electionId);
     const outputDirectory = '/output';
+    const encryptedOutputDirectory = '/encrypted_output';  // <-- mounted volume
 
     try {
-        const result =await callPythonFunction("generate",numBallots,numElections)
+        // Step 1: Generate ballots
+        await callPythonFunction("generate", numBallots, numElections);
+        console.log('Ballot generation complete');
+
+        // Step 2: Encrypt
+        callPythonEncrypt();
+        console.log('Encryption complete');
+
+        // Step 3: Build per-BMD ZIPs
+        // Structure: /encrypted_output/<bmd_id>/<election_id>/ballot/*.enc.json
+        if (!fs.existsSync(encryptedOutputDirectory)) {
+            return res.status(404).json({ error: 'No encrypted output found' });
+        }
+
+        const bmdDirs = fs.readdirSync(encryptedOutputDirectory)
+            .filter(entry =>
+                fs.statSync(path.join(encryptedOutputDirectory, entry)).isDirectory()
+            );
+
+        if (bmdDirs.length === 0) {
+            return res.status(404).json({ error: 'No BMD directories found in encrypted output' });
+        }
+
         const concurrencyLimit = Math.min(os.cpus().length, 20);
-        const electionIds = Array.from({ length: numElections }, (_, i) => i + 1);
-        await async.eachLimit(electionIds, concurrencyLimit, async (i) => {
-            // Generate ballots for this election
-            console.log(`Ballots generated for election ${i}`);
+        const bmdZipPaths = [];
 
-            // Find PDFs for this election
-            const electionFiles = fs.readdirSync(outputDirectory)
-                .filter(file => file.startsWith(`election_id_${i}_`) && file.endsWith('.pdf'));
+        await async.eachLimit(bmdDirs, concurrencyLimit, async (bmdId) => {
+            const bmdDir = path.join(encryptedOutputDirectory, bmdId);
+            const bmdZipName = `${bmdId}.zip`;
+            const bmdZipPath = path.join(outputDirectory, bmdZipName);
 
-            if (electionFiles.length === 0) {
-                console.warn(`No PDFs found for election ${i}`);
-                return;
-            }
-
-            // Create individual ZIP
-            const individualZipName = `election_id_${i}_ballots.zip`;
-            const individualZipPath = path.join(outputDirectory, individualZipName);
-            
             await new Promise((resolve, reject) => {
-                const output = fs.createWriteStream(individualZipPath);
+                const output = fs.createWriteStream(bmdZipPath);
                 const archive = archiver('zip', { zlib: { level: 9 } });
 
                 output.on('close', () => {
-                    console.log(`Created individual ZIP for election ${i}`);
+                    console.log(`Created ZIP for ${bmdId}`);
                     resolve();
                 });
 
                 archive.on('error', reject);
                 archive.pipe(output);
-                
-                electionFiles.forEach(file => {
-                    archive.file(path.join(outputDirectory, file), { name: file });
+
+                // Walk: /encrypted_output/<bmdId>/<electionId>/ballot/*.enc.json
+                const electionDirs = fs.readdirSync(bmdDir)
+                    .filter(entry =>
+                        fs.statSync(path.join(bmdDir, entry)).isDirectory()
+                    );
+
+                electionDirs.forEach(electionId => {
+                    const ballotDir = path.join(bmdDir, electionId, 'ballot');
+                    if (!fs.existsSync(ballotDir)) return;
+
+                    const encFiles = fs.readdirSync(ballotDir)
+                        .filter(file => file.endsWith('.enc.json'));
+
+                    encFiles.forEach(file => {
+                        archive.file(
+                            path.join(ballotDir, file),
+                            { name: `${electionId}/ballot/${file}` }
+                        );
+                    });
                 });
 
                 archive.finalize();
             });
+
+            bmdZipPaths.push({ name: bmdZipName, filePath: bmdZipPath });
         });
 
-        // 2. Create master ZIP
-        const zipFiles = fs.readdirSync(outputDirectory)
-            .filter(file => file.startsWith('election_id_') && file.endsWith('_ballots.zip'));
-
-        if (zipFiles.length === 0) {
-            return res.status(404).json({ error: 'No ballots generated' });
-        }
-
-        const masterZipName = 'all_elections_combined.zip';
+        // Step 4: Master ZIP of all BMD ZIPs
+        const masterZipName = 'all_bmds_encrypted.zip';
         const masterZipPath = path.join(outputDirectory, masterZipName);
-        
+
         await new Promise((resolve, reject) => {
             const outputStream = fs.createWriteStream(masterZipPath);
             const archive = archiver('zip', { zlib: { level: 9 } });
@@ -176,19 +250,19 @@ router.post('/generate', requireAuth, async (req, res) => {
             outputStream.on('close', resolve);
             archive.on('error', reject);
             archive.pipe(outputStream);
-            
-            zipFiles.forEach(file => {
-                archive.file(path.join(outputDirectory, file), { name: file });
+
+            bmdZipPaths.forEach(({ name, filePath }) => {
+                archive.file(filePath, { name });
             });
 
             archive.finalize();
         });
-
-        // 3. Send the master ZIP
         res.download(masterZipPath, masterZipName, (err) => {
             if (err) {
                 console.error('Download error:', err);
-                res.status(500).json({ error: 'Failed to download ballots' });
+                if (!res.headersSent) {
+                    res.status(500).json({ error: 'Failed to download ballots' });
+                }
             }
         });
 
@@ -200,26 +274,29 @@ router.post('/generate', requireAuth, async (req, res) => {
 
 
 const BATCH_SIZE = 1000;
-router.post('/upload', requireAuth, async (req, res) => {
+router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
     try {
-        // 1. Validate and extract 'votes' array from payload
-        const { votes } = req.body;
+        const uploadedFile = req.file;
+        let votes;
+        if (uploadedFile) {
+            console.log(`Decrypting uploaded file: ${uploadedFile.path}`);
+            votes = callPythonDecrypt(uploadedFile.path);
+            console.log(`Decryption complete, got ${votes.length} votes`);
+        } else {
+            votes = req.body.votes;
+        }
         if (!Array.isArray(votes) || votes.length === 0) {
             return res.status(400).json({
                 status: 'Error',
                 message: "Payload must contain a non-empty 'votes' array."
             });
         }
-
         let totalInserted = 0;
         let totalMatched = 0;
         let totalModified = 0;
-
-        // 2. Process in batches
         for (let i = 0; i < votes.length; i += BATCH_SIZE) {
             const batch = votes.slice(i, i + BATCH_SIZE);
 
-            // 3. Prepare bulk write operations
             const bulkOps = batch.map(doc => ({
                 updateOne: {
                     filter: {
@@ -236,25 +313,18 @@ router.post('/upload', requireAuth, async (req, res) => {
                     hint: { voter_id: 1, election_id: 1 }
                 }
             }));
-
-            // 4. Execute bulk write
             const bulkResult = await Bulletin.bulkWrite(bulkOps, {
                 ordered: false,
                 bypassDocumentValidation: true
             });
-
             totalInserted += bulkResult.upsertedCount || 0;
             totalMatched += bulkResult.matchedCount || 0;
             totalModified += bulkResult.modifiedCount || 0;
-
-            // 5. Process successful inserts (if any)
             const insertedIds = Object.values(bulkResult.upsertedIds || {});
             if (insertedIds.length > 0) {
                 const insertedDocs = await Bulletin.find({
                     _id: { $in: insertedIds }
                 });
-
-                // 6. Update receipts for newly inserted documents
                 await Promise.all(insertedDocs.map(async (entry) => {
                     const { commitment } = entry;
                     const receipt = await Receipt.findOne({ enc_hash: commitment });
@@ -269,19 +339,20 @@ router.post('/upload', requireAuth, async (req, res) => {
                     }
                 }));
             }
-            // New voter status update
             const updateVoterConditions = batch.map(doc => ({
                 voter_id: doc.voter_id,
                 election_id: doc.election_id
             }));
-
-            const voterUpdateResult = await Voter.updateMany(
+            await Voter.updateMany(
                 { $or: updateVoterConditions },
                 { $set: { vote: true } },
                 { multi: true }
             );
         }
-
+        if (uploadedFile && fs.existsSync(uploadedFile.path)) {
+            fs.unlinkSync(uploadedFile.path);
+            console.log(`Cleaned up temp file: ${uploadedFile.path}`);
+        }
         res.send({
             status: 'OK',
             message: 'Upload process completed with timestamp-based conflict resolution.',
@@ -292,6 +363,9 @@ router.post('/upload', requireAuth, async (req, res) => {
         requestStatus["upload"] = "success";
     } catch (err) {
         console.error(err);
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         res.status(500).send({
             status: 'Error',
             message: 'An error occurred while processing the request.',
@@ -300,6 +374,7 @@ router.post('/upload', requireAuth, async (req, res) => {
         requestStatus["upload"] = "failed";
     }
 });
+              
 
 module.exports = router;
 async function generateAndInsertCombinations({
@@ -482,7 +557,27 @@ router.post('/upload_voters', requireAuth, async (req, res) => {
     }
 });
 
+router.post('/upload_bmd_keys', requireAuth, async (req, res) => {
+    try {
+        const jsonData = req.body;
 
+        if (!Array.isArray(jsonData) || jsonData.length === 0) {
+            return res.status(400).json({ status: 'Error', message: 'Payload must be a non-empty array.' });
+        }
+        await BMDPublicKey.insertMany(jsonData);
+        return res.status(200).json({
+            status: 'OK',
+            message: 'BMD public keys uploaded successfully.',
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            status: 'Error',
+            message: 'An error occurred while processing the request.',
+            detailedError: err.message
+        });
+    }
+});
 
 // endpoint to 
 router.post('/mix', requireAuth, async (req, res) => {

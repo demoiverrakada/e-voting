@@ -1,27 +1,27 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ReactSession } from 'react-client-session';
 import './Upload.css';
-import Navigation from '../Navigation'
+import Navigation from '../Navigation';
 import { useNavigate } from 'react-router-dom';
+
 function UploadDefault() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  
-    // Check for authentication when the page loads
-    useEffect(() => {
-      if (!sessionStorage.getItem('access_token')) {
-        navigate('/'); // Redirect to login page if no token
-      }
-    }, [navigate]);
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('access_token')) {
+      navigate('/');
+    }
+  }, [navigate]);
+
   const handleFileChange = (event) => {
     const uploadedFile = event.target.files[0];
-    if (uploadedFile && uploadedFile.type === 'application/json') {
+    if (uploadedFile && uploadedFile.name.endsWith('.enc.json')) {
       setFile(uploadedFile);
       setMessage('File selected: ' + uploadedFile.name);
     } else {
-      setMessage('Please upload a valid JSON file.');
+      setMessage('Please upload a valid .enc.json file.');
       setFile(null);
     }
   };
@@ -32,36 +32,32 @@ function UploadDefault() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const jsonData = JSON.parse(e.target.result);
-        const token = sessionStorage.getItem('access_token');
+    try {
+      const token = sessionStorage.getItem('access_token');
+      const formData = new FormData();
+      formData.append('file', file);
 
-        const response = await axios.post('/api/upload', jsonData, {
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+      const response = await axios.post('/api/upload', formData, {
+        headers: {
+          authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-        setMessage(`Upload successful: ${response.data.message || 'Success'}`);
-      } catch (error) {
-        setMessage(
-          `Upload failed: ${
-            error.response?.data?.message || error.message || 'Invalid JSON format or unknown error.'
-          }`
-        );
-      }
-    };
-
-    reader.readAsText(file);
+      setMessage(`Upload successful: ${response.data.message || 'Success'}`);
+    } catch (error) {
+      setMessage(
+        `Upload failed: ${
+          error.response?.data?.message || error.message || 'Unknown error.'
+        }`
+      );
+    }
   };
 
   return (
     <div className="upload-container">
-      <h1>Upload JSON File (Default)</h1>
-      <input type="file" accept=".json" onChange={handleFileChange} />
+      <h1>Upload Final Votes File</h1>
+      <input type="file" accept=".enc.json" onChange={handleFileChange} />
       {message && <p>{message}</p>}
       <button onClick={handleUpload}>Upload</button>
       <Navigation />

@@ -25,6 +25,7 @@ function OptionsPage() {
             <button onClick={() => handleNavigation('/upload_candidate')}>Upload Candidates List</button>
             <button onClick={() => handleNavigation('/upload_po')}>Upload Polling Officer Credentials</button>
             <button onClick={() => handleNavigation('/upload_voters')}>Upload Voter List</button>
+            <button onClick={() => handleNavigation('/upload_bmd_keys')}>Upload BMD Keys</button>
             <button onClick={() => handleNavigation('/setup')}>Setup System</button>
             <button onClick={() => handleNavigation('/generate_ballots')}>Generate Ballots</button>
           </div>
@@ -32,7 +33,6 @@ function OptionsPage() {
         <div className="section during-poll">
           <h2>Polling process</h2>
           <div className="buttons">
-          <button onClick={() => handleNavigation('/evoting_app')}>Generate Evoting App</button>
           <button onClick={() => handleNavigation('/upload_votes')}>Upload Votes</button>
           </div>
         </div>

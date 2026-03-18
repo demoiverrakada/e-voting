@@ -20,7 +20,7 @@ export default function Scanner(props) {
     if (isValidQRCode(data)) {
       setIsScannerActive(false);
       Alert.alert(
-        "Encrypted candidate ID's scanned successfully",
+        "Ballot QR code scanned correctly",
         "Do you want to proceed or rescan?",
         [
           {
@@ -35,7 +35,7 @@ export default function Scanner(props) {
           {
             text: 'Proceed',
             onPress: () => {
-              props.navigation?.navigate?.("bid", { commitments: data });
+              props.navigation?.navigate?.("audit", { commitments: data });
             }
           },
         ],

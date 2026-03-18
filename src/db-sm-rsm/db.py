@@ -14,8 +14,12 @@ function_map = {
 
 
 def init():
-    client = MongoClient('mongodb://root:pass@eadb:27017')
-    db = client['test']
+    username=os.environ.get("MONGO_USERNAME")
+    password=os.environ.get("MONGO_PASSWORD")
+    host= os.environ.get("MONGO_HOST")
+    port=os.environ.get("MONGO_PORT","27017")
+    client=MongoClient(f'mongodb://{username}:{password}@{host}:{port}')
+    db=client['test']
     return db
 
 def store(funcs,params):

@@ -119,11 +119,6 @@ def create_ballot_json(m, collection, filename, candidates, pai_sklist, pai_pk_o
         print(f"Error saving JSON: {str(e)}")
         return False
 
-def init():
-    client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
-    db = client["test"]
-    return db
-
 def clean_for_json(obj):
     """
     Recursively cleans crypto objects to simple Strings/Ints/Lists.

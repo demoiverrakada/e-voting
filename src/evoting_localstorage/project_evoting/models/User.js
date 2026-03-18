@@ -320,6 +320,83 @@ const pairingElementSchema = new mongoose.Schema({
       required: true
     }
   });
+const BMDPublicKeySchema = new mongoose.Schema({
+    bmd_id: {
+        type: Number,
+        required: true,
+        unique: true
+    },
+    rsa_public_key_pem: {
+        type: String,
+        required: true
+    },
+    is_active: {
+        type: Boolean,
+        required: true,
+        default: true
+    },
+    assigned_ballot_range: {
+        start_index: {
+            type: Number,
+            required: true
+        },
+        end_index: {
+            type: Number,
+            required: true
+        }
+    },
+    key_version: {
+        type: Number,
+        default: 1
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
+    }
+});
+const ServerKeySchema = new mongoose.Schema({
+    server_id: {
+        type: String,
+        required: true,
+        unique: true,
+        default: "main_server"
+    },
+    rsa_public_key_pem: {
+        type: String,
+        required: true
+    },
+    rsa_private_key_pem: {
+        type: String,
+        required: true// stored as passphrase-protected encrypted PEM
+    },
+    key_version: {
+        type: Number,
+        default: 1
+    },
+    is_active: {
+        type: Boolean,
+        default: true
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
+    }
+});
+const AESKeySchema = new mongoose.Schema({
+    encrypted_aes_key: {
+        type: String,
+        required: true // AES key encrypted with server's RSA public key (base64)
+    },
+    nonce_base: {
+        type: String,
+        required: true // base64-encoded 12-byte nonce
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
+    }
+});
+
 // Create models for each schema
 const PO = dbConnection.model('PO', PollingSchema);
 const Votes = dbConnection.model('Votes', VotesSchema);
@@ -331,6 +408,9 @@ const Bulletin=dbConnection.model('Bulletin',BulletinSchema);
 const Keys=dbConnection.model('Keys',keysSchema);
 const Dec=dbConnection.model('Dec',decSchema);
 const Generator=dbConnection.model('Generator',generatorSchema);
+const BMDPublicKey=dbConnection.model('BMDPublicKey',BMDPublicKeySchema);
+const ServerKey    = mongoose.model('ServerKey',ServerKeySchema);
+const AESKey       = mongoose.model('AESKey',AESKeySchema);
 module.exports = {
     PO,
     Votes,
@@ -341,5 +421,8 @@ module.exports = {
     Bulletin,
     Keys,
     Dec,
-    Generator
+    Generator,
+    BMDPublicKey, 
+    ServerKey, 
+    AESKey
 };
