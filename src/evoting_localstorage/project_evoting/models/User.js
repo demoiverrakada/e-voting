@@ -112,10 +112,10 @@ AdminSchema.methods.comparePassword = function (candidatePassword) {
     return new Promise((resolve, reject) => {
         bcrypt.compare(candidatePassword, user.password, (err, isMatch) => {
             if (err) {
-                return reject(err);
+                return reject(err); 
             }
             if (!isMatch) {
-                return reject(null);
+                return resolve(false); 
             }
             resolve(true); 
         });
@@ -334,24 +334,6 @@ const BMDPublicKeySchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: true
-    },
-    assigned_ballot_range: {
-        start_index: {
-            type: Number,
-            required: true
-        },
-        end_index: {
-            type: Number,
-            required: true
-        }
-    },
-    key_version: {
-        type: Number,
-        default: 1
-    },
-    created_at: {
-        type: Date,
-        default: Date.now
     }
 });
 const ServerKeySchema = new mongoose.Schema({

@@ -166,7 +166,7 @@ router.post('/generate', requireAuth, async (req, res) => {
     const numBallots = Number(n);
     const numElections = Number(electionId);
     const outputDirectory = '/output';
-    const encryptedOutputDirectory = '/encrypted_output';  // <-- mounted volume
+    const encryptedOutputDirectory = '/encrypted_output';
 
     try {
         // Step 1: Generate ballots
@@ -179,6 +179,7 @@ router.post('/generate', requireAuth, async (req, res) => {
 
         // Step 3: Build per-BMD ZIPs
         // Structure: /encrypted_output/<bmd_id>/<election_id>/ballot/*.enc.json
+        //                              <bmd_id>/<election_id>/aes_key.enc
         if (!fs.existsSync(encryptedOutputDirectory)) {
             return res.status(404).json({ error: 'No encrypted output found' });
         }
@@ -212,14 +213,26 @@ router.post('/generate', requireAuth, async (req, res) => {
                 archive.on('error', reject);
                 archive.pipe(output);
 
-                // Walk: /encrypted_output/<bmdId>/<electionId>/ballot/*.enc.json
+                // Walk: /encrypted_output/<bmdId>/<electionId>/
                 const electionDirs = fs.readdirSync(bmdDir)
                     .filter(entry =>
                         fs.statSync(path.join(bmdDir, entry)).isDirectory()
                     );
 
                 electionDirs.forEach(electionId => {
-                    const ballotDir = path.join(bmdDir, electionId, 'ballot');
+                    const electionDir = path.join(bmdDir, electionId);
+
+                    // ✅ Include aes_key.enc at <electionId>/aes_key.enc
+                    const aesKeyFile = path.join(electionDir, 'aes_key.enc');
+                    if (fs.existsSync(aesKeyFile)) {
+                        archive.file(aesKeyFile, { name: `${electionId}/aes_key.enc` });
+                        console.log(`Added AES key file for BMD ${bmdId}, election ${electionId}`);
+                    } else {
+                        console.warn(`Missing aes_key.enc for BMD ${bmdId}, election ${electionId}`);
+                    }
+
+                    // ✅ Include ballot/*.enc.json files
+                    const ballotDir = path.join(electionDir, 'ballot');
                     if (!fs.existsSync(ballotDir)) return;
 
                     const encFiles = fs.readdirSync(ballotDir)
@@ -257,6 +270,7 @@ router.post('/generate', requireAuth, async (req, res) => {
 
             archive.finalize();
         });
+
         res.download(masterZipPath, masterZipName, (err) => {
             if (err) {
                 console.error('Download error:', err);
@@ -723,20 +737,30 @@ router.post('/signin/PO', async (req, res) => {
 
 // for signing in Admin
 router.post('/signin/Admin', async (req, res) => {
+    console.log("---------------- DEBUG START ----------------");
     const { email, password } = req.body;
+    console.log("1. Login Attempt for:", email);
+    console.log("2. Password Length:", password ? password.length : "Missing");
     if (!email || !password) {
+        console.log("3. ERROR: Missing credentials");
         return res.status(422).send({ error: "Must provide email or password" });
     }
     const newAdmin = await Admin.findOne({ email });
     if (!newAdmin) {
+        console.log("4. ERROR: Admin doesn't exist with this email");
         return res.status(422).send({ error: "Admin doesn't exist with this email" });
     }
     try {
-        await newAdmin.comparePassword(password);
+        const isMatch = await newAdmin.comparePassword(password);
+        if (!isMatch) {
+            console.log("5. ERROR: Invalid password");
+            return res.status(422).send({ error: "Invalid password" });
+        }
         const token = jwt.sign({ userId: newAdmin._id }, jwtkey);
-        console.log(token)
+        console.log(token);
         res.send({ token });
     } catch (err) {
+        console.log("6. ERROR: error");
         return res.status(422).send(err.message);
     }
 });
