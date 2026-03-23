@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { jwtkey } = require('../keys');
 const router = express.Router();
 const requireAuth = require('../middelware/requireToken');
-const { PO, Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey} = require('../models/User');
+const { PO, Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey,AESKey,ServerKey} = require('../models/User');
 const cors = require('cors');
 const { spawnSync } = require('child_process');
 const fs = require('fs');
@@ -14,6 +14,7 @@ const archiver = require('archiver');
 router.use(cors());
 const async = require('async');
 const os = require('os');
+const multer = require('multer');
 // function for running api.py python script
 function callPythonFunction(functionName, ...params) {
     const scriptPath = join(__dirname, '../../../db-sm-rsm/api.py');
@@ -107,28 +108,6 @@ function callPythonEncrypt() {
     console.log("Python output:", stdout);
     return stdout;
 }
-function callPythonDecrypt(encryptedFilePath) {
-    const scriptPath = join(__dirname, '../../../db-sm-rsm/decrypt_json.py');
-    const pythonExecutable = 'python3';
-    console.log(`Running: ${pythonExecutable} ${scriptPath} ${encryptedFilePath}`);
-    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, encryptedFilePath], {
-        cwd: '/',
-        env: { ...process.env },
-        maxBuffer: 1024 * 1024 * 50
-    });
-    if (pythonProcess.error) {
-        throw pythonProcess.error;
-    }
-    const stderr = pythonProcess.stderr.toString().trim();
-    if (stderr) {
-        console.error('Python stderr:', stderr);
-    }
-    if (pythonProcess.status !== 0) {
-        throw new Error(`Decryption failed with exit code ${pythonProcess.status}: ${stderr}`);
-    }
-    const stdout = pythonProcess.stdout.toString().trim();
-    return JSON.parse(stdout);
-}
 let requestStatus = {"generate":"pending","upload":"pending","decryption":"pending"};
 
 
@@ -174,7 +153,7 @@ router.post('/generate', requireAuth, async (req, res) => {
         console.log('Ballot generation complete');
 
         // Step 2: Encrypt
-        callPythonEncrypt();
+        await callPythonEncrypt();
         console.log('Encryption complete');
 
         // Step 3: Build per-BMD ZIPs
@@ -219,16 +198,21 @@ router.post('/generate', requireAuth, async (req, res) => {
                         fs.statSync(path.join(bmdDir, entry)).isDirectory()
                     );
 
+                let aesKeyAdded = false;
+
                 electionDirs.forEach(electionId => {
                     const electionDir = path.join(bmdDir, electionId);
 
-                    // ✅ Include aes_key.enc at <electionId>/aes_key.enc
-                    const aesKeyFile = path.join(electionDir, 'aes_key.enc');
-                    if (fs.existsSync(aesKeyFile)) {
-                        archive.file(aesKeyFile, { name: `${electionId}/aes_key.enc` });
-                        console.log(`Added AES key file for BMD ${bmdId}, election ${electionId}`);
-                    } else {
-                        console.warn(`Missing aes_key.enc for BMD ${bmdId}, election ${electionId}`);
+                    // ✅ Include aes_key.enc at archive root (once)
+                    if (!aesKeyAdded) {
+                        const aesKeyFile = path.join(electionDir, 'aes_key.enc');
+                        if (fs.existsSync(aesKeyFile)) {
+                            archive.file(aesKeyFile, { name: 'aes_key.enc' });
+                            console.log(`Added AES key file for BMD ${bmdId}`);
+                            aesKeyAdded = true;
+                        } else {
+                            console.warn(`Missing aes_key.enc for BMD ${bmdId}, election ${electionId}`);
+                        }
                     }
 
                     // ✅ Include ballot/*.enc.json files
@@ -288,61 +272,100 @@ router.post('/generate', requireAuth, async (req, res) => {
 
 
 const BATCH_SIZE = 1000;
+
+function callPythonDecrypt(encryptedFilePath) {
+    const scriptPath = join(__dirname, '../../../db-sm-rsm/decrypt_json.py');
+    const pythonExecutable = 'python3';
+    console.log(`Running: ${pythonExecutable} ${scriptPath} ${encryptedFilePath}`);
+    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, encryptedFilePath], {
+        cwd: '/',
+        env: { ...process.env },
+        maxBuffer: 1024 * 1024 * 50
+    });
+    if (pythonProcess.error) {
+        throw pythonProcess.error;
+    }
+    const stderr = pythonProcess.stderr.toString().trim();
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+    if (pythonProcess.status !== 0) {
+        throw new Error(`Decryption failed with exit code ${pythonProcess.status}: ${stderr}`);
+    }
+    const stdout = pythonProcess.stdout.toString().trim();
+    return JSON.parse(stdout);
+}
+function parseTimestamp(ts) {
+    // '20-03-26 04:12:06' → '2020-03-26T04:12:06'
+    const [datePart, timePart] = ts.split(' ');
+    const [yy, mm, dd] = datePart.split('-');
+    return new Date(`20${yy}-${mm}-${dd}T${timePart}`);
+}
 router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
     try {
         const uploadedFile = req.file;
         let votes;
+
         if (uploadedFile) {
             console.log(`Decrypting uploaded file: ${uploadedFile.path}`);
-            votes = callPythonDecrypt(uploadedFile.path);
+            votes = await callPythonDecrypt(uploadedFile.path);
             console.log(`Decryption complete, got ${votes.length} votes`);
         } else {
             votes = req.body.votes;
         }
+        console.log(votes)
         if (!Array.isArray(votes) || votes.length === 0) {
             return res.status(400).json({
                 status: 'Error',
                 message: "Payload must contain a non-empty 'votes' array."
             });
         }
+
         let totalInserted = 0;
-        let totalMatched = 0;
+        let totalMatched  = 0;
         let totalModified = 0;
+
         for (let i = 0; i < votes.length; i += BATCH_SIZE) {
             const batch = votes.slice(i, i + BATCH_SIZE);
 
             const bulkOps = batch.map(doc => ({
                 updateOne: {
                     filter: {
-                        voter_id: doc.voter_id,
-                        election_id: doc.election_id
+                        voter_id:    doc.voter_id,
+                        election_id: Number(doc.election_id)
                     },
                     update: {
                         $setOnInsert: {
-                            ...doc,
-                            timestamp: new Date(doc.timestamp)
+                            election_id: Number(doc.election_id),
+                            voter_id:    doc.voter_id,
+                            booth_num:   Number(doc.booth_num),
+                            commitment:  doc.commitment,
+                            pref_id:     doc.pref_id,
+                            hash_value:  doc.hash_value,
+                            timestamp:   parseTimestamp(doc.timestamp)
                         }
                     },
-                    upsert: true,
-                    hint: { voter_id: 1, election_id: 1 }
+                    upsert: true
                 }
             }));
+            
             const bulkResult = await Bulletin.bulkWrite(bulkOps, {
                 ordered: false,
                 bypassDocumentValidation: true
             });
+            
+            console.log(`Bulk result: inserted=${bulkResult.upsertedCount}, matched=${bulkResult.matchedCount}, modified=${bulkResult.modifiedCount}`);
             totalInserted += bulkResult.upsertedCount || 0;
-            totalMatched += bulkResult.matchedCount || 0;
+            totalMatched  += bulkResult.matchedCount  || 0;
             totalModified += bulkResult.modifiedCount || 0;
+
             const insertedIds = Object.values(bulkResult.upsertedIds || {});
             if (insertedIds.length > 0) {
-                const insertedDocs = await Bulletin.find({
-                    _id: { $in: insertedIds }
-                });
+                const insertedDocs = await Bulletin.find({ _id: { $in: insertedIds } });
+
                 await Promise.all(insertedDocs.map(async (entry) => {
                     const { commitment } = entry;
                     const receipt = await Receipt.findOne({ enc_hash: commitment });
-
                     if (receipt) {
                         const { ov_hash } = receipt;
                         const updatedReceipts = await Receipt.updateMany(
@@ -353,28 +376,34 @@ router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
                     }
                 }));
             }
+
             const updateVoterConditions = batch.map(doc => ({
-                voter_id: doc.voter_id,
+                voter_id:    doc.voter_id,
                 election_id: doc.election_id
             }));
+
             await Voter.updateMany(
                 { $or: updateVoterConditions },
                 { $set: { vote: true } },
                 { multi: true }
             );
         }
+
         if (uploadedFile && fs.existsSync(uploadedFile.path)) {
             fs.unlinkSync(uploadedFile.path);
             console.log(`Cleaned up temp file: ${uploadedFile.path}`);
         }
+
         res.send({
             status: 'OK',
             message: 'Upload process completed with timestamp-based conflict resolution.',
             insertedCount: totalInserted,
-            matchedCount: totalMatched,
+            matchedCount:  totalMatched,
             modifiedCount: totalModified
         });
+
         requestStatus["upload"] = "success";
+
     } catch (err) {
         console.error(err);
         if (req.file && fs.existsSync(req.file.path)) {
@@ -388,9 +417,8 @@ router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
         requestStatus["upload"] = "failed";
     }
 });
-              
 
-module.exports = router;
+
 async function generateAndInsertCombinations({
     electionId,
     election_name,
@@ -402,12 +430,14 @@ async function generateAndInsertCombinations({
     let buffer = [];
     let nextId = 0;
     const NAFS = { name: "NAFS", entry_number: "012" };
+
     async function flushIfNeeded() {
         if (buffer.length >= INSERT_BATCH) {
             await Candidate.insertMany(buffer, { ordered: false });
             buffer = [];
         }
     }
+
     function makeRecord(path) {
         return {
             election_id: electionId,
@@ -419,12 +449,20 @@ async function generateAndInsertCombinations({
             cand_id: (nextId++).toString()
         };
     }
+
     async function backtrack(path, used) {
         if (path.length === number_of_preferences) {
             buffer.push(makeRecord(path));
             await flushIfNeeded();
             return;
         }
+
+        // Place NAFS at this position
+        path.push(NAFS);
+        await backtrack(path, used);
+        path.pop();
+
+        // Place any unused real candidate at this position
         for (let i = 0; i < candidateObjects.length; i++) {
             if (!used[i]) {
                 used[i] = true;
@@ -435,19 +473,9 @@ async function generateAndInsertCombinations({
             }
         }
     }
+
     await backtrack([], new Array(candidateObjects.length).fill(false));
-    buffer.push(makeRecord(new Array(number_of_preferences).fill(NAFS)));
-    await flushIfNeeded();
-    for (const candidate of candidateObjects) {
-        for (let nafsPos = 0; nafsPos < number_of_preferences; nafsPos++) {
-            const path = [];
-            for (let slot = 0; slot < number_of_preferences; slot++) {
-                path.push(slot === nafsPos ? NAFS : candidate);
-            }
-            buffer.push(makeRecord(path));
-            await flushIfNeeded();
-        }
-    }
+
     if (buffer.length > 0) {
         await Candidate.insertMany(buffer, { ordered: false });
     }

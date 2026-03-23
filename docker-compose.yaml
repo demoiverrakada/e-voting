@@ -27,8 +27,8 @@ services:
     - ./output:/output
     - ./encrypted_output:/encrypted_output  # <-- add this
     - /app/evoting_localstorage/project_evoting/node_modules
-    cpu_count: 8  # Explicit core allocation
-    cpus: 8.0     # Alternative: 8.0 = 8 cores (100% per core)
+    cpu_count: 4  # Explicit core allocation
+    cpus: 4.0     # Alternative: 8.0 = 8 cores (100% per core)
     cpu_shares: 1024  # Default priority
     mem_limit: 32G
   

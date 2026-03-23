@@ -75,7 +75,7 @@ function DecryptedVotes() {
         try {
             const token = sessionStorage.getItem('access_token');
             await axios.post(
-                '/api/mix',
+                'https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/mix',
                 {},
                 { headers: { authorization: `Bearer ${token}` } }
             );
@@ -89,9 +89,13 @@ function DecryptedVotes() {
     const handleGetDcrpVotes = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('/api/getVotes');
+            const token = sessionStorage.getItem('access_token');
+            const response = await axios.get(
+                'https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/getVotes',
+                { headers: { authorization: `Bearer ${token}` } }
+            );
             const votesData = response.data || {};
-
+    
             const elections = Object.entries(votesData).map(([id, data]) => ({
                 id: id.toString(),
                 name: data.election_name || `Election ${id}`

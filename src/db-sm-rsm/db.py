@@ -3,6 +3,7 @@ from misc import serialize_wrapper, deserialize_wrapper
 import os
 import ast
 import json
+import base64
 function_map = {
         "setup": 'keys',
         "mix": 'decs',
@@ -12,14 +13,13 @@ function_map = {
         "receipt":'receipts',
 }
 
-
 def init():
-    username=os.environ.get("MONGO_USERNAME")
-    password=os.environ.get("MONGO_PASSWORD")
-    host= os.environ.get("MONGO_HOST")
-    port=os.environ.get("MONGO_PORT","27017")
-    client=MongoClient(f'mongodb://{username}:{password}@{host}:{port}')
-    db=client['test']
+    username = os.environ.get("MONGO_USERNAME")
+    password = os.environ.get("MONGO_PASSWORD")
+    host     = os.environ.get("MONGO_HOST")
+    port     = os.environ.get("MONGO_PORT", "27017")
+    client   = MongoClient(f'mongodb://{username}:{password}@{host}:{port}/test?authSource=admin')
+    db       = client['test']
     return db
 
 def store(funcs,params):
@@ -51,13 +51,13 @@ def store(funcs,params):
             "_elg_sklist":(serialize_wrapper(params[6])),
             "election_id":(params[7])
         })
-    elif(function_map[funcs]=='decs'):
+    elif function_map[funcs] == 'decs':
         collection.insert_one({
-        "election_id": params[0],  # First parameter is election_id
-        "msgs_out_dec": serialize_wrapper(params[1]),
-        "msgs_out": serialize_wrapper(params[2]),
-        "_msg_shares": serialize_wrapper(params[3]),
-        "_rand_shares": serialize_wrapper(params[4])
+            "election_id":  params[0],
+            "msgs_out_dec": (serialize_wrapper(params[1])),
+            "msgs_out":     (serialize_wrapper(params[2])),
+            "_msg_shares":  (serialize_wrapper(params[3])),
+            "_rand_shares": (serialize_wrapper(params[4]))
         })
 
 
@@ -95,22 +95,14 @@ def load(funcs, params, election_id):
         elif collection_name == 'votes':
             result = {}
             for param in params:
+                #print(param)
                 result[param] = []
-            documents = collection.find({"election_id": election_id})
-            for doc in documents:
-                vote_blocks = doc.get("votes", [])
-                if not isinstance(vote_blocks, list) or len(vote_blocks) == 0:
-                    continue
-                grouped = {param: [] for param in params}
-                for vote in vote_blocks:
-                    for param in params:
-                        if param in vote:
-                            val = deserialize_wrapper(vote[param])
-                            grouped[param].append(val)
-                        else:
-                            print(f"Missing {param} in {doc.get('_id')}")
-                for param in params:
-                    result[param].append(grouped[param])
+                # Create a fresh cursor for each parameter
+                parameter_documents = collection.find({"election_id": election_id})
+                for doc in parameter_documents:
+                    deserialized = deserialize_wrapper(doc[param])
+                    result[param].append(deserialized)
+            return result
         elif collection_name == 'candidates':
             result=[]
             documents = collection.find({"election_id": election_id})
@@ -142,57 +134,60 @@ def load(funcs, params, election_id):
 
 
 def process_bulletins(election_id):
-    db=init()
+    db = init()
     bulletins_collection = db['bulletins']
-    receipts_collection = db['receipts']
-    votes_collection = db['votes']
+    receipts_collection  = db['receipts']
+    votes_collection     = db['votes']
+
+    count = bulletins_collection.count_documents({"election_id": election_id})
+    print(f"Found {count} bulletins for election {election_id}")
 
     for bulletin in bulletins_collection.find({"election_id": election_id}):
         try:
-            commitments = bulletin.get("commitment", [])
-            receipts = list(receipts_collection.find({
-                "enc_hash": {"$in": commitments},
-                "election_id": election_id
-            }))
-            if len(receipts) != len(commitments):
-                print(f"Missing receipts for bulletin {bulletin.get('_id')}")
+            commitment = bulletin.get("commitment")
+            if not commitment:
+                print(f"No commitment in bulletin {bulletin.get('_id')}")
                 continue
-            ov_hash = receipts[0]["ov_hash"]
-            encrypted_votes = []
-            for r in receipts:
-                ev = {
-                    "enc_hash": r["enc_hash"],
-                    "enc_msg": r["enc_msg"],
-                    "comm": r["comm"],
-                    "enc_msg_share": r["enc_msg_share"],
-                    "enc_rand_share": r["enc_rand_share"],
-                    "pfcomm": r["pfcomm"],
-                    "enc_rand": r["enc_rand"],
-                    "pf_encmsg": r["pf_encmsg"],
-                    "pf_encrand": r["pf_encrand"],
-                    "pfs_enc_msg_share": r["pfs_enc_msg_share"],
-                    "pfs_enc_rand_share": r["pfs_enc_rand_share"]
-                }
-                encrypted_votes.append(ev)
 
-            # Convert string fields to arrays using JSON parsing
+            receipt = receipts_collection.find_one({
+                "enc_hash": commitment,
+                "election_id": election_id
+            })
+
+            if not receipt:
+                receipt = receipts_collection.find_one({"enc_hash": commitment})
+                if not receipt:
+                    print(f"Missing receipt for commitment {commitment[:16]}...")
+                    continue
+
+            print(f"Found receipt for voter {bulletin['voter_id']} election {election_id}")
+
             vote_doc = {
-                "election_id": bulletin["election_id"],
-                "voter_id": bulletin["voter_id"],
-                "ov_hash": ov_hash,
-                "votes": encrypted_votes
+                "election_id":        bulletin["election_id"],
+                "voter_id":           bulletin["voter_id"],
+                "ov_hash":            receipt["ov_hash"],
+                "enc_hash":           receipt["enc_hash"],
+                "enc_msg":            receipt["enc_msg"],
+                "comm":               receipt["comm"],
+                "enc_msg_share":      receipt["enc_msg_share"],
+                "enc_rand_share":     receipt["enc_rand_share"],
+                "pfcomm":             receipt["pfcomm"],
+                "enc_rand":           receipt["enc_rand"],
+                "pf_encmsg":          receipt["pf_encmsg"],
+                "pf_encrand":         receipt["pf_encrand"],
+                "pfs_enc_msg_share":  receipt["pfs_enc_msg_share"],
+                "pfs_enc_rand_share": receipt["pfs_enc_rand_share"]
             }
 
-            # Insert into votes collection
-            votes_collection.update_one(
-                        {
-                            "voter_id": bulletin["voter_id"],
-                            "election_id": bulletin["election_id"]
-                        },
-                        {"$setOnInsert": vote_doc},
-                        upsert=True
+            result = votes_collection.update_one(
+                {
+                    "voter_id":    bulletin["voter_id"],
+                    "election_id": bulletin["election_id"]
+                },
+                {"$setOnInsert": vote_doc},
+                upsert=True
             )
-            #print(f"Processed voter {bulletin['voter_id']} in election {bulletin['election_id']}")
+            print(f"Upsert result: matched={result.matched_count}, upserted={result.upserted_id}")
 
         except KeyError as e:
             print(f"Missing field {str(e)} in bulletin {bulletin.get('_id')}")
@@ -202,4 +197,3 @@ def process_bulletins(election_id):
             print(f"Error processing bulletin {bulletin.get('_id')}: {str(e)}")
 
     print("Bulletin processing completed")
-    

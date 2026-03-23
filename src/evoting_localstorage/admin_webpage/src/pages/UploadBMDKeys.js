@@ -4,18 +4,17 @@ import { ReactSession } from 'react-client-session';
 import './Upload.css';
 import Navigation from '../Navigation'
 import { useNavigate } from 'react-router-dom';
-
-function UploadBMDKeys() {
+function UploadCandidate() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  
-    // Check for authentication when the page loads
-    useEffect(() => {
-      if (!sessionStorage.getItem('access_token')) {
-        navigate('/'); // Redirect to login page if no token
-      }
-    }, [navigate]);
+
+  // Check for authentication when the page loads
+  useEffect(() => {
+    if (!sessionStorage.getItem('access_token')) {
+      navigate('/'); // Redirect to login page if no token
+    }
+  }, [navigate]);
   const handleFileChange = (event) => {
     const uploadedFile = event.target.files[0];
     if (uploadedFile && uploadedFile.type === 'application/json') {
@@ -37,9 +36,10 @@ function UploadBMDKeys() {
     reader.onload = async (e) => {
       try {
         const jsonData = JSON.parse(e.target.result);
+        console.log(jsonData)
         const token = sessionStorage.getItem('access_token');
 
-        const response = await axios.post('/api/upload_bmd_keys', jsonData, {
+        const response = await axios.post('https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/upload_bmd_keys', jsonData, {
           headers: {
             authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ function UploadBMDKeys() {
 
   return (
     <div className="upload-container">
-      <h1>Upload JSON File (Voters)</h1>
+      <h1>Upload BMD Public Keys</h1>
       <input type="file" accept=".json" onChange={handleFileChange} />
       {message && <p>{message}</p>}
       <button onClick={handleUpload}>Upload</button>
@@ -70,4 +70,4 @@ function UploadBMDKeys() {
   );
 }
 
-export default UploadBMDKeys;
+export default UploadCandidate;

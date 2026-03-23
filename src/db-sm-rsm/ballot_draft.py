@@ -103,7 +103,8 @@ def create_ballot_json(m, collection, filename, candidates, pai_sklist, pai_pk_o
     json_output = {
         "election_id": str(election_id),
         "election_name": election_name,
-        
+        "election_type":candidates[0]["election_type"],
+        "number_of_preferences":candidates[0]["number_of_preferences"],
         # This will now look like "[['hash1', ...], [1, ['sig...']]]"
         "commitments": right_qr_string, 
         "candidates": candidates_list,
@@ -501,7 +502,9 @@ def ballot_draft(num, election_id):
         for document in documents:
             candidates_data.append({
                 "name": document["name"],
-                "entry_number": document.get("entry_number", "N/A")
+                "entry_number": document.get("entry_number", "N/A"),
+                "election_type":document["election_type"],
+                "number_of_preferences":document["number_of_preferences"]
             })
             if election_name == "Unknown Election":
                 election_name = document.get("election_name", "Unknown Election")

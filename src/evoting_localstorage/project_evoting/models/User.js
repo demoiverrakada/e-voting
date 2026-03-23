@@ -171,7 +171,7 @@ const CandidateSchema = new mongoose.Schema({
     number_of_preferences:{
         type:Number,
         required:true
-    }   
+    },  
 });
 CandidateSchema.index({ election_id: 1, cand_id: 1 }, { unique: true });
 // Schema for voters
@@ -195,8 +195,7 @@ const VoterSchema = new mongoose.Schema({
     },
     token_id:{
         type:String,
-        default:"",
-        required:true
+        default:""
     },
     time_stamp: {
         type: Date,
