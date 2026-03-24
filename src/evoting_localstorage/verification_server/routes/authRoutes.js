@@ -426,58 +426,90 @@ router.post('/fetch', async (req, res) => {
 });
 
 
-    
-    
 router.post('/audit', async (req, res) => {
-        try {
-            // Corrected request body extraction
-            const { commitment, booth_num, bid ,election_id} = req.body; 
-    
-            console.log("Received audit request");
-            console.log(commitment)
-            console.log(booth_num)
-            console.log(bid)
-            console.log(election_id)
-            // Call the Python function
-            const result = await callPythonFunction("audit", commitment, booth_num, bid,election_id);
-            if(result==="The ballot has already been audited or the ballot has been used to cast a vote."){
-                return res.json({results:"The ballot has already been audited or the ballot has been used to cast a vote."})
-            }
-            const parsedResult = typeof result === "string" ? JSON.parse(result) : result;
-    
-        // Check if any result has success === false
-        const hasFailure = parsedResult.some(entry => entry[0] === false);
-    
-        // Map results to the desired response format
-        const formattedResults = parsedResult.map(entry => ({
-            success: entry[0],
-            v_w_nbar: entry[1],
-            name: entry[2],
-            gamma_w: entry[3],
-            commitment: entry[4]
-        }));
-    
-        // Return false if there are any failures, otherwise return the results
-        if (hasFailure) {
-            return res.json({
-                success: false,
-                results: formattedResults
-            });
-        }
-    
-        // Return true if all entries are successful
-        res.json({
-            success: true,
-            results: formattedResults
-        });
-        requestStatus["audit"] = "success"
-        } catch (err) {
-            // Catch and return any errors that occur
-            console.error("Error during audit:", err.message);
-            requestStatus["audit"] = "failed"
-            return res.status(500).json({ error: err.message });
-        }
+  try {
+    const { commitment, bid, election_id } = req.body;
+
+    console.log("Received audit request");
+    console.log({ commitment, bid, election_id });
+
+    // ✅ Validate input
+    if (!commitment || !bid || !election_id) {
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields"
+      });
+    }
+
+    // ✅ Call Python function
+    const result = await callPythonFunction(
+      "audit",
+      commitment,
+      bid,
+      election_id
+    );
+
+    // ✅ Handle already audited case (string response)
+    if (
+      result ===
+      "The ballot has already been audited or the ballot has been used to cast a vote."
+    ) {
+      return res.json({
+        success: false,
+        results:
+          "The ballot has already been audited or the ballot has been used to cast a vote."
+      });
+    }
+
+    // ✅ Safe parsing
+    let parsedResult;
+    try {
+      parsedResult =
+        typeof result === "string" ? JSON.parse(result) : result;
+    } catch (e) {
+      console.error("JSON parse error:", e.message);
+      return res.status(500).json({
+        success: false,
+        error: "Invalid response from audit function"
+      });
+    }
+
+    // ✅ Check failures
+    const hasFailure = parsedResult.some(entry => entry[0] === false);
+
+    // ✅ Format response
+    const formattedResults = parsedResult.map(entry => ({
+      success: entry[0],
+      v_w_nbar: entry[1],
+      name: entry[2],
+      gamma_w: entry[3],
+      commitment: entry[4]
+    }));
+
+    if (hasFailure) {
+      return res.json({
+        success: false,
+        results: formattedResults
+      });
+    }
+
+    requestStatus["audit"] = "success";
+
+    return res.json({
+      success: true,
+      results: formattedResults
     });
+
+  } catch (err) {
+    console.error("Error during audit:", err.message);
+    requestStatus["audit"] = "failed";
+
+    return res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
 
 router.post('/vvpat', async (req, res) => {
         try {

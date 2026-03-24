@@ -152,65 +152,76 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands, dpk_bbspl
 
 
 def audit(commitment, bid, election_id):
-    f = io.StringIO()
-    election_id=int(election_id)
+    import json, io, contextlib
+    election_id = int(election_id)
     g12, h12 = load("generators", ["g1", "h1"], election_id).values()
-    result = load("receipt", [commitment, "accessed"],election_id)
+    result = load("receipt", [commitment, "accessed"], election_id)
     accessed = result.get("accessed")
     if accessed is True:
-        print(f"The ballot for election {election_id} has already been audited or used to cast a vote.")
-        return
+        return "The ballot has already been audited or the ballot has been used to cast a vote."
+    f = io.StringIO()
     with contextlib.redirect_stdout(f):
-    #if True:
-        setup_data = load("setup", ['alpha', '_pai_sklist_single', 'pai_pklist_single'], election_id)
+        setup_data = load("setup",['alpha', '_pai_sklist_single', 'pai_pklist_single'],election_id)
         alpha = setup_data['alpha']
         _pai_sklist_single = setup_data['_pai_sklist_single']
         pai_pklist_single = setup_data['pai_pklist_single']
-
-        mixers = lambda alpha: [f"mixer {a}" for a in range(alpha)]
         enc_msg, comm, enc_msg_share, enc_rand_share = [], [], [], []
         candidates = load("load", [], election_id)
-
-        receipt_data = load("receipt", [commitment, "enc_msg", "comm", "enc_msg_share", "enc_rand_share"], election_id)
+        receipt_data = load(
+            "receipt",
+            [commitment, "enc_msg", "comm", "enc_msg_share", "enc_rand_share"],
+            election_id
+        )
         enc_msg.append(receipt_data["enc_msg"])
         comm.append(receipt_data["comm"])
         enc_msg_share.append(receipt_data["enc_msg_share"])
         enc_rand_share.append(receipt_data["enc_rand_share"])
-
-        with timer("decryption of individual message/randomness shares", report_subtimers=mixers(alpha)):
-            _msg_shares, _rand_shares = [], []
-            for a in range(alpha):
-                with timer(f"mixer {a}: decryption of individual message/randomness shares"):
-                    enc_msg_shares_a = list(zip(*enc_msg_share))[a]
-                    enc_rand_shares_a = list(zip(*enc_rand_share))[a]
-                    _msg_shares_a = [pai_decrypt_single(pai_pklist_single[a], _pai_sklist_single[a], enc_msg_share_a, embedded_q=q) for enc_msg_share_a in enc_msg_shares_a]
-                    _rand_shares_a = [pai_decrypt_single(pai_pklist_single[a], _pai_sklist_single[a], enc_rand_share_a, embedded_q=q) for enc_rand_share_a in enc_rand_shares_a]
-                    _msg_shares.append(_msg_shares_a)
-                    _rand_shares.append(_rand_shares_a)
-
-    result = []
-    db = init()
-    receipts_collection = db['receipts']
+        _msg_shares, _rand_shares = [], []
+        for a in range(alpha):
+            enc_msg_shares_a = list(zip(*enc_msg_share))[a]
+            enc_rand_shares_a = list(zip(*enc_rand_share))[a]
+            _msg_shares_a = [
+                pai_decrypt_single(
+                    pai_pklist_single[a],
+                    _pai_sklist_single[a],
+                    enc_msg_share_a,
+                    embedded_q=q
+                )
+                for enc_msg_share_a in enc_msg_shares_a
+            ]
+            _rand_shares_a = [pai_decrypt_single(pai_pklist_single[a],_pai_sklist_single[a],enc_rand_share_a,embedded_q=q)for enc_rand_share_a in enc_rand_shares_a]
+            _msg_shares.append(_msg_shares_a)
+            _rand_shares.append(_rand_shares_a)
     msg_shares = [_msg_shares[j] for j in range(alpha)]
     rand_shares = [_rand_shares[j] for j in range(alpha)]
     v_w = reconstruct(msg_shares)
     r_w = reconstruct(rand_shares)
+    candidates = load("load", [], election_id)
     v_w_nbar = int(str(v_w)) % len(candidates)
     name = candidates[v_w_nbar]
-    gamma_w = (g12**v_w) * (h12**r_w)
+    gamma_w = (g12 ** v_w) * (h12 ** r_w)
+    result_output = []
 
+    # ✅ Verify
     if gamma_w == comm[0] and int(v_w) == int(int(bid) + 0):
+        db = init()
+        receipts_collection = db['receipts']
         receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[0])})
         if receipt:
             receipts_collection.update_one(
-                    {'_id': receipt['_id']},
-                    {'$set': {'accessed': True}}
-                )
-        result.append([True, v_w_nbar, name, str(gamma_w), str(comm[0])])
+                {'_id': receipt['_id']},
+                {'$set': {'accessed': True}}
+            )
+        result_output.append([
+            True,
+            v_w_nbar,
+            name,
+            str(gamma_w),
+            str(comm[0])
+        ])
     else:
-        result.append([False, None, None, None, None])
-
-    print(json.dumps(result))
+        result_output.append([False, None, None, None, None])
+    return json.dumps(result_output)
 
 def VVPATverif(bid,election_id):
     election_id=int(election_id)
