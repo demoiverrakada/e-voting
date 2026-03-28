@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { jwtkey } = require('../keys');
 const router = express.Router();
 const requireAuth = require('../middelware/requireToken');
-const { PO, Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey,AESKey,ServerKey} = require('../models/User');
+const { PO, Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey,AESKey,ServerKey,Generator} = require('../models/User');
 const cors = require('cors');
 const { spawnSync } = require('child_process');
 const fs = require('fs');
@@ -180,7 +180,7 @@ router.post('/generate', requireAuth, async (req, res) => {
             const bmdZipName = `${bmdId}.zip`;
             const bmdZipPath = path.join(outputDirectory, bmdZipName);
 
-            await new Promise((resolve, reject) => {
+            await new Promise(async (resolve, reject) => {
                 const output = fs.createWriteStream(bmdZipPath);
                 const archive = archiver('zip', { zlib: { level: 9 } });
 
@@ -200,7 +200,7 @@ router.post('/generate', requireAuth, async (req, res) => {
 
                 let aesKeyAdded = false;
 
-                electionDirs.forEach(electionId => {
+                const electionCandidatePromises = electionDirs.map(async (electionId) => {
                     const electionDir = path.join(bmdDir, electionId);
 
                     // ✅ Include aes_key.enc at archive root (once)
@@ -217,19 +217,31 @@ router.post('/generate', requireAuth, async (req, res) => {
 
                     // ✅ Include ballot/*.enc.json files
                     const ballotDir = path.join(electionDir, 'ballot');
-                    if (!fs.existsSync(ballotDir)) return;
+                    if (fs.existsSync(ballotDir)) {
+                        const encFiles = fs.readdirSync(ballotDir)
+                            .filter(file => file.endsWith('.enc.json'));
+                        encFiles.forEach(file => {
+                            archive.file(
+                                path.join(ballotDir, file),
+                                { name: `${electionId}/ballot/${file}` }
+                            );
+                        });
+                    }
 
-                    const encFiles = fs.readdirSync(ballotDir)
-                        .filter(file => file.endsWith('.enc.json'));
-
-                    encFiles.forEach(file => {
-                        archive.file(
-                            path.join(ballotDir, file),
-                            { name: `${electionId}/ballot/${file}` }
-                        );
-                    });
+                    // ✅ Include candidates.json fetched from MongoDB
+                    const numericId = parseInt(electionId.replace('election_id_', ''));
+                    if (!isNaN(numericId)) {
+                        const candidates = await Candidate.find({ election_id: numericId }).lean();
+                        if (candidates.length > 0) {
+                            archive.append(JSON.stringify(candidates, null, 2), { name: `${electionId}/candidates.json` });
+                            console.log(`Added candidates.json for ${electionId} (${candidates.length} candidates)`);
+                        } else {
+                            console.warn(`No candidates found in DB for ${electionId}`);
+                        }
+                    }
                 });
 
+                await Promise.all(electionCandidatePromises);
                 archive.finalize();
             });
 
@@ -296,7 +308,12 @@ function callPythonDecrypt(encryptedFilePath) {
     return JSON.parse(stdout);
 }
 function parseTimestamp(ts) {
-    // '20-03-26 04:12:06' → '2020-03-26T04:12:06'
+    // Handle ISO format: '2026-03-28T03:54:14.559751'
+    if (ts.includes('T') || ts.length > 17) {
+        const d = new Date(ts);
+        if (!isNaN(d.getTime())) return d;
+    }
+    // Handle legacy format: '26-03-26 04:12:06' → '2026-03-26T04:12:06'
     const [datePart, timePart] = ts.split(' ');
     const [yy, mm, dd] = datePart.split('-');
     return new Date(`20${yy}-${mm}-${dd}T${timePart}`);
@@ -429,7 +446,7 @@ async function generateAndInsertCombinations({
     const INSERT_BATCH = 5000;
     let buffer = [];
     let nextId = 0;
-    const NAFS = { name: "NAFS", entry_number: "012" };
+    const NAFS = { name: "NOTA", entry_number: "012" };
 
     async function flushIfNeeded() {
         if (buffer.length >= INSERT_BATCH) {
@@ -515,7 +532,7 @@ router.post('/upload_candidate', requireAuth, async (req, res) => {
                         election_name,
                         election_type,
                         number_of_preferences,
-                        name: "NAFS",
+                        name: "NOTA",
                         entry_number: "012",
                         cand_id: (maxId + 1).toString()
                     }], { ordered: false });
@@ -900,6 +917,41 @@ router.post('/runBuild1', async (req, res) => {
 
 router.get("/status", (req, res) => {
     res.json(requestStatus);
+});
+
+
+router.post('/reset-election', requireAuth, async (req, res) => {
+    try {
+        await Promise.all([
+            PO.deleteMany({}),
+            Votes.deleteMany({}),
+            Candidate.deleteMany({}),
+            Voter.deleteMany({}),
+            Receipt.deleteMany({}),
+            Bulletin.deleteMany({}),
+            Keys.deleteMany({}),
+            Dec.deleteMany({}),
+            BMDPublicKey.deleteMany({}),
+            AESKey.deleteMany({}),
+            ServerKey.deleteMany({}),
+            Generator.deleteMany({}),
+        ]);
+
+        const clearDir = (dirPath) => {
+            if (fs.existsSync(dirPath)) {
+                for (const file of fs.readdirSync(dirPath)) {
+                    fs.rmSync(path.join(dirPath, file), { recursive: true, force: true });
+                }
+            }
+        };
+        clearDir('/output');
+        clearDir('/encrypted_output');
+
+        res.json({ message: 'Election reset successful.' });
+    } catch (err) {
+        console.error('Error resetting election:', err.message);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 

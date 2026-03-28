@@ -192,7 +192,7 @@ def count_process(election_id):
     all_candidates = set()
     for combo in candidate_data:
         for name in combo.split(","):
-            if name != "NAFS":
+            if name != "NOTA":
                 all_candidates.add(name)
 
     active_candidates = set(all_candidates)

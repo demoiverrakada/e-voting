@@ -1,11 +1,13 @@
 import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './OptionsPage.css';
 import Navigation from '../Navigation';
 
 function OptionsPage() {
   const navigate = useNavigate();
-  
+  const [resetting, setResetting] = useState(false);
+
     // Check for authentication when the page loads
     useEffect(() => {
       if (!sessionStorage.getItem('access_token')) {
@@ -13,6 +15,28 @@ function OptionsPage() {
       }
     }, [navigate]);
   const handleNavigation = (path) => navigate(path);
+
+  const handleResetElection = async () => {
+    const confirmed = window.confirm(
+      'WARNING: This will permanently delete all election data (candidates, voters, votes, keys, etc.) and clear output folders.\n\nAdmin credentials will be preserved.\n\nAre you sure you want to reset the entire election?'
+    );
+    if (!confirmed) return;
+
+    setResetting(true);
+    try {
+      const token = sessionStorage.getItem('access_token');
+      await axios.post(
+        'https://5000-01kffrqdksydbdk11zftsh7yns.cloudspaces.litng.ai/reset-election',
+        {},
+        { headers: { authorization: `Bearer ${token}` } }
+      );
+      alert('Election has been reset successfully.');
+    } catch (err) {
+      alert('Failed to reset election: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setResetting(false);
+    }
+  };
 
   return (
     <div className="admin-dashboard-container">
@@ -42,6 +66,11 @@ function OptionsPage() {
             <button onClick={() => handleNavigation('/decrypted_votes')}>Get/Decrypt Votes</button>
           </div>
         </div>
+      </div>
+      <div className="reset-section">
+        <button className="reset-btn" onClick={handleResetElection} disabled={resetting}>
+          {resetting ? 'Resetting...' : 'Reset Election'}
+        </button>
       </div>
       <Navigation />
     </div>

@@ -76,3 +76,29 @@ button:focus {
   outline: none;
   box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
 }
+
+.reset-section {
+  margin-top: 40px;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, #dc3545, #a71d2a);
+  padding: 15px 50px;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+
+.reset-btn:hover {
+  background: linear-gradient(135deg, #a71d2a, #7b1520);
+}
+
+.reset-btn:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

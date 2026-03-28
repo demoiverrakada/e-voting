@@ -390,8 +390,8 @@ const Keys=dbConnection.model('Keys',keysSchema);
 const Dec=dbConnection.model('Dec',decSchema);
 const Generator=dbConnection.model('Generator',generatorSchema);
 const BMDPublicKey=dbConnection.model('BMDPublicKey',BMDPublicKeySchema);
-const ServerKey    = mongoose.model('ServerKey',ServerKeySchema);
-const AESKey       = mongoose.model('AESKey',AESKeySchema);
+const ServerKey    = dbConnection.model('ServerKey',ServerKeySchema);
+const AESKey       = dbConnection.model('AESKey',AESKeySchema);
 module.exports = {
     PO,
     Votes,
