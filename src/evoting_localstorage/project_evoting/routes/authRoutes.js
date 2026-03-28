@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { jwtkey } = require('../keys');
 const router = express.Router();
 const requireAuth = require('../middelware/requireToken');
-const { PO, Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey,AESKey,ServerKey,Generator} = require('../models/User');
+const { Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey,AESKey,ServerKey,Generator} = require('../models/User');
 const cors = require('cors');
 const { spawnSync } = require('child_process');
 const fs = require('fs');
@@ -582,22 +582,6 @@ router.post('/upload_candidate', requireAuth, async (req, res) => {
 });
 
 
-router.post('/upload_PO', requireAuth, async (req, res) => {
-    try {
-        const jsonData = req.body;
-        const BATCH_SIZE = 1000;
-        // Batch insert polling officers
-        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
-            const batch = jsonData.slice(i, i + BATCH_SIZE);
-            await PO.insertMany(batch);
-        }
-
-        return res.status(200).send({ status: 'OK', message: 'Polling Officers uploaded successfully' });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
-    }
-});
 
 router.post('/upload_voters', requireAuth, async (req, res) => {
     try {
@@ -758,27 +742,6 @@ router.get('/getVotes', async (req, res) => {
   
       
 
-// for signing in Polling Officer
-router.post('/signin/PO', async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(422).send({ error: "Must provide email or password" });
-    }
-
-    try {
-        const newPO = await PO.findOne({ email });
-        if (!newPO) {
-            return res.status(422).send({ error: "Polling Officer doesn't exist with this email" });
-        }
-
-        await newPO.comparePassword(password);
-        const token = jwt.sign({ userId: newPO._id }, jwtkey);
-        res.send({ token });
-    } catch (err) {
-        console.error(err);
-        return res.status(422).send(err.message);
-    }
-});
 
 // for signing in Admin
 router.post('/signin/Admin', async (req, res) => {
@@ -923,7 +886,6 @@ router.get("/status", (req, res) => {
 router.post('/reset-election', requireAuth, async (req, res) => {
     try {
         await Promise.all([
-            PO.deleteMany({}),
             Votes.deleteMany({}),
             Candidate.deleteMany({}),
             Voter.deleteMany({}),

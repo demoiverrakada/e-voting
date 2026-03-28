@@ -1,75 +1,52 @@
-/* Setup Page Container */
 .setup-container {
-  padding: 30px;
-  max-width: 600px;
-  margin: 50px auto; /* Centers horizontally with top margin */
-  background-color: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  font-family: 'Arial', sans-serif;
-
-  display: flex; /* Enables flexbox */
-  flex-direction: column;
-  align-items: center; /* Centers content horizontally */
-  justify-content: center; /* Centers content vertically */
-  min-height: 70vh; /* Ensures enough vertical space */
-}
-
-/* Heading Styles */
-.setup-container h2 {
-  text-align: center;
-  font-size: 2.2rem;
-  margin-bottom: 25px;
-  color: #2c3e50; /* Dark blue for heading */
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Form Styles */
-.setup-container form {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Spacing between form elements */
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 24px;
+  background-color: var(--bg);
+  gap: 0;
 }
 
-/* Label Styles */
-.setup-container label {
-  font-size: 1.1rem;
+.setup-container h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+}
+
+.setup-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 32px;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.setup-form label {
+  font-size: 0.82rem;
   font-weight: 600;
-  color: #495057; /* Slightly darker gray for labels */
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: block;
+  margin-bottom: 4px;
 }
 
-/* Input Field */
-.setup-container input[type="number"] {
-  padding: 12px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  transition: border-color 0.3s ease;
+.setup-form button {
+  width: 100%;
+  padding: 11px;
+  font-weight: 600;
+  margin-top: 4px;
 }
 
-.setup-container input[type="number"]:focus {
-  border-color: #007bff; /* Highlight input field */
-  outline: none;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
-}
-
-.setup-container button {
-  padding: 12px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #ffffff;
-  background: linear-gradient(135deg, #145cf7, #6a99ff);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.setup-container button:hover {
-  background: linear-gradient(135deg, #6a99ff, #0956fc);
-  transform: translateY(-3px);
-}
+.setup-container > .navigation-bar { margin-top: 24px; }

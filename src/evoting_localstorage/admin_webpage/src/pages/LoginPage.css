@@ -1,101 +1,48 @@
-/* Full Page Container */
 .login-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #4a90e2, #007bff); /* Blue gradient background */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #ffffff;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--bg);
+  padding: 20px;
+  gap: 0;
 }
 
-/* Heading Styling */
-h1 {
-  font-size: 2.5rem;
+.login-container h1 {
+  font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 20px;
-  color: #f8f9fa;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: var(--text);
+  margin-bottom: 24px;
   text-align: center;
 }
 
-/* Form Container: Elegant card style */
-form {
+.login-container form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  background: #ffffff;
-  padding: 30px 25px;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  gap: 14px;
+  background: var(--surface);
+  padding: 32px 28px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   width: 100%;
-  max-width: 350px;
-  transition: all 0.3s ease-in-out;
+  max-width: 380px;
+  border: 1px solid var(--border);
 }
 
-form:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-}
-
-/* Input Fields */
-input {
+.login-container button {
   width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 1px solid #cdd7e1;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #333333;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-input:focus {
-  outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 6px rgba(74, 144, 226, 0.5);
-}
-
-/* Login Button */
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  font-size: 1rem;
+  padding: 11px;
   font-weight: 600;
-  color: #ffffff;
-  background-color: #007bff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  margin-top: 4px;
 }
 
-button:hover {
-  background-color: #0056b3;
-  box-shadow: 0 6px 12px rgba(0, 91, 179, 0.3);
-  transform: translateY(-2px);
+.login-container p {
+  font-size: 0.82rem;
+  color: var(--danger);
+  margin-top: -6px;
 }
 
-/* Error Message Styling */
-p {
-  width: 100%;
-  color: #e74c3c;
-  font-size: 0.85rem;
-  margin: 5px 0;
-  text-align: left;
+@media (max-width: 480px) {
+  .login-container form { padding: 24px 18px; }
 }
-
-/* Mobile Responsiveness */
-@media (max-width: 500px) {
-  h1 {
-      font-size: 2rem;
-  }
-  form {
-      width: 90%;
-      padding: 20px;
-  }
-}
-
-  

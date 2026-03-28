@@ -28,52 +28,6 @@ dbConnection.on('error', (err) => {
 });
 
 
-// Schema for Polling officer and their methods
-const PollingSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    }
-});
-
-PollingSchema.pre('save', function (next) {
-    const user = this;
-    if (!user.isModified('password')) {
-        return next();
-    }
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) {
-            return next(err);
-        }
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err) {
-                return next(err);
-            }
-            user.password = hash;
-            next();
-        });
-    });
-});
-
-PollingSchema.methods.comparePassword = function (candidatePassword) {
-    const user = this;
-    return new Promise((resolve, reject) => {
-        bcrypt.compare(candidatePassword, user.password, (err, isMatch) => {
-            if (err) {
-                return reject(err); 
-            }
-            if (!isMatch) {
-                return reject(null); 
-            }
-            resolve(true); 
-        });
-    });
-};
 
 // Schema for Admin user and its methods
 const AdminSchema = new mongoose.Schema({
@@ -379,7 +333,6 @@ const AESKeySchema = new mongoose.Schema({
 });
 
 // Create models for each schema
-const PO = dbConnection.model('PO', PollingSchema);
 const Votes = dbConnection.model('Votes', VotesSchema);
 const Admin = dbConnection.model('Admin', AdminSchema);
 const Candidate = dbConnection.model('Candidate', CandidateSchema);
@@ -393,7 +346,6 @@ const BMDPublicKey=dbConnection.model('BMDPublicKey',BMDPublicKeySchema);
 const ServerKey    = dbConnection.model('ServerKey',ServerKeySchema);
 const AESKey       = dbConnection.model('AESKey',AESKeySchema);
 module.exports = {
-    PO,
     Votes,
     Admin,
     Candidate,

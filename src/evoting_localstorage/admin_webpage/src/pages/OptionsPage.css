@@ -1,104 +1,185 @@
+/* ── Page shell ──────────────────────────────────────────── */
 .admin-dashboard-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "title   title"
+    "cards   cards"
+    "nav     reset";
   min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 40px 32px 28px;
+  background-color: var(--bg);
+  gap: 24px 0;
 }
 
-h1 {
-  font-size: 3rem;
-  color: #343a40;
-  margin-bottom: 40px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+/* ── Title ───────────────────────────────────────────────── */
+.admin-dashboard-container > h1 {
+  grid-area: title;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
   text-align: center;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  margin: 0;
 }
 
+/* ── Three-column grid ───────────────────────────────────── */
 .dashboard-sections {
+  grid-area: cards;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-  width: 100%;
-  max-width: 1200px;
-}
-
-.section {
-  background-color: #70b3ff;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  text-align: center;
-}
-
-.section h2 {
-  font-size: 1.8rem;
-  color: #343a40;
-  margin-bottom: 20px;
-}
-
-.buttons {
-  display: grid;
-  grid-template-columns: 1fr;
   gap: 20px;
+  align-items: stretch;
 }
 
-button {
+/* ── Individual section card ─────────────────────────────── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.section.pre-poll   { border-top: 3px solid #2563eb; }
+.section.during-poll{ border-top: 3px solid #d97706; }
+.section.post-poll  { border-top: 3px solid #16a34a; }
+
+/* ── Section header ──────────────────────────────────────── */
+.section h2 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  margin: 0;
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.section.pre-poll h2    { color: #2563eb; }
+.section.during-poll h2 { color: #d97706; }
+.section.post-poll h2   { color: #16a34a; }
+
+/* Step badge */
+.section.pre-poll h2::before    { content:"1"; background:#dbeafe; color:#2563eb; }
+.section.during-poll h2::before { content:"2"; background:#fef3c7; color:#d97706; }
+.section.post-poll h2::before   { content:"3"; background:#dcfce7; color:#16a34a; }
+
+.section h2::before {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 15px 10px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  border: none;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  text-transform: capitalize;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-button:hover {
-  background: linear-gradient(135deg, #0056b3, #003d80);
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-}
-
-button:focus {
-  outline: none;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
-}
-
-.reset-section {
-  margin-top: 40px;
-  width: 100%;
-  max-width: 1200px;
+/* ── Buttons inside section ──────────────────────────────── */
+.buttons {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  flex: 1;
 }
 
+.buttons button {
+  flex: 1;
+  padding: 0 18px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  background: transparent;
+  color: var(--text);
+  border-radius: 0;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s, color 0.15s;
+  box-shadow: none;
+  min-height: 46px;
+}
+
+.buttons button:last-child { border-bottom: none; }
+
+.buttons button:hover {
+  background-color: var(--bg);
+  color: var(--primary);
+  box-shadow: none;
+}
+
+/* ── Footer row: nav left, reset right ───────────────────── */
+/* Navigation component (.navigation-bar) maps to grid-area nav */
+.admin-dashboard-container > .navigation-bar {
+  grid-area: nav;
+  justify-self: start;
+  align-self: center;
+  margin: 0;
+  gap: 8px;
+}
+
+/* Reset section maps to grid-area reset */
+.reset-section {
+  grid-area: reset;
+  justify-self: end;
+  align-self: center;
+  border-top: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ── Reset button ────────────────────────────────────────── */
 .reset-btn {
-  background: linear-gradient(135deg, #dc3545, #a71d2a);
-  padding: 15px 50px;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
+  background-color: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 9px 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .reset-btn:hover {
-  background: linear-gradient(135deg, #a71d2a, #7b1520);
+  background-color: var(--danger);
+  color: #fff;
+  box-shadow: none;
 }
 
 .reset-btn:disabled {
-  background: #aaa;
+  opacity: 0.4;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  background-color: transparent;
+  color: var(--danger);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .admin-dashboard-container {
+    grid-template-areas:
+      "title title"
+      "cards cards"
+      "nav   reset";
+  }
+  .dashboard-sections { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 560px) {
+  .admin-dashboard-container {
+    grid-template-areas:
+      "title"
+      "cards"
+      "reset"
+      "nav";
+    grid-template-columns: 1fr;
+    padding: 28px 16px 20px;
+  }
+  .dashboard-sections { grid-template-columns: 1fr; }
+  .admin-dashboard-container > .navigation-bar { justify-self: center; }
+  .reset-section { justify-self: center; }
 }

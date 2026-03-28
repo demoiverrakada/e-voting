@@ -47,7 +47,6 @@ function OptionsPage() {
           <div className="buttons">
             <button onClick={() => handleNavigation('/change_password')}>Change Password</button>
             <button onClick={() => handleNavigation('/upload_candidate')}>Upload Candidates List</button>
-            <button onClick={() => handleNavigation('/upload_po')}>Upload Polling Officer Credentials</button>
             <button onClick={() => handleNavigation('/upload_voters')}>Upload Voter List</button>
             <button onClick={() => handleNavigation('/upload_bmd_keys')}>Upload BMD Keys</button>
             <button onClick={() => handleNavigation('/setup')}>Setup System</button>
