@@ -22,6 +22,7 @@ import sys
 from db import load,store,init
 import zipfile
 import logging
+import shutil
 from time import sleep
 import json
 #import pyqrcode
@@ -509,11 +510,20 @@ def ballot_draft(num, election_id):
             if election_name == "Unknown Election":
                 election_name = document.get("election_name", "Unknown Election")
 
+        if not candidates_data:
+            raise ValueError(f"No candidates found for election_id={election_id}. Upload candidates first.")
+
+        logger.info(f"Found {len(candidates_data)} candidate entries for election {election_id}")
+
         # Load Keys
         m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2(election_id).values()
         collection = connect_to_mongodb()
-        
+
         output_dir = f"/output/election_id_{election_id}"
+        # Clear any stale ballot files from previous runs so they cannot be re-encrypted
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+            logger.info(f"Cleared stale output dir: {output_dir}")
         os.makedirs(output_dir, exist_ok=True)
         for i in range(num):
             json_filename = f"ballot_{i+1}.json"
@@ -531,8 +541,10 @@ def ballot_draft(num, election_id):
         logger.info(f"Success: {ballots_generated}/{num} ballots for Election {election_id}")
 
     except Exception as e:
-        logger.error(f"Failed: {str(e)}")
-        print(f"Error: {str(e)}") # Print to console as well
+        import traceback
+        logger.error(f"Failed: {str(e)}\n{traceback.format_exc()}")
+        print(f"Error in ballot_draft for election {election_id}: {str(e)}", flush=True)
+        raise  # Re-raise so api.py exits with non-zero code, surfacing the error
     finally:
         handler.close()
         logger.removeHandler(handler)

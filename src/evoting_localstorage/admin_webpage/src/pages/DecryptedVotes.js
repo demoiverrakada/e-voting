@@ -42,6 +42,17 @@ function DecryptedVotes() {
                     });
                 }
             }
+            else if (election.is_block) {
+                csvContent += `"Winners (${election.number_of_seats} seats):","${(election.winners || []).join(', ')}"\r\n`;
+                csvContent += `"Total Voters:","${election.total_voters}"\r\n\r\n`;
+                csvContent += "Candidate Name,Votes,Result\r\n";
+                (election.candidates || []).forEach(candidate => {
+                    const name = `"${(candidate.name || '').replace(/"/g, '""')}"`;
+                    const votes = `"${(candidate.votes || 0).toString()}"`;
+                    const result = candidate.is_winner ? '"Winner"' : '""';
+                    csvContent += `${name},${votes},${result}\r\n`;
+                });
+            }
             else {
                 csvContent += "Entry Number,Candidate Name,Votes\r\n";
                 (election.candidates || []).forEach(candidate => {
@@ -96,16 +107,53 @@ function DecryptedVotes() {
             );
             const votesData = response.data || {};
     
-            const elections = Object.entries(votesData).map(([id, data]) => ({
+            // For block elections, aggregate combo votes into individual candidate counts
+            const processedVotes = {};
+            Object.entries(votesData).forEach(([electionId, election]) => {
+                if (election.election_type === 'block' && Array.isArray(election.candidates)) {
+                    const number_of_seats = election.candidates[0]?.number_of_preferences ||
+                        (election.candidates[0]?.name?.split(',').filter(n => n !== 'NOTA' && n !== 'NAFS').length) || 1;
+                    const individualCounts = {};
+                    election.candidates.forEach(combo => {
+                        const names = (combo.name || '').split(',');
+                        names.forEach(name => {
+                            if (name && name !== 'NOTA' && name !== 'NAFS') {
+                                individualCounts[name] = (individualCounts[name] || 0) + (combo.votes || 0);
+                            }
+                        });
+                    });
+                    const sorted = Object.entries(individualCounts).sort((a, b) => b[1] - a[1]);
+                    // number_of_seats from first combo that has the field, or from election
+                    const seats = election.candidates[0]?.number_of_preferences || 3;
+                    const winners = sorted.slice(0, seats).map(([name]) => name);
+                    const totalVoters = Math.max(...election.candidates.map(c => c.votes || 0)) > 0
+                        ? election.candidates.reduce((sum, c) => sum + (c.votes || 0), 0) / seats
+                        : 0;
+                    processedVotes[electionId] = {
+                        ...election,
+                        is_block: true,
+                        number_of_seats: seats,
+                        total_voters: Math.round(totalVoters),
+                        winners,
+                        candidates: sorted.map(([name, votes]) => ({
+                            name,
+                            votes,
+                            is_winner: winners.includes(name)
+                        }))
+                    };
+                } else {
+                    processedVotes[electionId] = election;
+                }
+            });
+            setDecryptedVotes(processedVotes);
+            setElectionIds(Object.entries(processedVotes).map(([id, data]) => ({
                 id: id.toString(),
                 name: data.election_name || `Election ${id}`
-            }));
-            setDecryptedVotes(votesData);
-            setElectionIds(elections);
-            setSelectedElection(elections[0]?.id || '');
-            localStorage.setItem("decryptedVotes", JSON.stringify(votesData));
+            })));
+            setSelectedElection(Object.keys(processedVotes)[0] || '');
+            localStorage.setItem("decryptedVotes", JSON.stringify(processedVotes));
             setTimeout(() => {
-                downloadCSV(votesData);
+                downloadCSV(processedVotes);
             }, 50);
         } catch (err) {
             console.error("Fetch failed:", err);
@@ -153,19 +201,25 @@ function DecryptedVotes() {
                     <div className="votes-table-wrapper">
                         <h3 className="table-header">
                             {selectedElectionData.election_name || `Election ${selectedElection}`} Results
+                            {selectedElectionData.is_block ? ` (Block Voting — ${selectedElectionData.number_of_seats} seats)` : ''}
                         </h3>
+                        {selectedElectionData.is_block && (
+                            <p><strong>🏆 Winners:</strong> {(selectedElectionData.winners || []).join(', ')} &nbsp;|&nbsp; <strong>Total Voters:</strong> {selectedElectionData.total_voters}</p>
+                        )}
                         <table className="votes-table">
                             <thead>
                                 <tr>
                                     <th>Candidate Name</th>
                                     <th>Vote Count</th>
+                                    {selectedElectionData.is_block && <th>Result</th>}
                                 </tr>
                             </thead>
                             <tbody>
                                 {selectedElectionData.candidates.map((vote, index) => (
-                                    <tr key={`${selectedElection}-${index}`}>
+                                    <tr key={`${selectedElection}-${index}`} style={vote.is_winner ? { backgroundColor: '#d4edda', fontWeight: 'bold' } : {}}>
                                         <td>{vote.name}</td>
                                         <td>{vote.votes}</td>
+                                        {selectedElectionData.is_block && <td>{vote.is_winner ? '🏆 Winner' : ''}</td>}
                                     </tr>
                                 ))}
                             </tbody>

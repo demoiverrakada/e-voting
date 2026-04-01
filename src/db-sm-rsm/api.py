@@ -183,28 +183,57 @@ def count_process(election_id):
         print(json.dumps({"error": "No votes to count"}))
         return
 
-    # candidate_data is list of combo strings like ["D,E,F", "D,NAFS,E", ...]
+    # candidate_data is list of combo strings like ["D,E,F", "D,NOTA,E", ...]
     # msgs_out_dec[i] is an integer index into candidate_data
     # parsed[i] = ["D", "E", "F"] — the preference order for voter i
     parsed = [candidate_data[int(cand_id)].split(",") for cand_id in msgs_out_dec]
 
-    # Get all real candidates — exclude NAFS
+    # Get all real candidates — exclude NOTA
     all_candidates = set()
     for combo in candidate_data:
         for name in combo.split(","):
-            if name != "NAFS":
+            if name != "NOTA":
                 all_candidates.add(name)
 
+    # Fetch election_type and number_of_preferences from MongoDB
+    db = init()
+    meta_doc = db['candidates'].find_one({"election_id": election_id})
+    election_type = meta_doc.get("election_type", "preferential") if meta_doc else "preferential"
+    number_of_seats = int(meta_doc.get("number_of_preferences", 1)) if meta_doc else 1
+
+    # ── BLOCK VOTING ──────────────────────────────────────────────────────────
+    if election_type == "block":
+        vote_counts = {c: 0 for c in all_candidates}
+        for voter_prefs in parsed:
+            for pref in voter_prefs:
+                if pref in vote_counts:
+                    vote_counts[pref] += 1
+
+        sorted_candidates = sorted(vote_counts.items(), key=lambda x: x[1], reverse=True)
+        winners = [c for c, _ in sorted_candidates[:number_of_seats]]
+
+        print(json.dumps({
+            "election_id": election_id,
+            "election_type": "block",
+            "winners": winners,
+            "number_of_seats": number_of_seats,
+            "total_voters": n,
+            "vote_counts": vote_counts
+        }))
+        return
+
+    # ── IRV (FPTP / PREFERENTIAL) ─────────────────────────────────────────────
     active_candidates = set(all_candidates)
     rounds = []
     round_number = 1
 
     def get_top_preference(voter_prefs, active):
-        """Get highest ranked active candidate for a voter, skipping NAFS and eliminated."""
+        """Get highest ranked active candidate for a voter, skipping NOTA and eliminated."""
         for pref in voter_prefs:
             if pref in active:
                 return pref
         return None
+
     while len(active_candidates) > 1:
         vote_counts = {c: 0 for c in active_candidates}
         for i in range(n):

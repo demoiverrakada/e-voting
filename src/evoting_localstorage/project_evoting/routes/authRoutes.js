@@ -38,6 +38,12 @@ function callPythonFunction(functionName, ...params) {
         console.error('Python stderr:', stderr);
     }
 
+    if (pythonProcess.status !== 0) {
+        const errMsg = stderr || stdout || `Python exited with code ${pythonProcess.status}`;
+        console.error(`Python script '${functionName}' failed (exit ${pythonProcess.status}):`, errMsg);
+        throw new Error(`Python '${functionName}' failed (exit ${pythonProcess.status}): ${errMsg}`);
+    }
+
     try {
         const result = stdout;
         console.log(result)
@@ -148,7 +154,13 @@ router.post('/generate', requireAuth, async (req, res) => {
     const encryptedOutputDirectory = '/encrypted_output';
 
     try {
-        // Step 1: Generate ballots
+        // Step 0: Clear stale encrypted output so old files can never be re-zipped
+        if (fs.existsSync(encryptedOutputDirectory)) {
+            fs.rmSync(encryptedOutputDirectory, { recursive: true, force: true });
+            console.log('Cleared stale encrypted_output directory');
+        }
+
+        // Step 1: Generate ballots (ballot_draft.py also clears /output/election_id_N/)
         await callPythonFunction("generate", numBallots, numElections);
         console.log('Ballot generation complete');
 
@@ -296,7 +308,13 @@ function callPythonDecrypt(encryptedFilePath) {
     return JSON.parse(stdout);
 }
 function parseTimestamp(ts) {
-    // '20-03-26 04:12:06' → '2020-03-26T04:12:06'
+    if (!ts) return new Date();
+    // ISO format: '2026-03-31T10:00:00' or '2026-03-31T10:00:00.000000'
+    if (ts.includes('T') || ts.length > 17) {
+        const d = new Date(ts);
+        if (!isNaN(d.getTime())) return d;
+    }
+    // Legacy format: '26-03-26 04:12:06' → '2026-03-26T04:12:06'
     const [datePart, timePart] = ts.split(' ');
     const [yy, mm, dd] = datePart.split('-');
     return new Date(`20${yy}-${mm}-${dd}T${timePart}`);
@@ -503,10 +521,10 @@ router.post('/upload_candidate', requireAuth, async (req, res) => {
                     election_type,
                     number_of_preferences
                 } = candidates[0];
-                if (election_type !== "preferential") {
+                if (election_type === "fptp") {
                     await Candidate.insertMany(candidates, { ordered: false });
 
-                    // Add NAFS
+                    // Add NOTA
                     const maxId = Math.max(
                         ...candidates.map(c => parseInt(c.cand_id))
                     );
@@ -515,12 +533,13 @@ router.post('/upload_candidate', requireAuth, async (req, res) => {
                         election_name,
                         election_type,
                         number_of_preferences,
-                        name: "NAFS",
+                        name: "NOTA",
                         entry_number: "012",
                         cand_id: (maxId + 1).toString()
                     }], { ordered: false });
                 }
                 else {
+                    // preferential and block both use combination table
                     const candidateObjects = candidates.map(c => ({
                         name: c.name,
                         entry_number: c.entry_number
@@ -711,6 +730,42 @@ router.get('/getVotes', async (req, res) => {
                         error: "Failed to process preferential vote count"
                     };
                 }
+            }
+            else if (electionType === "block") {
+                const number_of_seats = electionCandidates[0]?.number_of_preferences || 1;
+                // Build pref_id → combo name map
+                const comboMap = {};
+                electionCandidates.forEach(c => {
+                    comboMap[parseInt(c.cand_id)] = c.name;
+                });
+                // Count each individual candidate across all votes
+                const individualCounts = {};
+                groupedVotes[electionId].forEach(prefId => {
+                    const combo = comboMap[prefId];
+                    if (!combo) return;
+                    combo.split(',').forEach(name => {
+                        if (name !== 'NOTA' && name !== 'NAFS') {
+                            individualCounts[name] = (individualCounts[name] || 0) + 1;
+                        }
+                    });
+                });
+                const sorted = Object.entries(individualCounts)
+                    .sort((a, b) => b[1] - a[1]);
+                const winners = sorted.slice(0, number_of_seats).map(([name]) => name);
+                response[electionId] = {
+                    election_name: electionName,
+                    election_type: electionType,
+                    is_preferential: false,
+                    is_block: true,
+                    number_of_seats,
+                    total_voters: groupedVotes[electionId].length,
+                    winners,
+                    candidates: sorted.map(([name, votes]) => ({
+                        name,
+                        votes,
+                        is_winner: winners.includes(name)
+                    }))
+                };
             }
             else {
                 const voteCounts = new Array(electionCandidates.length).fill(0);

@@ -62,20 +62,43 @@ function FinalVotes() {
                         </div>
                         {!selectedElectionData.is_preferential && Array.isArray(selectedElectionData.candidates) && (
                             <div style={{ overflowX: "auto" }}>
+                                {selectedElectionData.is_block && (
+                                    <div style={{
+                                        margin: "1rem auto",
+                                        padding: "1rem 2rem",
+                                        background: "linear-gradient(135deg, #4facfe, #00f2fe)",
+                                        borderRadius: "10px",
+                                        display: "inline-block",
+                                        marginBottom: "1.5rem"
+                                    }}>
+                                        <h2 style={{ color: "#fff", margin: 0 }}>
+                                            🏆 Winners ({selectedElectionData.number_of_seats} seats): {selectedElectionData.winners?.join(", ")}
+                                        </h2>
+                                        <p style={{ color: "#fff", margin: "0.5rem 0 0" }}>
+                                            Total Voters: {selectedElectionData.total_voters}
+                                        </p>
+                                    </div>
+                                )}
                                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "1.5rem" }}>
                                     <thead>
                                         <tr>
                                             <th style={thStyle}>Candidate Name</th>
-                                            <th style={thStyle}>Entry Number</th>
+                                            {!selectedElectionData.is_block && <th style={thStyle}>Entry Number</th>}
                                             <th style={thStyle}>Votes</th>
+                                            {selectedElectionData.is_block && <th style={thStyle}>Result</th>}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {selectedElectionData.candidates.map((candidate, index) => (
-                                            <tr key={index} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff" }}>
+                                            <tr key={index} style={{
+                                                backgroundColor: candidate.is_winner ? "#e0ffe0" : index % 2 === 0 ? "#f9f9f9" : "#ffffff"
+                                            }}>
                                                 <td style={tdStyle}>{candidate.name}</td>
-                                                <td style={tdStyle}>{candidate.entry_number}</td>
+                                                {!selectedElectionData.is_block && <td style={tdStyle}>{candidate.entry_number}</td>}
                                                 <td style={tdStyle}>{candidate.votes}</td>
+                                                {selectedElectionData.is_block && (
+                                                    <td style={tdStyle}>{candidate.is_winner ? "🏆 Winner" : ""}</td>
+                                                )}
                                             </tr>
                                         ))}
                                     </tbody>
