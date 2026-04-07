@@ -13,14 +13,17 @@ function_map = {
         "receipt":'receipts',
 }
 
+_mongo_client = None
+
 def init():
-    username = os.environ.get("MONGO_USERNAME")
-    password = os.environ.get("MONGO_PASSWORD")
-    host     = os.environ.get("MONGO_HOST")
-    port     = os.environ.get("MONGO_PORT", "27017")
-    client   = MongoClient(f'mongodb://{username}:{password}@{host}:{port}/test?authSource=admin')
-    db       = client['test']
-    return db
+    global _mongo_client
+    if _mongo_client is None:
+        username = os.environ.get("MONGO_USERNAME")
+        password = os.environ.get("MONGO_PASSWORD")
+        host     = os.environ.get("MONGO_HOST")
+        port     = os.environ.get("MONGO_PORT", "27017")
+        _mongo_client = MongoClient(f'mongodb://{username}:{password}@{host}:{port}/test?authSource=admin')
+    return _mongo_client['test']
 
 def store(funcs,params):
     db=init()
