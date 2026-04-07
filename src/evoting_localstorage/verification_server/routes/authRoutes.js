@@ -81,9 +81,13 @@ function processElementTuple(parsedInput) {
         if (parsedInput[0] === "pairing.Element") {
             return `('pairing.Element', b'${parsedInput[1]}')`;
         }
-        // Handle builtins.mpz
+        // Handle builtins.mpz — keep as string to preserve full precision
         if (parsedInput[0] === "builtins.mpz") {
-            return `('builtins.mpz', ${parsedInput[1]})`; // Ensure correct formatting for mpz
+            return `('builtins.mpz', '${parsedInput[1]}')`;
+        }
+        // Handle builtins.int
+        if (parsedInput[0] === "builtins.int") {
+            return `('builtins.int', ${parsedInput[1]})`;
         }
         // Handle builtins.tuple (nested tuples or lists inside)
         if (parsedInput[0] === "builtins.tuple" && Array.isArray(parsedInput[1])) {
@@ -361,9 +365,9 @@ router.post('/pf_zkrsm_verf', async (req, res) => {
                 const EncSigsRevRands = reconstructOriginal(enc_sigs_rev_rands);
                 console.log(`Processed components for election ${electionId}:`);
                 console.log("Verfpk:", Verfpk);
-                console.log("Sigs:", SigsRev);
-                console.log("EncSigs:", EncSigsRev);
-                console.log("EncSigsRands:", EncSigsRevRands);
+                console.log("SigsRev:", SigsRev);
+                console.log("EncSigsRev:", EncSigsRev);
+                console.log("EncSigsRandsRev:", EncSigsRevRands);
                 const result2 = await callPythonFunction2('pf_zkrsm',Verfpk,SigsRev,EncSigsRev,EncSigsRevRands,electionId);
                 if (!result2) {
                     return res.status(422).send({ 
@@ -425,93 +429,124 @@ router.post('/fetch', async (req, res) => {
     }
 });
 
-
-    
     
 router.post('/audit', async (req, res) => {
-        try {
-            // Corrected request body extraction
-            const { commitment, booth_num, bid ,election_id} = req.body; 
-    
-            console.log("Received audit request");
-            console.log(commitment)
-            console.log(booth_num)
-            console.log(bid)
-            console.log(election_id)
-            // Call the Python function
-            const result = await callPythonFunction("audit", commitment, booth_num, bid,election_id);
-            if(result==="The ballot has already been audited or the ballot has been used to cast a vote."){
-                return res.json({results:"The ballot has already been audited or the ballot has been used to cast a vote."})
-            }
-            const parsedResult = typeof result === "string" ? JSON.parse(result) : result;
-    
-        // Check if any result has success === false
-        const hasFailure = parsedResult.some(entry => entry[0] === false);
-    
-        // Map results to the desired response format
-        const formattedResults = parsedResult.map(entry => ({
-            success: entry[0],
-            v_w_nbar: entry[1],
-            name: entry[2],
-            gamma_w: entry[3],
-            commitment: entry[4]
-        }));
-    
-        // Return false if there are any failures, otherwise return the results
-        if (hasFailure) {
-            return res.json({
-                success: false,
-                results: formattedResults
-            });
-        }
-    
-        // Return true if all entries are successful
-        res.json({
-            success: true,
-            results: formattedResults
+    try {
+      const { commitment, bid, election_id } = req.body;
+  
+      console.log("Received audit request");
+      console.log({ commitment, bid, election_id });
+  
+      // ✅ Validate input
+      if (!commitment || !bid || !election_id) {
+        return res.status(400).json({
+          success: false,
+          error: "Missing required fields"
         });
-        requestStatus["audit"] = "success"
-        } catch (err) {
-            // Catch and return any errors that occur
-            console.error("Error during audit:", err.message);
-            requestStatus["audit"] = "failed"
-            return res.status(500).json({ error: err.message });
-        }
-    });
+      }
+  
+      // ✅ Call Python function
+      const result = await callPythonFunction(
+        "audit",
+        commitment,
+        bid,
+        election_id
+      );
+  
+      // ✅ Handle already audited case (string response)
+      if (
+        result ===
+        "The ballot has already been audited or the ballot has been used to cast a vote."
+      ) {
+        return res.json({
+          success: false,
+          results:
+            "The ballot has already been audited or the ballot has been used to cast a vote."
+        });
+      }
+  
+      // ✅ Safe parsing
+      let parsedResult;
+      try {
+        parsedResult =
+          typeof result === "string" ? JSON.parse(result) : result;
+      } catch (e) {
+        console.error("JSON parse error:", e.message);
+        return res.status(500).json({
+          success: false,
+          error: "Invalid response from audit function"
+        });
+      }
+  
+      // ✅ Check failures
+      const hasFailure = parsedResult.some(entry => entry[0] === false);
+  
+      // ✅ Format response
+      const formattedResults = parsedResult.map(entry => ({
+        success: entry[0],
+        v_w_nbar: entry[1],
+        name: entry[2],
+        gamma_w: entry[3],
+        commitment: entry[4]
+      }));
+  
+      if (hasFailure) {
+        return res.json({
+          success: false,
+          results: formattedResults
+        });
+      }
+  
+      requestStatus["audit"] = "success";
+  
+      return res.json({
+        success: true,
+        results: formattedResults
+      });
+  
+    } catch (err) {
+      console.error("Error during audit:", err.message);
+      requestStatus["audit"] = "failed";
+  
+      return res.status(500).json({
+        success: false,
+        error: err.message
+      });
+    }
+  });
+  
+  router.post('/vvpat', async (req, res) => {
+          try {
+              const { bid,electionId } = req.body;
+      
+              // Validate input
+              if (!bid) {
+                  return res.status(400).json({ error: "Ballot id is required." });
+              }
+      
+              // Call the Python function with the bid
+              const result = await callPythonFunction("vvpat",(JSONbig.parse(bid)[0]),electionId);
+      
+              // Handle the result
+              if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
+                  requestStatus["vvpatverf"] = "failed"
+                  return res.json({ results: result });
+              } else if (typeof result === "object" && result.cand_name &&result.extended_vote) {
+                  requestStatus["vvpatverf"] = "success"
+                  return res.json({ cand_name: result.cand_name ,extended_vote:result.extended_vote});
+              } else {
+                  // Handle unexpected response from Python function
+                  requestStatus["vvpatverf"] = "failed"
+                  return res.status(500).json({ error: "Unexpected response from verification process." });
+              }
+          } catch (err) {
+              console.error("Error during VVPAT verification:", err.message);
+              requestStatus["vvpatverf"] = "failed"
+              return res.status(500).json({ error: "Internal server error." });
+          }
+ });    
 
-router.post('/vvpat', async (req, res) => {
-        try {
-            const { bid,electionId } = req.body;
-    
-            // Validate input
-            if (!bid) {
-                return res.status(400).json({ error: "Ballot id is required." });
-            }
-    
-            // Call the Python function with the bid
-            const result = await callPythonFunction("vvpat",(JSONbig.parse(bid)[0]),electionId);
-    
-            // Handle the result
-            if (result === "This VVPAT doesn't correspond to a decrypted vote.") {
-                requestStatus["vvpatverf"] = "failed"
-                return res.json({ results: result });
-            } else if (typeof result === "object" && result.cand_name &&result.extended_vote) {
-                requestStatus["vvpatverf"] = "success"
-                return res.json({ cand_name: result.cand_name ,extended_vote:result.extended_vote});
-            } else {
-                // Handle unexpected response from Python function
-                requestStatus["vvpatverf"] = "failed"
-                return res.status(500).json({ error: "Unexpected response from verification process." });
-            }
-        } catch (err) {
-            console.error("Error during VVPAT verification:", err.message);
-            requestStatus["vvpatverf"] = "failed"
-            return res.status(500).json({ error: "Internal server error." });
-        }
-    });
-    
-
-router.post('/runBuild2', async(req, res) => {
+ router.post('/runBuild2', async(req, res) => {
     try {
         // Path to the pre-existing app file
         const appPath = path.join('/app/evoting_localstorage/BallotAudit/android/app/build/outputs/apk/release', 'app-release.apk');

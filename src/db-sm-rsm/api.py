@@ -270,9 +270,34 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
         enc_sigs_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rands))   
         # Get encryption commitments
         enc_data = load("enc", ["comm"], election_id)
-        comms = enc_data["comm"]
-        #print("setup_data",setup_data)
-        #print("enc_data",enc_data)
+        comms = enc_data.get("comm", [])
+        alpha        = setup_data["alpha"]
+        _msg_shares  = mix_data["_msg_shares"]
+        _rand_shares = mix_data["_rand_shares"]
+
+        g1, h1 = load("generators", ["g1", "h1"], election_id).values()
+        sys.__stderr__.write(f"=== pf_zksm debug election {election_id} ===\n")
+        sys.__stderr__.write(f"comms length: {len(comms)}\n")
+        sys.__stderr__.write(f"_msg_shares alpha={len(_msg_shares)}, n={len(_msg_shares[0])}\n")
+        sys.__stderr__.write(f"_rand_shares alpha={len(_rand_shares)}, n={len(_rand_shares[0])}\n")
+        sys.__stderr__.write(f"msgs_out length: {len(mix_data['msgs_out'])}\n")
+
+        # Check if comms[i] == g1^(sum msg_shares)[i] * h1^(sum rand_shares)[i]
+        for i in range(len(comms)):
+            msg_sum  = sum(_msg_shares[a][i]  for a in range(alpha))
+            rand_sum = sum(_rand_shares[a][i] for a in range(alpha))
+            reconstructed = (g1 ** msg_sum) * (h1 ** rand_sum)
+            match = (comms[i] == reconstructed)
+            sys.__stderr__.write(f"  comm[{i}] matches reconstructed: {match}\n")
+            if not match:
+                sys.__stderr__.write(f"    comms[{i}]:        {str(comms[i])[:60]}\n")
+                sys.__stderr__.write(f"    reconstructed[{i}]: {str(reconstructed)[:60]}\n")
+
+        status_verfsigs = check_verfsigs(
+            mix_data["msgs_out"], sigs, verfpk, enc_sigs, enc_sigs_rands,
+            setup_data["elg_pk"], alpha, election_id
+        )
+        sys.__stderr__.write(f"status_verfsigs: {status_verfsigs}\n")
         status_verfsigs = check_verfsigs(mix_data["msgs_out"],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"],election_id)
         assert status_verfsigs, f"Signature verification failed for election {election_id}"
         blsigs, _blshares = get_blsigs(enc_sigs,setup_data["ck"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["_svecperm"],setup_data["_pi"], 

@@ -15,7 +15,7 @@ function LoginPage() {
     }),
     onSubmit: async (values) => {
       try {
-        const res = await axios.post('https://5000-01kffrqdksydbdk11zftsh7yns.cloudspaces.litng.ai/signin/Admin', values);
+        const res = await axios.post('https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai//signin/Admin', values);
         sessionStorage.setItem('access_token', res.data.token);
         navigate('/options');
       } catch (err) {

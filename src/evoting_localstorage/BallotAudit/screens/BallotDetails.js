@@ -1,78 +1,115 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert, PermissionsAndroid, Platform, AppState } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useFocusEffect } from '@react-navigation/native';
 
-export default function Scanner(props) {
+export default function BallotDetails(props) {
   const [isScannerActive, setIsScannerActive] = useState(true);
+  const [scanned, setScanned] = useState(false); // ✅ FIXED
   const scannerRef = useRef(null);
 
+  // ✅ Request camera permission
+  const requestCameraPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true;
+  };
+
+  // ✅ Reset scanner when screen is focused
   useFocusEffect(
     useCallback(() => {
-      setIsScannerActive(true);
+      const init = async () => {
+        const hasPermission = await requestCameraPermission();
+
+        if (!hasPermission) {
+          Alert.alert("Permission Denied", "Camera access is required");
+          return;
+        }
+
+        setIsScannerActive(true);
+        setScanned(false); // ✅ reset scan state
+
+        setTimeout(() => {
+          scannerRef.current?.reactivate?.();
+        }, 500);
+      };
+
+      init();
+
       return () => setIsScannerActive(false);
     }, [])
   );
 
-  const handleScan = async ({ data }) => {
-    if (!isScannerActive) return;
+  // ✅ Handle app foreground
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        scannerRef.current?.reactivate?.();
+      }
+    });
 
-    if (isValidQRCode(data)) {
-      setIsScannerActive(false);
-      Alert.alert(
-        "Ballot QR code scanned correctly",
-        "Do you want to proceed or rescan?",
-        [
-          {
-            text: 'Rescan',
-            onPress: () => {
-              setIsScannerActive(true);
-              setTimeout(() => {
-                scannerRef.current?.reactivate();
-              }, 1000); // Changed to 1 second
-            },
-          },
-          {
-            text: 'Proceed',
-            onPress: () => {
-              props.navigation?.navigate?.("audit", { commitments: data });
-            }
-          },
-        ],
-        { cancelable: false }
-      );
-    } else {
-      Alert.alert(
-        'Invalid QR Code',
-        'Please scan a valid QR code.',
-        [{ text: 'OK', onPress: () => {
-          setIsScannerActive(true);
-          setTimeout(() => {
-            scannerRef.current?.reactivate();
-          }, 1000); // Changed to 1 second
-        }}],
-        { cancelable: false }
-      );
+    return () => subscription.remove();
+  }, []);
+
+  // ✅ Handle QR scan
+  const handleScan = (e) => {
+    if (scanned) return;
+
+    setScanned(true);
+
+    try {
+      const rawData = e.data || e.rawValue;
+
+      console.log("RAW QR:", rawData); // 🔥 DEBUG
+
+      let parsed;
+
+      // Try JSON parse
+      try {
+        parsed = JSON.parse(rawData);
+      } catch {
+        // fallback if comma-separated
+        parsed = rawData.split(',');
+      }
+
+      if (!Array.isArray(parsed) || parsed.length < 3) {
+        throw new Error("Invalid QR format");
+      }
+
+      const [election_id, commitment, bid] = parsed;
+
+      if (!election_id || !commitment || !bid) {
+        throw new Error("Invalid QR values");
+      }
+
+      // ✅ FIXED: send correct structure
+      props.navigation.navigate('audit', {
+        audit_data: [election_id, commitment, bid]
+      });
+
+    } catch (err) {
+      console.log("QR Error:", err);
+      Alert.alert("Invalid QR Code");
+      setScanned(false);
     }
-  };
-
-  const isValidQRCode = (data) => {
-    return typeof data === 'string' && data.trim() !== '';
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.appHeading}>Ballot Audit App</Text>
-      <Text style={styles.headerText}>
-        Scan Encrypted Candidate ID's on the Receipt side of the Ballot
-      </Text>
+      <Text style={styles.heading}>Receipt Challenge</Text>
+      <Text style={styles.subheading}>Scan Challenged Receipt QR</Text>
 
       {isScannerActive && (
         <QRCodeScanner
           ref={scannerRef}
           onRead={handleScan}
-          showMarker={true}
+          showMarker
           markerStyle={styles.marker}
+          fadeIn={false}
         />
       )}
     </View>
@@ -82,35 +119,25 @@ export default function Scanner(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 15,
-    paddingTop: 20,
-    backgroundColor: "#f5f5f5", // Changed from #F2F7FC to match target style
+    padding: 16,
+    backgroundColor: "#f5f5f5",
   },
-  headerText: {
-    fontSize: 22, // Reduced from 30 to match target style
+  heading: {
+    fontSize: 26,
     fontWeight: "bold",
-    color: "#6200ea", // Changed from #4A90E2 to purple theme
+    color: "#6200ea",
     textAlign: "center",
-    marginBottom: 25,
-    letterSpacing: 1, // Slightly reduced from original
+    marginBottom: 10,
   },
-  appHeading: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#6200ea", // Purple theme for consistency
+  subheading: {
+    fontSize: 18,
     textAlign: "center",
-    marginBottom: 15, // Space below heading
-    letterSpacing: 2, // Slight spacing for better readability
-    textTransform: "uppercase", // Make it look bold and official
+    marginBottom: 20,
+    color: "#444",
   },
   marker: {
-    borderColor: '#6200ea', // Updated to purple theme
-    borderWidth: 2,
-    // Added shadow effects for depth
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
+    borderColor: "#6200ea",
+    borderWidth: 3,
+    borderRadius: 10,
   },
 });
-

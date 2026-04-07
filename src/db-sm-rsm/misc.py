@@ -2,6 +2,7 @@ import time
 from hashlib import sha256
 from collections.abc import Iterable
 import gmpy2
+import base64
 
 from globals import CALLDEPTH, group
 from charm.toolbox.pairinggroup import PairingGroup
@@ -133,11 +134,6 @@ def deserialize_wrapper(sitem):
     else:
         item = _sitem
     return item
-
-
-
-
-
 
 """
 def serialize_wrapper(item):

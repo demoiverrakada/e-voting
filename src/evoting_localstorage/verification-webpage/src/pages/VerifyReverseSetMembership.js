@@ -16,7 +16,7 @@ const VerifyReverseSetMembership = () => {
     setResults(null);  // Reset to plural
 
     try {
-      const response = await axios.post("/verif/api/pf_zkrsm_verf", {}, {
+      const response = await axios.post("https://7000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/pf_zkrsm_verf", {}, {
         headers: { "Content-Type": "application/json" },
       });
 

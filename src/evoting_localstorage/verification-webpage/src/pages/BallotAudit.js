@@ -18,7 +18,7 @@ function BallotAudit() {
     try {
       const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
-        '/verif/api/runBuild2',
+        'https://7000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/runBuild2',
         {},
         {
           headers: { authorization: `Bearer ${token}` },

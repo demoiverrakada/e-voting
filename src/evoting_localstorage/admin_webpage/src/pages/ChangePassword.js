@@ -29,7 +29,7 @@ useEffect(() => {
     onSubmit: async (values, { resetForm }) => {
       try {
         const token = sessionStorage.getItem('access_token');
-        const response = await axios.post('https://5000-01kffrqdksydbdk11zftsh7yns.cloudspaces.litng.ai/update-password', values, {
+        const response = await axios.post('https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/update-password', values, {
         headers:{
         authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',

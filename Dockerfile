@@ -17,13 +17,13 @@ ENV HTTP_PROXY=${HTTP_PROXY}
 ENV HTTPS_PROXY=${HTTPS_PROXY}
 ENV no_proxy=${no_proxy}
 ENV NO_PROXY=${NO_PROXY}
-
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+ENV ANDROID_HOME=/opt/android-sdk
+ENV PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
 # ============================================================
 # Install OpenJDK 17 (Gradle compatibility)
 # ============================================================
-RUN apt-get update --fix-missing && \
-    apt-get install -y openjdk-17-jdk curl && \
-    rm -rf /var/lib/apt/lists/*
 
 # ============================================================
 # Configure Gradle proxy ONLY if proxy is provided
@@ -50,7 +50,9 @@ WORKDIR /app
 RUN apt-get update --fix-missing && \
     apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
-
+RUN apt-get update && \
+    apt-get install -y nodejs npm && \
+    which node && node -v
 # ============================================================
 # Install Python dependencies
 # ============================================================
@@ -65,12 +67,16 @@ RUN /bin/bash --login -c "cd evoting_localstorage/bulletin && npm install"
 RUN /bin/bash --login -c "cd evoting_localstorage/admin_webpage && npm install --force"
 RUN /bin/bash --login -c "cd evoting_localstorage/verification-webpage && npm install --force"
 RUN /bin/bash --login -c "cd evoting_localstorage/demo && npm install --force"
+# RUN /bin/bash --login -c "cd evoting_localstorage/BallotAudit && npm install"
+# RUN chmod +x /app/evoting_localstorage/BallotAudit/android/gradlew && \
+#     sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.6-all.zip|' \
+#     /app/evoting_localstorage/BallotAudit/android/gradle/wrapper/gradle-wrapper.properties
+# RUN /bin/bash --login -c "cd evoting_localstorage/BallotAudit/android && ./gradlew clean"
+# RUN /bin/bash --login -c "cd evoting_localstorage/BallotAudit/android && nice -n 19 ./gradlew assembleRelease"
 
 # ============================================================
 # Link Node.js binaries (ensure availability system-wide)
 # ============================================================
-RUN ln -sf /root/.nvm/versions/node/v22.3.0/bin/node /usr/bin/node && \
-    ln -sf /root/.nvm/versions/node/v22.3.0/bin/npm /usr/bin/npm
 
 # ============================================================
 # Fix executable permissions

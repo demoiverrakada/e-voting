@@ -95,10 +95,10 @@ def load(funcs, params, election_id):
         elif collection_name == 'votes':
             result = {}
             for param in params:
-                #print(param)
                 result[param] = []
-                # Create a fresh cursor for each parameter
-                parameter_documents = collection.find({"election_id": election_id})
+                parameter_documents = collection.find(
+                    {"election_id": election_id}
+                ).sort("enc_hash", 1)  # sort by enc_hash for consistent ordering
                 for doc in parameter_documents:
                     deserialized = deserialize_wrapper(doc[param])
                     result[param].append(deserialized)

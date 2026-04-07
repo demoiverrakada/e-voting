@@ -364,7 +364,7 @@ def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m, election_id):
     _sk = group.random(ZR)
     sigma_bid = g1**(1/(bid+_sk))
     
-    # Prepare the exact list used for the "Left QR" (Ballot ID QR)
+    # Left QR data (unchanged)
     qr_data_booth = [bid, gamma_booth, sigma_bid]
     
     eps_v_w_ls = []
@@ -376,39 +376,33 @@ def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m, election_id):
     for i, candidate in enumerate(candidates):
         v_w_bar = bid + i
         r_w = group.random(ZR)
-        gamma_w = (g1**v_w_bar)*(h1**r_w)
+
+        # Commitment
+        gamma_w = (g1**v_w_bar) * (h1**r_w)
         gamma_w_ls.append(gamma_w)
         
+        # Paillier encryptions
         epsilon_v_w_bar = optthpaillier.pai_encrypt(pai_pk_optthpaillier, v_w_bar)
         epsilon_r_w = optthpaillier.pai_encrypt(pai_pk_optthpaillier, r_w)
         eps_v_w_ls.append(epsilon_v_w_bar)
         eps_r_w_ls.append(epsilon_r_w)
         
+        # Secret sharing
         v_w_bar_k = secretsharing.share(v_w_bar, m)
         r_w_k = secretsharing.share(r_w, m)
         
         evr_kw_ls_sub2 = []
         evr_rw_ls_sub2 = []
+
         for j in range(m):
             ev_w_k = optpaillier.pai_encrypt(pai_pk[j], v_w_bar_k[j])
             er_w_k = optpaillier.pai_encrypt(pai_pk[j], r_w_k[j])
-            
-            # --- THE FIX IS HERE ---
-            # We create the pair [EncryptedVoteShare, EncryptedRandomnessShare]
-            evr_kw_ls_sub = [ev_w_k, er_w_k]
-            
-            # Append it to the first list
-            evr_kw_ls_sub2.append(evr_kw_ls_sub)
-            
-            # Append THE SAME pair to the second list (or you can create a new one if logic requires)
-            # Previously, you tried to append 'evr_rw_ls_sub' which was undefined.
-            evr_rw_ls_sub2.append(evr_kw_ls_sub) 
-            # -----------------------
+            evr_kw_ls_sub2.append([ev_w_k])   # vote share ONLY
+            evr_rw_ls_sub2.append([er_w_k])   # randomness share ONLY
         
         evr_kw_ls.append(evr_kw_ls_sub2)
-        evr_rw_ls.append(evr_rw_ls_sub2)        
+        evr_rw_ls.append(evr_rw_ls_sub2)
 
-    # Return the QR list
     return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, evr_rw_ls, bid, qr_data_booth
         
 def G2_part1(election_id):
