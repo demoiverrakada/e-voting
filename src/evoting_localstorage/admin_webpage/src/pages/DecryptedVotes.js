@@ -75,7 +75,7 @@ function DecryptedVotes() {
         try {
             const token = sessionStorage.getItem('access_token');
             await axios.post(
-                'https://5000-01kffrqdksydbdk11zftsh7yns.cloudspaces.litng.ai/mix',
+                'http://10.208.20.91:5002/mix',
                 {},
                 { headers: { authorization: `Bearer ${token}` } }
             );
@@ -91,7 +91,7 @@ function DecryptedVotes() {
         try {
             const token = sessionStorage.getItem('access_token');
             const response = await axios.get(
-                'https://5000-01kffrqdksydbdk11zftsh7yns.cloudspaces.litng.ai/getVotes',
+                'http://10.208.20.91:5002/getVotes',
                 { headers: { authorization: `Bearer ${token}` } }
             );
             const votesData = response.data || {};

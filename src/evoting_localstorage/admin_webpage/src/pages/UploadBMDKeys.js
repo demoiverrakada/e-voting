@@ -39,7 +39,7 @@ function UploadCandidate() {
         console.log(jsonData)
         const token = sessionStorage.getItem('access_token');
 
-        const response = await axios.post('https://5000-01kffrqdksydbdk11zftsh7yns.cloudspaces.litng.ai/upload_bmd_keys', jsonData, {
+        const response = await axios.post('http://10.208.20.91:5002/upload_bmd_keys', jsonData, {
           headers: {
             authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

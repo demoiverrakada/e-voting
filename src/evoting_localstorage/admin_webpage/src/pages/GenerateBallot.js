@@ -27,7 +27,7 @@ function GenerateBallot() {
     try {
       const token = sessionStorage.getItem('access_token');
       const response = await axios.post(
-        'https://5000-01kffrqdksydbdk11zftsh7yns.cloudspaces.litng.ai/generate',
+        'http://10.208.20.91:5002/generate',
         { n, electionId }, // Include electionId in the request
         {
           headers: {
