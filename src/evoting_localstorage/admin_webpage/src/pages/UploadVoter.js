@@ -39,7 +39,7 @@ function UploadVoters() {
         const jsonData = JSON.parse(e.target.result);
         const token = sessionStorage.getItem('access_token');
 
-        const response = await axios.post('http://10.208.20.91:5002/upload_voters', jsonData, {
+        const response = await axios.post('https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/upload_voters', jsonData, {
           headers: {
             authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

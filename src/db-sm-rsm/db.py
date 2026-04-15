@@ -95,10 +95,10 @@ def load(funcs, params, election_id):
         elif collection_name == 'votes':
             result = {}
             for param in params:
-                #print(param)
                 result[param] = []
-                # Create a fresh cursor for each parameter
-                parameter_documents = collection.find({"election_id": election_id})
+                parameter_documents = collection.find(
+                    {"election_id": election_id}
+                ).sort("enc_hash", 1)  # sort by enc_hash for consistent ordering
                 for doc in parameter_documents:
                     deserialized = deserialize_wrapper(doc[param])
                     result[param].append(deserialized)
@@ -149,8 +149,13 @@ def process_bulletins(election_id):
                 print(f"No commitment in bulletin {bulletin.get('_id')}")
                 continue
 
+            pref_id = bulletin.get("pref_id")
+            if not pref_id:
+                print(f"No pref_id in bulletin {bulletin.get('_id')}")
+                continue
+
             receipt = receipts_collection.find_one({
-                "enc_hash": commitment,
+                "enc_hash":   commitment,
                 "election_id": election_id
             })
 
@@ -160,11 +165,12 @@ def process_bulletins(election_id):
                     print(f"Missing receipt for commitment {commitment[:16]}...")
                     continue
 
-            print(f"Found receipt for voter {bulletin['voter_id']} election {election_id}")
+            print(f"Found receipt for voter {bulletin['voter_id']} pref {pref_id} election {election_id}")
 
             vote_doc = {
                 "election_id":        bulletin["election_id"],
                 "voter_id":           bulletin["voter_id"],
+                "pref_id":            bulletin["pref_id"],       # ← added
                 "ov_hash":            receipt["ov_hash"],
                 "enc_hash":           receipt["enc_hash"],
                 "enc_msg":            receipt["enc_msg"],
@@ -182,7 +188,8 @@ def process_bulletins(election_id):
             result = votes_collection.update_one(
                 {
                     "voter_id":    bulletin["voter_id"],
-                    "election_id": bulletin["election_id"]
+                    "election_id": bulletin["election_id"],
+                    "pref_id":     bulletin["pref_id"]           # ← added
                 },
                 {"$setOnInsert": vote_doc},
                 upsert=True

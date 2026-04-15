@@ -25,7 +25,9 @@ def verifier_signature_zksm():
     """Generate verifier signatures for all elections"""
     db=init()
     election_ids = db.keys.distinct("election_id")
+    
     all_results = {}
+
     for election_id in election_ids:
         try:
             f = io.StringIO()
@@ -149,68 +151,109 @@ def pf_zkrsm_verif(verfpk, sigs_rev, enc_sigs_rev, enc_sigs_rev_rands, dpk_bbspl
     print(json.dumps(result))
 
 
-
-
 def audit(commitment, bid, election_id):
-    f = io.StringIO()
-    election_id=int(election_id)
-    g12, h12 = load("generators", ["g1", "h1"], election_id).values()
-    result = load("receipt", [commitment, "accessed"],election_id)
-    accessed = result.get("accessed")
-    if accessed is True:
-        print(f"The ballot for election {election_id} has already been audited or used to cast a vote.")
-        return
-    with contextlib.redirect_stdout(f):
-    #if True:
-        setup_data = load("setup", ['alpha', '_pai_sklist_single', 'pai_pklist_single'], election_id)
-        alpha = setup_data['alpha']
-        _pai_sklist_single = setup_data['_pai_sklist_single']
-        pai_pklist_single = setup_data['pai_pklist_single']
+    try:
+        election_id = int(election_id)
+        bid = int(bid)
 
-        mixers = lambda alpha: [f"mixer {a}" for a in range(alpha)]
-        enc_msg, comm, enc_msg_share, enc_rand_share = [], [], [], []
-        candidates = load("load", [], election_id)
+        g12, h12 = load("generators", ["g1", "h1"], election_id).values()
 
-        receipt_data = load("receipt", [commitment, "enc_msg", "comm", "enc_msg_share", "enc_rand_share"], election_id)
-        enc_msg.append(receipt_data["enc_msg"])
-        comm.append(receipt_data["comm"])
-        enc_msg_share.append(receipt_data["enc_msg_share"])
-        enc_rand_share.append(receipt_data["enc_rand_share"])
+        # Check if already accessed
+        receipt_status = load("receipt", [commitment, "accessed"], election_id)
+        if receipt_status.get("accessed") is True:
+            print(json.dumps([[False, None, None, None, None]]))
+            return
 
-        with timer("decryption of individual message/randomness shares", report_subtimers=mixers(alpha)):
-            _msg_shares, _rand_shares = [], []
+        f = io.StringIO()
+        with contextlib.redirect_stdout(f):
+
+            setup_data = load(
+                "setup",
+                ['alpha', '_pai_sklist_single', 'pai_pklist_single'],
+                election_id
+            )
+            alpha = setup_data['alpha']
+            _pai_sklist_single = setup_data['_pai_sklist_single']
+            pai_pklist_single = setup_data['pai_pklist_single']
+
+            candidates = load("load", [], election_id)
+
+            receipt_data = load(
+                "receipt",
+                [commitment, "enc_msg", "comm", "enc_msg_share", "enc_rand_share"],
+                election_id
+            )
+
+            enc_msg_share = receipt_data["enc_msg_share"]
+            enc_rand_share = receipt_data["enc_rand_share"]
+            comm = receipt_data["comm"]
+
+            _msg_shares = []
+            _rand_shares = []
+
+            # ✅ Correct structure (flat list of shares)
             for a in range(alpha):
-                with timer(f"mixer {a}: decryption of individual message/randomness shares"):
-                    enc_msg_shares_a = list(zip(*enc_msg_share))[a]
-                    enc_rand_shares_a = list(zip(*enc_rand_share))[a]
-                    _msg_shares_a = [pai_decrypt_single(pai_pklist_single[a], _pai_sklist_single[a], enc_msg_share_a, embedded_q=q) for enc_msg_share_a in enc_msg_shares_a]
-                    _rand_shares_a = [pai_decrypt_single(pai_pklist_single[a], _pai_sklist_single[a], enc_rand_share_a, embedded_q=q) for enc_rand_share_a in enc_rand_shares_a]
-                    _msg_shares.append(_msg_shares_a)
-                    _rand_shares.append(_rand_shares_a)
+                msg_share = pai_decrypt_single(
+                    pai_pklist_single[a],
+                    _pai_sklist_single[a],
+                    enc_msg_share[a],
+                    embedded_q=q
+                )
+                rand_share = pai_decrypt_single(
+                    pai_pklist_single[a],
+                    _pai_sklist_single[a],
+                    enc_rand_share[a],
+                    embedded_q=q
+                )
 
-    result = []
-    db = init()
-    receipts_collection = db['receipts']
-    msg_shares = [_msg_shares[j] for j in range(alpha)]
-    rand_shares = [_rand_shares[j] for j in range(alpha)]
-    v_w = reconstruct(msg_shares)
-    r_w = reconstruct(rand_shares)
-    v_w_nbar = int(str(v_w)) % len(candidates)
-    name = candidates[v_w_nbar]
-    gamma_w = (g12**v_w) * (h12**r_w)
+                # Ensure proper type
+                if isinstance(msg_share, (bytes, str)):
+                    msg_share = group.deserialize(msg_share)
+                if isinstance(rand_share, (bytes, str)):
+                    rand_share = group.deserialize(rand_share)
 
-    if gamma_w == comm[0] and int(v_w) == int(int(bid) + 0):
-        receipt = receipts_collection.find_one({'comm': serialize_wrapper(comm[0])})
-        if receipt:
-            receipts_collection.update_one(
+                _msg_shares.append(msg_share)
+                _rand_shares.append(rand_share)
+
+        # Reconstruct
+        v_w = reconstruct(_msg_shares)
+        r_w = reconstruct(_rand_shares)
+
+        v_w_nbar = int(str(v_w)) % len(candidates)
+        name = candidates[v_w_nbar]
+
+        gamma_w = (g12 ** v_w) * (h12 ** r_w)
+
+        # ✅ Recover index i
+        i = int(v_w) - bid
+
+        # ✅ Final verification
+        if gamma_w == comm and 0 <= i < len(candidates):
+            db = init()
+            receipts_collection = db['receipts']
+
+            receipt = receipts_collection.find_one({
+                'comm': serialize_wrapper(comm)
+            })
+
+            if receipt:
+                receipts_collection.update_one(
                     {'_id': receipt['_id']},
                     {'$set': {'accessed': True}}
                 )
-        result.append([True, v_w_nbar, name, str(gamma_w), str(comm[0])])
-    else:
-        result.append([False, None, None, None, None])
 
-    print(json.dumps(result))
+            print(json.dumps([
+                [True, v_w_nbar, name, str(gamma_w), str(comm)]
+            ]))
+        else:
+            print(json.dumps([
+                [False, None, None, None, None]
+            ]))
+
+    except Exception as e:
+        print(json.dumps([
+            [False, None, None, None, f"ERROR: {str(e)}"]
+        ]))
 
 def VVPATverif(bid,election_id):
     election_id=int(election_id)

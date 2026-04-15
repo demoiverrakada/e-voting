@@ -26,7 +26,7 @@ function OptionsPage() {
     try {
       const token = sessionStorage.getItem('access_token');
       await axios.post(
-        'http://10.208.20.91:5002/reset-election',
+        'https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/reset-election',
         {},
         { headers: { authorization: `Bearer ${token}` } }
       );

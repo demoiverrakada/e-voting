@@ -318,11 +318,14 @@ function parseTimestamp(ts) {
     const [yy, mm, dd] = datePart.split('-');
     return new Date(`20${yy}-${mm}-${dd}T${timePart}`);
 }
+
+
 router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
     try {
         const uploadedFile = req.file;
         let votes;
 
+        // ── 1. Decrypt or parse votes ────────────────────────────────────────
         if (uploadedFile) {
             console.log(`Decrypting uploaded file: ${uploadedFile.path}`);
             votes = await callPythonDecrypt(uploadedFile.path);
@@ -330,7 +333,7 @@ router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
         } else {
             votes = req.body.votes;
         }
-        console.log(votes)
+
         if (!Array.isArray(votes) || votes.length === 0) {
             return res.status(400).json({
                 status: 'Error',
@@ -338,74 +341,197 @@ router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
             });
         }
 
+        // ── 2. Group votes by election_id ─────────────────────────────────────
+        const votesByElection = votes.reduce((acc, doc) => {
+            const eid = Number(doc.election_id);
+            if (!acc[eid]) acc[eid] = [];
+            acc[eid].push(doc);
+            return acc;
+        }, {});
+
+        const electionIds = Object.keys(votesByElection).map(Number);
+
+        // ── 3. Fetch all election metadata in one query ───────────────────────
+        const electionMetas = await Candidate.find({ election_id: { $in: electionIds } });
+
+        // Map election_id -> metadata
+        const metaByElection = electionMetas.reduce((acc, meta) => {
+            acc[meta.election_id] = meta;
+            return acc;
+        }, {});
+
+        // Ensure all elections exist
+        const missingElections = electionIds.filter(eid => !metaByElection[eid]);
+        if (missingElections.length > 0) {
+            return res.status(400).json({
+                status: 'Error',
+                message: `No candidates found for elections: ${missingElections.join(', ')}`
+            });
+        }
+
+        // ── 4. Per-election validation ────────────────────────────────────────
+        for (const electionId of electionIds) {
+            const electionVotes  = votesByElection[electionId];
+            const meta           = metaByElection[electionId];
+            const isBlockVoting  = meta.election_type === 'block';
+            const maxPreferences = meta.number_of_preferences;
+
+            // Deduplicate within this election's votes
+            const seen = new Set();
+            votesByElection[electionId] = electionVotes.filter(doc => {
+                const key = isBlockVoting
+                    ? `${doc.voter_id}__${electionId}__${doc.pref_id}`
+                    : `${doc.voter_id}__${electionId}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+
+            const dedupedElectionVotes = votesByElection[electionId];
+            const voterIds = [...new Set(dedupedElectionVotes.map(doc => doc.voter_id))];
+
+            if (!isBlockVoting) {
+                // ── Majority / Preferential: one vote per voter ───────────────
+
+                // Reject if payload has multiple votes for same voter
+                const multiVoters = voterIds.filter(vid =>
+                    dedupedElectionVotes.filter(d => d.voter_id === vid).length > 1
+                );
+                if (multiVoters.length > 0) {
+                    return res.status(400).json({
+                        status: 'Error',
+                        message: `Election ${electionId} (${meta.election_type}): multiple votes in payload for voters: ${multiVoters.join(', ')}`
+                    });
+                }
+
+                // Reject if voter has already voted in DB
+                const alreadyVoted = await Bulletin.find({
+                    voter_id:    { $in: voterIds },
+                    election_id: electionId
+                }).distinct('voter_id');
+
+                if (alreadyVoted.length > 0) {
+                    return res.status(400).json({
+                        status: 'Error',
+                        message: `Election ${electionId} (${meta.election_type}): voters already voted: ${alreadyVoted.join(', ')}`
+                    });
+                }
+
+            } else {
+                // ── Block voting: enforce number_of_preferences cap ───────────
+
+                const voteCountByVoter = dedupedElectionVotes.reduce((acc, doc) => {
+                    acc[doc.voter_id] = (acc[doc.voter_id] || 0) + 1;
+                    return acc;
+                }, {});
+
+                // Check payload alone doesn't exceed cap
+                const exceedingInPayload = Object.entries(voteCountByVoter)
+                    .filter(([_, count]) => count > maxPreferences)
+                    .map(([voter_id]) => voter_id);
+
+                if (exceedingInPayload.length > 0) {
+                    return res.status(400).json({
+                        status: 'Error',
+                        message: `Election ${electionId} (block): voters exceeded max preferences (${maxPreferences}) in payload: ${exceedingInPayload.join(', ')}`
+                    });
+                }
+
+                // Check payload + existing DB votes don't exceed cap
+                const existingCounts = await Bulletin.aggregate([
+                    { $match: { voter_id: { $in: voterIds }, election_id: electionId } },
+                    { $group: { _id: '$voter_id', count: { $sum: 1 } } }
+                ]);
+
+                const exceedingInDB = existingCounts.filter(e =>
+                    (e.count + (voteCountByVoter[e._id] || 0)) > maxPreferences
+                );
+
+                if (exceedingInDB.length > 0) {
+                    return res.status(400).json({
+                        status: 'Error',
+                        message: `Election ${electionId} (block): voters would exceed max preferences (${maxPreferences}): ${exceedingInDB.map(e => e._id).join(', ')}`
+                    });
+                }
+            }
+        }
+
+        // ── 5. Batch processing across all elections ──────────────────────────
         let totalInserted = 0;
         let totalMatched  = 0;
         let totalModified = 0;
 
-        for (let i = 0; i < votes.length; i += BATCH_SIZE) {
-            const batch = votes.slice(i, i + BATCH_SIZE);
+        // Flatten back to single array (already deduped per election)
+        const dedupedVotes = Object.values(votesByElection).flat();
 
-            const bulkOps = batch.map(doc => ({
-                updateOne: {
-                    filter: {
-                        voter_id:    doc.voter_id,
-                        election_id: Number(doc.election_id)
-                    },
-                    update: {
-                        $setOnInsert: {
-                            election_id: Number(doc.election_id),
-                            voter_id:    doc.voter_id,
-                            booth_num:   Number(doc.booth_num),
-                            commitment:  doc.commitment,
-                            pref_id:     doc.pref_id,
-                            hash_value:  doc.hash_value,
-                            timestamp:   parseTimestamp(doc.timestamp)
-                        }
-                    },
-                    upsert: true
-                }
-            }));
-            
+        for (let i = 0; i < dedupedVotes.length; i += BATCH_SIZE) {
+            const batch = dedupedVotes.slice(i, i + BATCH_SIZE);
+
+            const bulkOps = batch.map(doc => {
+                const eid           = Number(doc.election_id);
+                const isBlockVoting = metaByElection[eid].election_type === 'block';
+
+                return {
+                    updateOne: {
+                        filter: isBlockVoting
+                            ? { voter_id: doc.voter_id, election_id: eid, pref_id: doc.pref_id }
+                            : { voter_id: doc.voter_id, election_id: eid },
+                        update: {
+                            $setOnInsert: {
+                                election_id: eid,
+                                voter_id:    doc.voter_id,
+                                booth_num:   Number(doc.booth_num),
+                                commitment:  doc.commitment,
+                                pref_id:     doc.pref_id,
+                                hash_value:  doc.hash_value,
+                                timestamp:   parseTimestamp(doc.timestamp)
+                            }
+                        },
+                        upsert: true
+                    }
+                };
+            });
+
             const bulkResult = await Bulletin.bulkWrite(bulkOps, {
                 ordered: false,
                 bypassDocumentValidation: true
             });
-            
+
             console.log(`Bulk result: inserted=${bulkResult.upsertedCount}, matched=${bulkResult.matchedCount}, modified=${bulkResult.modifiedCount}`);
             totalInserted += bulkResult.upsertedCount || 0;
             totalMatched  += bulkResult.matchedCount  || 0;
             totalModified += bulkResult.modifiedCount || 0;
 
+            // ── 6. Update receipts for newly inserted docs ────────────────────
             const insertedIds = Object.values(bulkResult.upsertedIds || {});
             if (insertedIds.length > 0) {
                 const insertedDocs = await Bulletin.find({ _id: { $in: insertedIds } });
 
                 await Promise.all(insertedDocs.map(async (entry) => {
-                    const { commitment } = entry;
-                    const receipt = await Receipt.findOne({ enc_hash: commitment });
+                    const receipt = await Receipt.findOne({ enc_hash: entry.commitment });
                     if (receipt) {
-                        const { ov_hash } = receipt;
                         const updatedReceipts = await Receipt.updateMany(
-                            { ov_hash },
-                            { accessed: true }
+                            { ov_hash: receipt.ov_hash },
+                            { $set: { accessed: true } }
                         );
-                        console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
+                        console.log(`Updated ${updatedReceipts.modifiedCount} receipts with ov_hash: ${receipt.ov_hash}`);
                     }
                 }));
             }
 
+            // ── 7. Mark voters as having voted ───────────────────────────────
             const updateVoterConditions = batch.map(doc => ({
                 voter_id:    doc.voter_id,
-                election_id: doc.election_id
+                election_id: Number(doc.election_id)
             }));
 
             await Voter.updateMany(
                 { $or: updateVoterConditions },
-                { $set: { vote: true } },
-                { multi: true }
+                { $set: { vote: true } }
             );
         }
 
+        // ── 8. Cleanup temp file ──────────────────────────────────────────────
         if (uploadedFile && fs.existsSync(uploadedFile.path)) {
             fs.unlinkSync(uploadedFile.path);
             console.log(`Cleaned up temp file: ${uploadedFile.path}`);
@@ -413,7 +539,8 @@ router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
 
         res.send({
             status: 'OK',
-            message: 'Upload process completed with timestamp-based conflict resolution.',
+            message: 'Upload process completed successfully.',
+            electionsProcessed: electionIds,
             insertedCount: totalInserted,
             matchedCount:  totalMatched,
             modifiedCount: totalModified
