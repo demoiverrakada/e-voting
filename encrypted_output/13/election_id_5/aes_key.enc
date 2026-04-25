@@ -1,0 +1,5 @@
+{
+  "bmd_id": "13",
+  "encrypted_aes_key": "dpze+yLbSWSQw2/xlY1uI+Xq+Fj2lci1xDwqjHQKWuUo1HYbFxfJ2HxHD5jTdpTMN8wudOcxKuy69bbl/pnQWNwjMCXEhGx+KuWHwpZWjlfFW5PntqX59zOys7NyCnG8hAOZMPGfdxf50FQClK037XvogILoP6E0HgNYVQF+C3aJt4zniXzCJQ+4CUs1Hzcko0t9OMfQss571+PJ7t9VhBTUPMgbJqsig3GZeHuiDqwTeWOQ7SFg4BXtgCaFslOE2yJXprfQe+erx1FEGHh6q/x5jwtPT6ZXDu9/DscxUXi6aM9Y6noAVPLQpgqoegdBXgMZbqoYrHojhiBu4O/60g==",
+  "algorithm": "RSA-OAEP-SHA256"
+}

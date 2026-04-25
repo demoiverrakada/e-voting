@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/bulletin")
+      .get("http://10.208.20.91:5002/bulletin")
       .then((response) => {
         // Sort the users array by election_id
         const sortedUsers = response.data.sort((a, b) => a.election_id - b.election_id);

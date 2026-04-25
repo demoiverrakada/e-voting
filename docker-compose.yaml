@@ -20,7 +20,7 @@ services:
     working_dir: /app/evoting_localstorage/project_evoting
     command: /root/.nvm/versions/node/v22.3.0/bin/node --watch index
     ports:
-      - "5000:5000"
+      - "5002:5000"
     links:
       - ea-db
     volumes:
@@ -42,7 +42,7 @@ services:
     volumes:
       - ./mongo-init:/docker-entrypoint-initdb.d
     ports:
-      - 27017:27017
+      - 27018:27017
 
   verif-server:
     build: .

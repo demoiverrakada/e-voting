@@ -177,7 +177,7 @@ router.post('/generate', requireAuth, async (req, res) => {
 
         await async.eachLimit(bmdDirs, concurrencyLimit, async (bmdId) => {
             const bmdDir = path.join(encryptedOutputDirectory, bmdId);
-            const bmdZipName = `${bmdId}.zip`;
+            const bmdZipName = `ballot_${bmdId}.zip`;
             const bmdZipPath = path.join(outputDirectory, bmdZipName);
 
             await new Promise(async (resolve, reject) => {

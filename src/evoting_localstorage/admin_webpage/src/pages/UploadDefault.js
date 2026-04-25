@@ -37,7 +37,7 @@ function UploadDefault() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await axios.post('https://5000-01kk9e5t37w5v48yspx6hdpj3s.cloudspaces.litng.ai/upload', formData, {
+      const response = await axios.post('http://10.208.20.91:5002/upload', formData, {
         headers: {
           authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

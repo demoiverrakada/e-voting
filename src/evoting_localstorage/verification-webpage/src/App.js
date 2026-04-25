@@ -13,7 +13,7 @@ import VoterVerificationApp from "./pages/VoterVerification.js";
 import VerifyVVPAT from "./pages/VVPATVerification.js";
 const App = () => {
   return (
-    <Router>
+    <Router basename="/verif">
       <div className="app-container">
         <header className="header">
           <h1>Verification Webpage</h1>
@@ -27,15 +27,15 @@ const App = () => {
             <Link to="/pf_zkrsm_verf" className="btn">
               Verify Decrypted Votes
             </Link>
-            <Link to ="/ballotaudit" className="btn">
+            {/*<Link to ="/ballotaudit" className="btn">
               Generate Ballot Audit app
-            </Link>
+            </Link>*/}
             {/* <Link to ="/voterverification" className="btn">
               Generate Voter Verification app
             </Link> */}
-            <Link to ="/verifyvvpat" className="btn">
+            {/*<Link to ="/verifyvvpat" className="btn">
               Verify VVPAT
-            </Link>
+            </Link>*/}
           </div>
         </main>
 
