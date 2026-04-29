@@ -1,7 +1,7 @@
 const express = require('express');
 //const { jwtkey } = require('../keys');
 const router = express.Router();
-//const requireAuth = require('../middelware/requireToken');
+//const requireAuth = require('../middleware/requireToken');
 //const {Verf,VerfP} = require('../models/User');
 const cors = require('cors');
 const { spawnSync } = require('child_process');

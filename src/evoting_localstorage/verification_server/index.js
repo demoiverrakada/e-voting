@@ -10,7 +10,7 @@ app.use(cors());
 
 require('./models/User')
 
-//const requireToken=require('./middelware/requireToken')
+//const requireToken=require('./middleware/requireToken')
 const authRoutes=require('./routes/authRoutes')
 
 app.use(bodyParser.json())

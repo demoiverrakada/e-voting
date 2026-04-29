@@ -8,7 +8,13 @@ const dbConnection = mongoose.createConnection(mongoUrl, {
     useUnifiedTopology: true
 });
 
-// ── Schemas (define BEFORE models so syncIndexes can reference them) ──────────
+dbConnection.on('connected', () => {
+    console.log('Connected to MongoDB');
+});
+
+dbConnection.on('error', (err) => {
+    console.log('Error connecting to MongoDB', err);
+});
 
 const AdminSchema = new mongoose.Schema({
     email:    { type: String, unique: true, required: true },
@@ -173,7 +179,6 @@ const AESKeySchema = new mongoose.Schema({
     created_at:        { type: Date, default: Date.now }
 });
 
-// ── Models ────────────────────────────────────────────────────────────────────
 const Votes       = dbConnection.model('Votes',       VotesSchema);
 const Admin       = dbConnection.model('Admin',       AdminSchema);
 const Candidate   = dbConnection.model('Candidate',   CandidateSchema);
@@ -187,30 +192,6 @@ const BMDPublicKey= dbConnection.model('BMDPublicKey',BMDPublicKeySchema);
 const ServerKey   = dbConnection.model('ServerKey',   ServerKeySchema);
 const AESKey      = dbConnection.model('AESKey',      AESKeySchema);
 
-// ── Sync indexes on connect (replaces old manual dropIndex) ───────────────────
-dbConnection.on('connected', async () => {
-    console.log('Connected to MongoDB');
-
-    try {
-        await Bulletin.syncIndexes();
-        console.log('Bulletin indexes synced');
-    } catch (err) {
-        console.log('Bulletin index sync error:', err.message);
-    }
-
-    try {
-        await Votes.syncIndexes();
-        console.log('Votes indexes synced');
-    } catch (err) {
-        console.log('Votes index sync error:', err.message);
-    }
-});
-
-dbConnection.on('error', (err) => {
-    console.log('Error connecting to MongoDB', err);
-});
-
-// ── Exports ───────────────────────────────────────────────────────────────────
 module.exports = {
     Votes,
     Admin,
