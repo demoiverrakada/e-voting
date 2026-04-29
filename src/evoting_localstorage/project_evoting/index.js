@@ -28,7 +28,7 @@ const voteLimiter = rateLimit({
 });
 app.use('/vote*', voteLimiter);
 
-require('./models/User')
+require('./models')
 //routes will come below this
 const requireToken=require('./middleware/requireToken')
 const authRoutes=require('./routes/authRoutes')
