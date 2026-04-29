@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const dbConnection = require('./connection');
 
 const ReceiptSchema = new mongoose.Schema({
+    org_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        required: true,
+        index: true
+    },
     election_id:        { type: Number, required: true },
     ov_hash:            { type: String, required: true },
     enc_hash:           { type: String, required: true },

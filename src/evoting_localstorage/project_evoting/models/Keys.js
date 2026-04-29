@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 const dbConnection = require('./connection');
 
 const keysSchema = new mongoose.Schema({
-    election_id:          { type: Number, unique: true, required: true },
+    org_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        required: true,
+        index: true
+    },
+    election_id:          { type: Number, required: true },
     alpha:                { type: String, required: true },
     pai_pk:               { type: [mongoose.Schema.Types.Mixed], required: true },
     _pai_sklist:          { type: [mongoose.Schema.Types.Mixed], required: true },
@@ -20,9 +26,16 @@ const keysSchema = new mongoose.Schema({
     beaver_b_shares:      { type: [mongoose.Schema.Types.Mixed], required: true },
     beaver_c_shares:      { type: [mongoose.Schema.Types.Mixed], required: true }
 });
+keysSchema.index({ org_id: 1, election_id: 1 }, { unique: true });
 
 const generatorSchema = new mongoose.Schema({
-    election_id: { type: Number, unique: true, required: true },
+    org_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        required: true,
+        index: true
+    },
+    election_id: { type: Number, required: true },
     g1:          { type: String, required: true },
     f2:          { type: String, required: true },
     eg1f2:       { type: String, required: true },
@@ -35,6 +48,7 @@ const generatorSchema = new mongoose.Schema({
     inveg1f2:    { type: String, required: true },
     fT:          { type: String, required: true }
 });
+generatorSchema.index({ org_id: 1, election_id: 1 }, { unique: true });
 
 const Keys = dbConnection.model('Keys', keysSchema);
 const Generator = dbConnection.model('Generator', generatorSchema);
