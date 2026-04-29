@@ -60,6 +60,10 @@
       "models/**/*.js",
       "lib/logger.js",
       "lib/mailer.js",
+      "!routes/authRoutes.js",
+      "!routes/voterAuthRoutes.js",
+      "!middleware/requireToken.js",
+      "!models/Admin.js",
       "!models/connection.js",
       "!**/node_modules/**"
     ],
