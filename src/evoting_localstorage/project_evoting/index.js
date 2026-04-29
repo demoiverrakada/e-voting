@@ -4,6 +4,7 @@ const helmet=require('helmet');
 const rateLimit=require('express-rate-limit');
 const bodyParser=require('body-parser')
 const mongoose =require('mongoose')
+const logger = require('./lib/logger');
 const PORT=5000;
 
 const app=express();
@@ -50,5 +51,5 @@ app.post('/',(req,res)=>
 })
 
 app.listen(PORT, () => {
-    console.log('Server is running on', PORT);
+    logger.info(`Server is running on ${PORT}`);
 });

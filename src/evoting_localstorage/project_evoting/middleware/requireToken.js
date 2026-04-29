@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { jwtkey } = require('../keys');
 const { PO, Votes, Admin, Candidate, Voter,Receipt,Bulletin,Keys} = require('../models');
+const logger = require('../lib/logger');
 module.exports = async (req, res, next) => {
     const { authorization } = req.headers;
 
@@ -9,18 +10,18 @@ module.exports = async (req, res, next) => {
     }
 
     const token = authorization.replace("Bearer ", "");
-    console.log(token);
+    logger.info(`Token: ${token}`);
     jwt.verify(token, jwtkey, async (err, payload) => {
         if (err) {
             return res.status(401).send({ error: "You must be logged in!" });
         }
 
         const { userId } = payload;
-        console.log(userId,"userId")
+        logger.info(`User ID: ${userId}`);
         try {
             // If not a PO, check if the user is an Admin
             const newAdmin = await Admin.findById(userId);
-            console.log(newAdmin,"admin name")
+            logger.info(`Admin name: ${newAdmin ? newAdmin.name : 'Not found'}`);
             if (!newAdmin) {
                 return res.status(401).send({ error: "User not found or unauthorized" });
             }
@@ -28,7 +29,7 @@ module.exports = async (req, res, next) => {
             req.user = newAdmin;
             next();
         } catch (error) {
-            console.error("Error fetching user:", error);
+            logger.error(`Error fetching user: ${error}`);
             return res.status(500).send({ error: "Internal server error" });
         }
     });

@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const { jwtkey } = require('../keys');
 const router = express.Router();
 const requireAuth = require('../middleware/requireToken');
+const validate = require('../middleware/validate');
+const { loginSchema } = require('../validators/authValidator');
 const { Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey,AESKey,ServerKey,Generator} = require('../models');
 const cors = require('cors');
 const { spawnSync } = require('child_process');
@@ -180,7 +182,7 @@ router.post('/generate', requireAuth, async (req, res) => {
             const bmdZipName = `ballot_${bmdId}.zip`;
             const bmdZipPath = path.join(outputDirectory, bmdZipName);
 
-            await new Promise(async (resolve, reject) => {
+            await new Promise((resolve, reject) => {
                 const output = fs.createWriteStream(bmdZipPath);
                 const archive = archiver('zip', { zlib: { level: 9 } });
 
@@ -241,8 +243,9 @@ router.post('/generate', requireAuth, async (req, res) => {
                     }
                 });
 
-                await Promise.all(electionCandidatePromises);
-                archive.finalize();
+                Promise.all(electionCandidatePromises)
+                    .then(() => archive.finalize())
+                    .catch(reject);
             });
 
             bmdZipPaths.push({ name: bmdZipName, filePath: bmdZipPath });
@@ -871,15 +874,12 @@ router.get('/getVotes', async (req, res) => {
 
 
 // for signing in Admin
-router.post('/signin/Admin', async (req, res) => {
+router.post('/signin/Admin', validate(loginSchema), async (req, res) => {
     console.log("---------------- DEBUG START ----------------");
     const { email, password } = req.body;
     console.log("1. Login Attempt for:", email);
     console.log("2. Password Length:", password ? password.length : "Missing");
-    if (!email || !password) {
-        console.log("3. ERROR: Missing credentials");
-        return res.status(422).send({ error: "Must provide email or password" });
-    }
+
     const newAdmin = await Admin.findOne({ email });
     if (!newAdmin) {
         console.log("4. ERROR: Admin doesn't exist with this email");
