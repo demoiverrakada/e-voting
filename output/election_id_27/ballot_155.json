@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"f96d63b9bdeb399e29949b23ee3628e019cd22e059b019fb155b057dd522c1d5\", \"718886dd79bba16ab4b5288ea59b724a87a60cac28f0ab94d9e5c34e4c1be0c6\", \"f990e0eebb941458045f7936f36259a57aababc653926e0e405de3a7ae88ba4a\", \"5a681e7a09bd3d6a6789e4d1a972b3549c4e0ce9f94f04b94b576147d4c3bb05\", \"00f2bfcc8b0e4cc0bfbbed25f73c78221012e80437de8856982d618ea9f0d93f\", \"e1489527d7701df0b7a9634a6a6330519dc8a0fb3ab8232c7966a0a2122594e3\"], [1, \"[12593840572441593059884954256540607912367464439236027239745044324813885830829, 13789928663200239162757918461561006891547940132237310951035807166086715848777]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[12648054408596681506755328002483081730764041676194799180942268493867434402846, \"[11509387664976100039360065249743562313115619815344100341140727807481966100519, 882975250551797810899687033307365677016112470366724103622895314238529189280]\", \"[15404983447999490865273181629120435282953115194853206645353547829366149629533, 2575337791804214933808906459029966512229989500209807618397971002246127642840]\"]"
+}

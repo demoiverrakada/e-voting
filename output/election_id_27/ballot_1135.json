@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"2d3d6a2fbba8b49c54ce0194997b09ad92ba83715354b56a55938612b1784a4b\", \"d72d7af28e0d0c925175fc87b76bcfb86055766bef1a81404dd561898a1bd2c9\", \"ac87dbf9f25b6b792d90903c7e494e25199c22adac0df1df63c4867928c75210\", \"6db2093bce2f4395cb05d48ce221492d3bb7be60c43dd58fce755b4c69ca3cb4\", \"848c3191092a661301c6c436a12f7a6cba66c2ffd2aabf09598b68b4e8e020ae\", \"bdad976234577c031c6aa89a16f77fb6ad1cc2009c7c908fab5d203cc1fb7e15\"], [1, \"[2245810694529365691254436028375829432528251058513280893604579235467584247125, 8050322699884677152716221450607789616091398429021099113250045019547294792999]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[15485947765619027850793603787237599289674016040550855421767157734641316223237, \"[7475936755446755079587911554808676060334741795284342439463547608739101333316, 2086209800499560966379926745643335543419867173910841984269555536043844059633]\", \"[8559747610525830323759758300809149503089190983110515393978334483395685237855, 3813789002966921303773757854318405049877208182042453825209485064315966767135]\"]"
+}

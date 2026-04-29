@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"1d7fb5047328165192e2c624e7dc5515c4d9062b93c418bdfd4a6a4c35f7ead0\", \"4776bd989c0e30ec88cfa108e1441c8ab3f7c924b40d1f23dc9a195b79e54b17\", \"51e1d2dd34707118d70022018c99469c199dffa1eb50710ad93c3a263b8b5dd8\", \"dbcf4386388a3ae2974187c5edeebb4386ee2369a63490fef9988fbfd56d3059\", \"17001a25e0ee7394d48ad725a73e5665314b87063d4da292af87d0e3e697a4d3\", \"765bc8b9cf9f95611e1b1244a4ceb25be8a2a6ef4fb51053b68651bda9f11ba5\"], [1, \"[9047114913368859314182435122714381117201111020590722857277335081239267385195, 9981337074377559886225528232808456730036471663178029947505425930820240741849]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[2766447904255991879345368450834469234564565391272571342923340825270239001418, \"[14778753652506736329934747249762804495638036947486744764791502897423752384071, 8992354648234451923640659543037284492241810236775150950901510292628721610108]\", \"[15098834511564510120497050707335681151314811129438028610478974761983921240900, 1901837920351248267976734320596625081592433098599930725450410831122129505523]\"]"
+}

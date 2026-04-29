@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"f73cfa8423d6f792a1d80a67f3c7e2b5c82bb3d1d12c99fa6329d36def4a19a6\", \"acac910c72ddb55c3ec83ab71b5817a2a7e0e7715a7f1031125ddccd9e710f48\", \"59a5550cff61690bdcdf1c93bdc385fe7aa6a0e227ef88931506a5e93d968c71\", \"d95307f1ba58d108dba40d3993b154513c3fa73be4a1e580b26492996a6da920\", \"02e59e7d4c81940928b42944eb17ce28b7c0c108cade43bddaa5726ff2b1b401\", \"cf12d2c880788f3b8797ceb55a405a42cf4fdc8dfca793845e9b88c331a21bed\"], [1, \"[14491753252932674240020245450917501824725120185169751858825400081968923712533, 11516337073635392027199701215321453096707135211505230399890791906964024609529]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[9535885688221877429654275120698768679598297372502881119934143751035823611678, \"[5639123434757271476665154969397345898524735244975818994505757886765197633799, 6646818586917297126376845900144382952416790722208517009592335998106681287278]\", \"[10004873016691787226710714909266723310770917608011634802975061011963939547238, 2836302750859981164692688799693939067745720744470685865312897886012502239666]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"4888cd9d0f55eada230cf62fdb35b9a51caee77c1f3cebff66b54b5839311814\", \"6c34d0eba7bea6c8f3a7ddc192160a11ef4941eaafb190581411f1db54c26e24\", \"41b1018c73d3d8978842ff40fab8910acc5bb82c629c7a9ed5e5bb2f085c9b80\", \"f60275cf9b050517cf153a48bac8e8902b661f04f51da45e46b2c4795ef5ba84\", \"3ad76e302d8e825670c6ea382c5e4db5afa8658e425fac93dff2bcc5d271f091\", \"f2bd294ce44049926a93bfcdb755c9fd4207dfde4e3d64f871ec0f16b2665a00\"], [1, \"[16101681541895464268523730470497503841638876053460020443336505377179974655598, 1543289106506475188715210768018036318819447068907059086782592003792543312397]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[11809069196000176586377629721504453086643925406042062771218109512689320427712, \"[10426216692605420201715822205005279000754350857309299973184973277792573402286, 5173822023108913560870156694890658291122749791846158890087658970836042066318]\", \"[8130972135053993974100306755964553884143899617525786273903555906043174273302, 14566485780595141612100955328344398696264658507805565280610050259443477269903]\"]"
+}

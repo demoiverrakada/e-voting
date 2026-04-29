@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"6b5ba36d7d2518e8c30b5d7a4e9843c158ad9e6f896f78bb55e6ff1058da0f77\", \"d3ca3b5109d6b73c9f2ab1698b91b86f07ebd61efff78e6944d596e381827e30\", \"286a8c30071f3b6c06eadf0a295b7915cbeb449d5e1831cab0d0c9c5c04b2f61\", \"a900b49ee906dcb91ce76b6dd369c6d6806abed3d024bf8c27e91b34cc0fced1\", \"fb3b72ad9456a5daa0c678a3cd0512c0ab00b19649578a42191e1402be2e4324\", \"1d221807482e1813057246286b1a10cab23321b8245ac02f4a292ec259ec4ec5\"], [1, \"[5911197921132439178019410075227057512014906489078471460809701035375010333473, 5309507089091342891808972698570128620069926963460867995272167168801104169565]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[8116318412072591362359705526660614354462550464807885581655602412495642512297, \"[11193566981707376045493389963635999967054630220642858162494026183407774459680, 12220126566357614893578813397450518914810857500746759719193169949487403021670]\", \"[5055484770944970669000212309739259001680667916410536194514156283464270626734, 7233919011244596327705367430351427893777537766337261846965079717092676660212]\"]"
+}

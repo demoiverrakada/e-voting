@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"6cffea07548968b2ff9413d8821fd98f08c7f14051ddf165c8a5ba2548685853\", \"1ca3b4588310d7eff244d10ab474715d9fa60f1a7acdb94657e1d33efa08537d\", \"de607cf8eb62759f6d766357c595f9def5119196e5642542f898acba6b2c7a13\", \"c755d75958c95de2f6ca9cb5c7152c3df3c5664b0c1494fbcdcc150609523053\", \"a1fa301ade918e9bca5dee333b3564bfbd6224a3e6e3f13fd8b45fb4a0a775ed\", \"346a888363a6b4e1a90f78fe2c7f83cd9e3302dbb81f3b8d41acde6adccdb39b\"], [1, \"[3240391707604323941046145205608912200397738130066771416879530299280170399136, 7841229909041224949631946823717830339444572389792476628300712582060957938982]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[3285861204628728061043061907060179857837427928419579724258430008388919751233, \"[255804565036053161483125971390678277834711314347868028818017193424289228296, 11167222639714889201850623963246695748430421380242364998768217364692565326817]\", \"[9061369666812417321730865254762308956190966007873648986222320115472045090297, 12601296691169896521344429428667287664153630298967413735219367987875927013383]\"]"
+}

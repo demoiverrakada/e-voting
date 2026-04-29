@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"ed9c78267b536109b1709ed811cd8cc48765c521d1d68e84ad95678fc3665fac\", \"2377ea14b81d1a2d1fb26942282d58f74b8464dd14e7b17f40c71c09dfc00c59\", \"b873ad077a7fde980ae02912aec561049c2e0ac65f2f9a0fae23a338f82e467b\", \"011a62b23ab4bd1ae54609988ef8180d37975ee254950737c2e52bae014e6f79\", \"dd19da61e1711f7af603b8432ff3f97a7f773de27655f77a6b96c63fc6cab44b\", \"2666e97f1f6fa676d610621467bf217c4aed59d2c0d8de22a2ce84d2e22eae96\"], [1, \"[11595994638936678048109403803239321263517790327997072082842127337776445292035, 9714677991727718436433389361472815187083897001028481610942848222438759919489]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[2523611567984747428429116732336022971790955888704146383337348846032130375234, \"[2642303274770820944291935858532338433241878319025870471761428795376282554935, 3728541968827019143157724084966857384916232406053420769285837739277507032731]\", \"[3722652767849830751303500859564915020008392025664236099238590042568896621005, 15859603736220724731941756882122800476118351261053911739245090200890242728550]\"]"
+}

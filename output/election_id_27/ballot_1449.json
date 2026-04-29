@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"4a5f3fd63e318cac896ea4f653974b87ff640c126f418cc3a4fe36cffb2b76e2\", \"0f76b3da07db9cc012ed4166f42cb8130db218936ff5aba26e423d4dcabce1f5\", \"6ba4c5a66958ed00e0e7bfa4e840cf8b7634e0146635b06344c6aadab8ce5007\", \"7da19ad82222a6770128214d8466ef3fa99b3e06bdfb549b99e1ac0f6e471f7d\", \"2c8c2750dc5756b9a683db7a0ce8355237fa8338f7a9ed17e950f9683303b72a\", \"5346038f03de4da3b8dbce5aec4846e8018efb6e704bcf05912b527f8976aa41\"], [1, \"[12372698377505206410041483720826814202378443121962169352956794786530944195033, 13991327579368401716123817356465824531618895598127406647973179843701156599298]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[604686407482054127302131292587568983412512580260820635677454183482720056155, \"[14347064884142827356513529178210897139004309949916361251734208007532374751151, 9788480950729255870939868102829686401932142222707824507853620168440325870529]\", \"[5483868155754938596671733707602668772325055179508587117843813812242421051801, 5153338485852793939011775661030682255200043788296274460158409753749138924870]\"]"
+}

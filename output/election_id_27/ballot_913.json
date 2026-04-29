@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"7e5da5d34f8882babc5070e84f31474700f1d4709b93ac81283062a7461fd8e8\", \"9361e986c7f6ede20a22048bb03be2cfaf261a23c09677df39bf905b47778516\", \"ff193030d7008e7e28dc9c04eb70ea91ef6e1c73f7823ba6b417b29ed505185d\", \"f206e74cfb3e62fdf3e9d1849c0a457bf75c3e7136e52a89981c9f93ab616c6b\", \"82c88754bac46e97026f054abcef66b7f9580e7259c25c59b9c75ad66eafead4\", \"67801fe63c4babdfbdaee051931a4136334179c0c924247f48baee8b60769466\"], [1, \"[10157409453035652249406027118653649486327075299091000120140577121889040105588, 985532558329536174295294394418279721131582226106286313894817919992820343981]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[12913221171404433565712701173146756529144722295894916094932399290127471718404, \"[8587886288544944286822363547431818570080497615078399231651995144875864003096, 6907692540174562231010278969729160454738152360049885809689803644261804032230]\", \"[2739333764710033985455746229392719133772908249726161484558668966611567553819, 586280419075878170667566452559672867282640907838266784319357501949255524162]\"]"
+}

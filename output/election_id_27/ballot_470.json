@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"24ee0238f11b74f54ba7c6f56b06a153c5374ecf75ab4880033e6bae5332c215\", \"09488d587e07288cc3bc972727010edb4cf729938cd5adcd9f23bef9901f865c\", \"e65b4aeec04e547fe232d2841d7cb49801b139c1d81ad1f5c46f781fce055fd4\", \"8eb6ffc079f2eb37dfe62c1037c9a030ecdf33a4c8d24571a6129a64f692aedf\", \"2cdc61e5444238e4b223097d7d6d1b03e882ffda26d771676ef7a82609815cb2\", \"70067c7f879ea529cd8c5ce22a5825934dae368045e8e99e8a67726ccb25d85b\"], [1, \"[5344975445090993132005819019391306835756692144185380265599362408243116650362, 107222200930085148467285707773298934701373886937162291236510153427283427863]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[3607535589479841185318335899602943297188141902472699765136886421432104427209, \"[527602069411033594517840682068998987980372974768189536475897611119611086804, 5877143117658552110792980584336071141700620574209411629881363773835780834550]\", \"[14648443585156347319713112666478198744117023216493243690127343960390301320862, 12047565250579706710665461917360295933508313463507295240904873448841618101530]\"]"
+}

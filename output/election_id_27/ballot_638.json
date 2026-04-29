@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"02170aa6190d7eca3950a96c0a6d847aa9105647d2965f218acd31495238f803\", \"90d182452d37ee8ffb9d19bbff52adba34d8e3272c68658fb1434d9928ae97ba\", \"383cb59921ed0f7733aae50c41f7369e0757f1fc226f7f7cd2c3df0e971af87a\", \"f83ffc9f8730c6cb98e948ccd2da29893bd255a64b67b894cbc5cdac3b7c1c57\", \"8786079cb93b958721367c33524a16303aaa4bb657a4576588fbb68d78f33df4\", \"cf76206b378aa9bd4a0bab781ab19b60748646d615e49e527924442ea229c16d\"], [1, \"[9541000221542265561580581665428962329855374231383312066204788457734181087077, 4849104604977967349495171632245115722103756366597240746866327394458014573843]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[4192456421412846337119228676151515479227022004974005132057429716380955315578, \"[10749023728409880145481145629678985524596045137328188497146257579607426541173, 6258384710019815229457722593159048153257541697043082982123800942684643545875]\", \"[203027338111002041271982211104007588028369360506399523867888228016509140278, 8650166624603812195159600796233494273980327053001656587753733360976139054225]\"]"
+}

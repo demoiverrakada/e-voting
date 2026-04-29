@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"fcbdc24cfecd58fc0cf7fb662787003c7f853188e83b9d18abb806c6eedb5855\", \"1637023991e0046dea83ee1bafe4ddf4acf1c1e428bfe422c064d3045a69127f\", \"8432cecfc35be23150279343f1a29aaf7542e6aa3d3c4a868c063e7a647f4cfe\", \"fd98f701ce64f701011dd315e80cbf76ae505e42f13e2a396c919d8d714dd4a7\", \"894f5b192ad9a9449e39742c7bbd14799fe96653bd091e042670ed1ddec46346\", \"def1e3152c2abda765e5b18de098cc2bb88b49814916fd563a0fb48fe687575e\"], [1, \"[9982302251136872046127492783210588838814725108379050780729425667791017409380, 2660667114865365409807979526817121725899260519431571164123987321218290156309]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[7850409016464196636729540947031640656865770852318994097127710193794108193131, \"[9224051413868355903766860524175738350766458156234662754113262815719912297597, 1593848071242199067376931217331927543839681205042353617799965810151750764289]\", \"[14622448713512363829437680009763490160471157351789720656360057890436617872722, 11906698824796521623705726019604869962117699867176197039420971997879138048875]\"]"
+}

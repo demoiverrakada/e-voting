@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"987a08d7e0bd673f8e30cf6e93500ea9a8c1aad38972a32cc4dcfd15a2a7428f\", \"77bde2e3e43d11ab7bfac837382a7dac7fceb8f00fec9c8194f8c002d40c5bfe\", \"5007b6aeb9f971420735eda5e2abd57e87af18e9cc3e62379133ec66a0bb8691\", \"4fb95b317acec69d8d590c054fd9bba98e47dd8023e46c414579eb26a7ade8d5\", \"fabf9fee7c68ea18463e873035fb2eb173d073b8d677841312386d7d088ae80a\", \"95a90a6493977d3c74244c0153014bd5124d9c4ea28ed393ec8e07f2103f4055\"], [1, \"[5176110613680066681795554839273877180864249570456414818263538407842506818802, 12719409733138872349146224727185895436784583242611391899381374364139090791186]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[5060981274520779246928039545240579284564543610533429866247275796194256278872, \"[3611029860297210478189544476361897611634640384170505103961346499856143282154, 5892065765364324392238455248449995583798298371922105799481564617189153338700]\", \"[7866325174042475405467048107134724887982484447196454814073829532491994341357, 13526622983637974571047912920111172113829681376707411833017910063959734760236]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"89cb22769f4eccd1f7c1fb85cf35f646f1e99bd8b1d2b10fad9919527c6d5263\", \"169e9463edd41f03c244b92f37b7c6308016198c78220ef64ad85fd4b6554b0d\", \"097282e06c8134d13ce4a47ba3683109c154c7224e5ae0a78e399f489b4bd215\", \"617843d9720d7f8f4e4d5f28b7c81c036e33fde509c1fdcb95281f3f5f0bba9b\", \"2c45130dbe0a19212615c13c2044144fbdcec305e12261a3e60ed3789936ae18\", \"ee5903cf9a27eda11b53935ce557103381eebfcd907a40b1435ee9b8faffbdb4\"], [1, \"[7606590346041484143604573611580355675387083070694742239395730246560197523439, 10776273736604301407343673515902380601879457039948125375308471420222702855840]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[12200532834171544609222252261843054797312055354278852201501092442786073699916, \"[5128421234365696974587826791139063226823936539427008957543732729082123862157, 4330043935248121518456234442847121628660029224965886360802540220583624893494]\", \"[4655263363721422216418195974493092501681385070110613817628994903995975042217, 9599140196815326282851775684106348609099632091368803980676369897665356256424]\"]"
+}

@@ -1,0 +1,30 @@
+{
+    "election_id": "9",
+    "election_name": "Computer Science Engineering - 4th Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"077c6baacdd3f8bbde82ade7f6f58adf1d585d088cceaaa0d1fc7134fd47ebab\", \"21b7a1064e1e762aaa16be07e1b71137ad1f39c2f32dca2b7ae97a4bb9bb5109\", \"114c28bd2aa31378b7fae9fc4c65b7affe01d333570def460407cdddf394f2c4\", \"4fab489b9bb21bdc11fd5a75ebde29fc84bbebf817ca2f7d21ea396d97653a6d\"], [1, \"[10506212894648244895445090492780317361172490672144371865134756800212431182879, 14921361329583476319800237522311343967921303939230243986005752250032783721006]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2023CS10848",
+            "candidate_name": "Laksh Goel"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2023CS10251",
+            "candidate_name": "Parth Agrawal"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2023CS10820",
+            "candidate_name": "Rishika Garg"
+        }
+    ],
+    "ballot_id": "[9023838053302481315442512633356181451264428434980461165415768247281904653246, \"[15082257814852632924170077230615975104981000403146343090487352957962772933124, 13907871015942179653346933385191309918741473382583966601515266913992282449809]\", \"[7315134986190524053109317966112907607216521406305991227328582501049749216132, 9615402580435410709995353873885757288677523076152286061544053297666141624689]\"]"
+}

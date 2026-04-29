@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"65d3eae7031084636a515c17bd856605c7f1c1d40bcd0009d6c8bf5d98b91fd4\", \"baea19069af753c83811baa88e97d0ef77e90a49fbe2c6456ca3e6c4b3d2097a\", \"75f6c8a52c41c1c80bf6018bd3141a577ef0548bc0d523e36300a9b2d1b111e7\", \"4dd8f4fa6d4381cbde8e2298009323f5c14e1add279fd7e2642a2ce5965c7bcd\", \"f30778092f84eaf7fad6f5aa1fe4e52b252e5d1cfc7af679e0e8cfb09f5fbbc6\", \"69a426d641cf1284175cd59eec8f861372a41b625e98f217e6526541f8fe14a2\"], [1, \"[1902772158879704251296033973701698237794057339553723309826171882693577786245, 328758728698772109247283698218669232071186973940549289602956727980911045693]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[12298019119566583255061340806089377207983667606788535847816887832972731930624, \"[9064697603030726098163722895211924632762683199194951704933853723899583247489, 6843684642740144059556038426053363949190583284379369586635652593754013348545]\", \"[15881696397403375821297317881988227374002862283115865390076208154613286098287, 16241081591832336612837478050816205814646280206168610993002508003242519986001]\"]"
+}

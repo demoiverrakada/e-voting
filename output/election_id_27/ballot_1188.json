@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"1114e45f8d13720f5fdfb9097dbef12cdac8daa55acb4257bda61bef8457f3e1\", \"cfa7ffc93e71027328174bbf8dada77e144de6d3f53564bc5419f56c54479180\", \"0c7b1f4deba0b9ebe01a9883239db0f4cfa3ece828baa3223bdbd014eda543e0\", \"b7a436dadeaeca965cbee8fae64c335d679a103ee11908789f106e5e5226b1c7\", \"eaf6822a588a93802aad0cd7e3b689a255b689803bc41cdd5754d8bdeee369f6\", \"b6ff7eb0676a62f3f72854137bb73def1bcf6a4e0b12950953ef4094b21ecb8c\"], [1, \"[7306562164268667200713737878088226669073987815974738158783782224095164036206, 10791952108739558400351452712000923054253519019358693226317330143571398338844]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[12763281173041693212970422670864674727009178567614801033747718791443286059736, \"[13170766519467524789658118010808523540744090076598967553476741325212957464064, 8622300839302154259006569080236484315926521857730882525818713743659071120402]\", \"[12933674653385922918868057120064475578953331403094320308353203997736428581244, 9736275405518511003453581692997451562001892586877004296148578914056387724681]\"]"
+}

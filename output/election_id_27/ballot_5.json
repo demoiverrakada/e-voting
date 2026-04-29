@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"a13f326960ed8534cabad474716eec14cef714923a8337a901d9054b114169fb\", \"ad0806474d21660b073533ac05356902b7de73f83249539d43f0b346fd98e2fd\", \"81295fc14bf1bd1b6d66d968adf01fec894418ee5d86eddfecfc4568ec628d23\", \"8bfca21760e09d63c168caaa4bcf97653cb25d5458bc801f10e1435ebe471580\", \"f53771bf52be16a06ddfce009e8d505136f9c72357da288821076f90582b5454\", \"9df4e92ccb16b80e267c08fd0f2b9ed2416ccc65cf6ef1784e51f66781d0e93a\"], [1, \"[1511871477490307741262586752222253888349026206459403426307810284220312791787, 1723734041241465502884928926849762612298804120518614851223226203567475803010]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[739092552109177604031388835010707168754806780894329747729439634177275998955, \"[7362013740673349521618948506610865573314951525254023768231292818182877106759, 5831884213503817251816170555808235878439481008155219754309768979111044483813]\", \"[3639127932025647160071900760469343223266839512229160861190472372218231116919, 16052271609369719939123338216802436908651526480525296557602564708700835475023]\"]"
+}

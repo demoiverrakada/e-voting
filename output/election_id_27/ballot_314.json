@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"5306d1ddf0ea58340280d611691f60d298d8dcc3a2fd47e221000341309bd0b0\", \"90a02820a7a63a7327277b3dbddb39b0f1604ea3bc9f326d8c3ad9b131d71f8a\", \"f86159e8dadee5358a8bb926c1a21f50a36504b2cd148d75f86a74f0836e8240\", \"d983c6c41a093df462e30801b15f4f86e1bf48f765294a52ad3e7370c555dd6d\", \"8b7fe69561cab11ca84c6f97591b3bff000c9f286349477982eab9f78035a8f6\", \"61e0e9f22e666401fab67a493fbc8ad2c469abb8b631a6444155c1708d4c5d49\"], [1, \"[12353201837800552320061631831272870439348903618393192658214430486708366039697, 4389101543918679487040613359158192539891826500728278340204464942098516894203]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[7292056660050202278322948688118705958700428459860059940718864536863528505220, \"[6123750787672195721428864677435298394922194347663443226481932093678538566398, 7384841723154375760933349771950238344286608759558344766994378661906528348303]\", \"[2288759662598005279067123736009112075803160446896839619379263250634555126424, 15158054112934207921825177237555687479797141975932882473049375185334169637604]\"]"
+}

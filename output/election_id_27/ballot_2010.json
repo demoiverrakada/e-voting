@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"490347e68565da0d13ac2c07d1b7f0ad974820fd4a5b06b6d33fdead854b6aa1\", \"cb191a0e43e8a15749c92742a495d0a8918c4e951d59ce57ae62c0358c91ced7\", \"542bb2aba50d822078c3fb2021f5a2f6371530db0dc4a0a59d1da39bd2c273b8\", \"f221dd82a0af6cc72efc4b829c137f38d060bc804883ffa0d82c2c4987c2e601\", \"694f6805a8f41b7bf515717a4b25584c6f4ae670d79977c4c221a267a503961f\", \"8eafae8cc4187f6964925dfcf9622339fb2f108e482de7c66afba58480283746\"], [1, \"[14841182018872721174971777524004106600730949853051812408430713560417019542848, 8437416208160862959343351735872548663341871796458724359775909736079988041769]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[14833961425880318929100724108560587402730667040556595030237723555072406624319, \"[993465062473336623980165897264910650440535493454329603419637009856222025387, 538262426095844858150258675692680021221878546607019557463433560743976184881]\", \"[14584028053312011203441122649322969642307756622681726608991047090365339800944, 9914399575552163303562417058926482470116601424789342241729387014160780445481]\"]"
+}

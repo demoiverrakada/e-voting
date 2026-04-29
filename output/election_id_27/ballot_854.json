@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"081306ab49131046d8669685d1c4cdfe6781f369ba1f39377d5dcda4c0df329e\", \"ef5f184eaf4704bdf42c0c3681540d378d32b9a472f4a86fed684badddad980d\", \"696ca9c49701488dd3e37e04c01256176021ec963c6a99402bcc9c3f44f58b4e\", \"fa4e879ebdcab17fb02d7f6418fce210c24fc9fcc52b54dc2e6d7d0d162277c2\", \"8cdacb5b2d068c9d516422395d22a133b5f0907b91f57bbb474a2cec9bdebac2\", \"48cd5219754a9858de0efc85d8f7156d19a67f58b0271b00fcd2c542d51b5323\"], [1, \"[11490515257024737380207272228199401539712828862677840589810035328261525105992, 4856722633937063895490463115917253869688690620892822752042050866806855658832]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[4512866598212720809904052381988538030489513097277880425110996137232707421470, \"[496852837672833537804082531672318211803338608000091112051678961940902111157, 1396182620214898960339176266426378169773080743390802416007585612201198702032]\", \"[1492820214632381828131664793832307019620282577937315297004635656214309145506, 5290136307526578052484306663157256389533316010571241861118386729221905209653]\"]"
+}

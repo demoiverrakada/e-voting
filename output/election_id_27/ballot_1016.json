@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"9db8bbbf9dbd87152ebd19822e9e170f47800aa974198a1ca880fbd0edb7993b\", \"97a28fa1289efe8227f7f4dcad116dd76498eb2794820dcb9c197654d12499d8\", \"e356f422b0d3b172a78a00db9944f23880037846323605b7a207589aac9ae519\", \"f6bd1262a8bfff9864772d4bc69cb2a537850f4d272e55806342816280cccebc\", \"a93941c56f43d006fe866e4c679bacdc874cb6ea0eb03957aab726eda5eff788\", \"36bfdec2b2d0fdecb30c24568df40bfe8f8189ff64da49e40306113e137abd86\"], [1, \"[9604807948630926423111404183915068714329632236535194993343848443167461612624, 4551931953540469814027901812132849704319442672007687061775083213450282691137]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[5182816718280616070481296755949588815091186712291080745608512173854882656905, \"[13317913505423080828297082172478002202002602966335364123427064869531034683593, 1264540580999372219968185750836551321883947358027530036720197831921108004131]\", \"[14420798692449927560747930077815380353254946459505470799250096026881468211980, 2374636181592671489832200065803323049673500690477858436701270376979655430123]\"]"
+}

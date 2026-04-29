@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"29b90788a6088b7739c51c87ef9e5778ca967dfeb9b1f0b83999c5f7a6175526\", \"655e2dbb3c4aecc0c9ffe5b99dc50a42902198a5fea254ace600597616de33f8\", \"5beb18f68066d7839545acbe6debbeffc3a559803db4778e85b22d8f0c6cf5b4\", \"044d08db32c0402d2e22a4e89ed7a5cdc0ebd20a8bac43f3a347e573555e17c0\", \"1fe6552ffd519ef78b977019c4ba95abc3b44096e54b47f17088c83011ad6f37\", \"65e5f258b13b5c1480072bc7706a03065a71c655b9be9088c4ba89a375f0a539\"], [1, \"[6869267298216186974765881253803324356994117257077236199952884776605955696442, 15989909125611520709243438090190635606272265452109465736785525522839239033275]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[9489235971800469242021739913431293502625790163082865941894041380316166852238, \"[8242199384543165063962638734635312161849969766431798242521568663361878629147, 11027492841296976254960637169801724041230029593204570741475051664141312482138]\", \"[4799559299833769323161865492236349660469719904356236373156581855885525988195, 10700098339842679769855291256567467468241876199404402999177201782790412217849]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"60918eb776643e1a90262b984b9dc81494d4344d873a6cad43469320aab6861b\", \"39409084db14ce07975ee82a15be3321837da655d2870a8dfd2b69b0df327726\", \"eee25eb8a3a54887ac9673fec211e739066873bcca15a94fbd216c90388cd891\", \"1912264cad12fafde4c7aca8e87ce23520caee6ca57a4c0812b6808ad73c1207\", \"3cb19d15c213493117848fa7a3eea9f57a21a5d3580c182d1440588e7e1e5390\", \"9bebbce51ab6198a4bebe5ebb5710b1b2dc5f92cd353050ec1597b573d4e02a7\"], [1, \"[8127373316208664776274815616588469026459316859775784026221950160288227450523, 5740324288268625406580060871354498123262078452403509399412855297369688565344]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[13948126904533974358748933667786159432045878895387332868102448696024772735183, \"[11068404387379875881632505152241876393057499597250748143569463209875586066895, 6583090769616338752163923529913167061342906958002255869414878348479658209296]\", \"[11820021464459382105605917390946080136998493626114455509693142994002410272479, 4089988744813952843721618754367368045575223162833489115008791782051745213314]\"]"
+}

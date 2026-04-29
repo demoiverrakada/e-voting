@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"ff148b443cb6f8badf06400172bae68839588c72498e537a41899bd7ef36e835\", \"72c71657b3cbb3ae6afdb753d384b13dc37adcdf014fa7be845d3644664514ef\", \"0ae7220da7139b5a9f895f4f77f7ec65cec43dd1a7fc0ca5f4e965f1aa1fe3d1\", \"9498acb0c49e416fb7586491d1e95098d7d3de6fc52fcfd19f0c464e6b5317d7\", \"069298f98b3d9b15b90ed983d078617a163555e0322adaa1e36392c343bb7dd3\", \"a4e88564bec5f15d6179a635de4c63c21e70c735e8c309bd0a4a2077e71bc0d5\"], [1, \"[16271059099720837361088756315153355386403394146846023528128783298580485732032, 13187234269429943744161693200800875884478505902215395045562143896207295464115]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[14235441343165800445681971378192259606497658026940852428728453725621458821602, \"[15019952776819144396391509556680736455163771096726001503016254368029153875875, 5089202908640740351523078889778193518033469093581177868264467126297836876000]\", \"[8250171019173207219150023235439923946517651529267121794397105331527271938525, 4859222113157370140869180822990193834918858035821925365595989897710978976283]\"]"
+}

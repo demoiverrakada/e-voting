@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"cf27525d6fea44e054a4f4e78e2798609d041b9e0ff75e0382faf5d3517daa38\", \"0328d2e625974524a93a65aa8064f30088b2c7c4a918edf386e6a4bc6c77c56f\", \"0a2ece7b9d46f6c37669cdb721cf464ab4d2018a8872bb3410ba824b5b696158\", \"3d01fe59dcc93e1bdc01cfebdebb85f9ab7c9ce1c61f74e4854d9c79846f7f13\", \"fc519c08b7eabd6ff2b9310d87318dbbd30da9f0fe471d4070fe13dde79a7a1e\", \"c9d394c505d1ff12f66be8aff44bf2f7c59516576ffea7342edc479cae7aefcf\"], [1, \"[15650589478452283945258151254711968635633769466333932402111600477234239734638, 7217025152416998504616069838596541154814822691505933321374697074153695891027]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[13368182793731398031485216360208553528648413082773717013389570875766560667581, \"[11232465829427921512990538622855915552930000252993895935373980168109168445158, 13241259935127957688600222477188147101731048232472622013931174486893845497152]\", \"[7790957612534790543348314699335370439135521624775322784226074401688814937593, 2420136807948002141163841742474833569741531726530846866517004213863662016131]\"]"
+}

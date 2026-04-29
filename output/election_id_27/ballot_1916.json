@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"9e022625d344fffac14bcab724f73feba3eb6980bc32449a53b758da934be028\", \"cac757f1c2784084a3a539bf25e33019f1e18d6f18441df41eb4fdbffa2d8f21\", \"49d36a2972f5edfc46cb7fee47070f0cf30f167f9cf4e14757c6304173d828ec\", \"861309f82cc2a37be30515deff30bc64b2d3ad0319259317b3fdc1ce7c083c10\", \"b2975855de26d907d39caf7bb779b580682d9823425d78ddfde892fbbbfddb88\", \"045736aab0661e7d306b5b15ad4140ff01dd2632af200f42a475b7a548a0187a\"], [1, \"[2719072334766854450781603719659408496847020647708018844630072522529002766956, 2380845070422281380908354613125794590972049951176459033974592162574168943782]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[8160361110788168212534641748019563133085654103524296635138295261028982260817, \"[2315112222613645729807203587379792742641852543709255639303818491602617327469, 2017260773825128775631595260182096316571001588130400595303093218505432877201]\", \"[7261332338245255708333821699687332246949743370784822197243417608058119256289, 4545045718917980989846595215128920586064512062265644436516738397624929591790]\"]"
+}

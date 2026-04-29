@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"647f2e93e4b6ba13d4c971007943101c33878909345b59f31b30c54aee706a95\", \"fd0cca6a1e7fb024f21e40c9229229c862ccb382dbb6f7ecbe2cd55c05512f12\", \"a383b0792c7fee0f18b88794ada032bd2b415fdcfd88ac0f485a13463f9ece63\", \"8b5e9aaebdc1dc9b4f73b36e65a35c769f8bc6a1b82a6a02045d012c43c5cbb8\", \"c0afe5fe1d5a4a16b2f385481fd81774c4b38b0d0a0a0bfee3165679f2773eed\", \"842357ddf7e507e6891834c3ca3edd049ffaae13eed84c5c389fe50bcdcd7cc6\"], [1, \"[2789071972061694707246316620150561563753897193495716872187610883416218185002, 11539626337751839064087827977517926936057953588731795704827888945223442096678]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[5369770739935433835946282186978678218894359854541404715519875608156455229052, \"[9656513923406273061379085365050635745205338160991823722875140397223111494475, 2890163833906090771259918441756707867333588459963502081384883809780949832029]\", \"[6031655393156202038382736307617214855875800281804453416533072329413258558594, 99235298090612137882913823321004626461227923399610285401949470641054682407]\"]"
+}

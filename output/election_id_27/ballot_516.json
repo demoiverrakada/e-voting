@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"abfcbfc1c0c322f671fc25cfe4fef89905c1a17fb7deb79044c3b9612c2c99ed\", \"afe546c9e9b2da9aaa8ac670cc4083468bd5f7f06f1a31486a38e0698c26ab07\", \"68c534615f140d7dadbac62009061de13876dd8bdb9bc7434d3cb82ffd155b74\", \"e5a763f8f8f4d0b173bff462af748d9164c123552d5a95fdc8da26c456a8a0d6\", \"cbf40d176d75a0fbbc9c1a057a57df528f5b3a0e2570d7c88e366ecda5d44a5a\", \"82b2978d2e9fec923a760af0cb2924a9bdd5bd0f96fdf83c59206f62acc0076f\"], [1, \"[9534815383954775695365290484836498861952121413648071863565975313684131360385, 4588568652779326933294621592377641376354467360836878312169322802207318337591]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[15437729527487686435897508871327366259730241579155032281167622415066164505673, \"[894200970463181444603212653998569877399900487699168655389454367398948610320, 957698584218464199438992197210501764672325479882975443017544215510889983563]\", \"[15150125662017807239258887516238241815697443267238743890681005107555584691774, 1224108710842502519020620812561204128999128664352535806999660804172671029771]\"]"
+}

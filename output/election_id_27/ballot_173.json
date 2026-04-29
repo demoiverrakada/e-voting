@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"9517cf422a7125c0fb6b2b0320c7df0095c855449851afa254dc8c514d934bd9\", \"fd9cb7cc731fc32bff7025ebfe33dcec7cf386dee61aae2cd6728b3d83effb8a\", \"645e116eaef03d395c60b378418a5c42b55dcf6dcd9fa381eacf48dd0e5e7084\", \"1e8826ce6fa53541a93b791983c0701e773b6a97c03725eb2de23de62537f49f\", \"001132b366fb14f9050df94d3b4e3948fdff55d47a5bcaf53f058139654ec7af\", \"06f8e211838247c2f1f923e06017f12b3971369388195b6e01f8fd6d675b9531\"], [1, \"[8570172527677595222189050197929370434960210431607152364077761237380838151262, 1240192001091115588452279797941872964983287119865372572836335127102025589091]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[5640633598091192133931631023613284466427618080274444579585407567789824606075, \"[14986537735592472096583894998745154400871862452654379447501016355315512271660, 7225926469185263152518942915377888893064904389839707862079008108129317591471]\", \"[5500064923692954380556129823350937762500008144912968537561362500123991768208, 1108927754112574391988642563124483489843705210837434076941585295464044783128]\"]"
+}

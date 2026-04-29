@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"bcec642f8b390a07033c147dce3fe20c6679de466ce6343257c0e1247269c9a7\", \"911f750a2eb9ce89e26dec1bc62aa5df6a1f7e16a36c123ff9a434144455a8b1\", \"50b8b960fcff51bf72b1ec8fe7afe52bc617c2e1d64bf6d2a35da527647ebc99\", \"86f94dbd61fc060c12e066613f6c432b8a7dd22d3b22323b279e0947e76806f6\", \"c4046c3df83670510075b2f9c2e2a03b3f8653b7f84556229d21a6d9512dec59\", \"ea646071d6e84b90b0b9048cdf2a29a377e063a827de48b4c43d92937c75db2d\"], [1, \"[12915874124797585595214898660620760875247290112309627027534136395919338424001, 1949739849158585714574194615837824544185265674937445124413415028759633840198]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[14764913361446609488701672072760405698505167457745108815705871875709624431217, \"[6708656277754369443090466570656937552975594125008746603750516534698653797993, 11609249425302810498502050700775594437471657608252316269510360416132838570287]\", \"[12971911174509614238400567055667183678884008283134953268421007515219824414242, 11722174914746371324600992201491796290928032059044052714230161944467360028409]\"]"
+}

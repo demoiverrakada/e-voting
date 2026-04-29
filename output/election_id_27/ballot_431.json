@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"bff75eb0af3af75a3e0418e63ac3debc6242ad79ffbf5980530d9b6e21ae6335\", \"095d38aa7150efb0f5b15f09f3edab6dbf9b003a0c0855e3936b40467e746a47\", \"caa7c05b578ae6b6cda2b2234da97978e6e6735afe89616bc5bb0134c3e6172e\", \"33a049edba7765fcb001416dba218cbd786a9306ccf0f99cbc503bfe31ac8620\", \"89597c8c8389481a1b946f44081956e1b761dba79fab2f0124e0c45881a03229\", \"0b7e2fd62fb51598b44f813a5fcb676f8f9541f54fd57fc40d36e05223c5d2ca\"], [1, \"[5415415710059959358637093843624743182900134699836249862418859639078208517006, 8318416642489646556985436245615652543044638235015158302429123336174895484038]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[11223781473682811553901484521784835529725717357723265498976420775343008608431, \"[1697011320142220551934225748139503726319552160166876907114986531642777662273, 8717832216057421859312343781687480574361790693419905212042767391993684383850]\", \"[1957871623677882504879595894390268803078394345084596127902203369429039855748, 11848404988986508894476377694843099353754405220239026243948049732147567615937]\"]"
+}

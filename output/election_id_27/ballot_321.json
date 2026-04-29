@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"e277271046a4ad16dd88228cb50dc20787d8d9d249be12ab20a3f612cd81455b\", \"78ea84e710b7cfd0c47d332d437a6475b487195941c3a8cfa36812bbac25ac2b\", \"0f635965a583ed60b8613db797fc9cdc4d13c61aea238be27dcd8941db572f82\", \"b4b2472f7ce17fad2f61212344fd1b64968c93f0ede94d3177dc6a89f2c5dc33\", \"e4d7cd2e8b53ad8083b640b7d4e94bda977c9a37ada26843b6ebfa9d1224f7b0\", \"4f1f6b1ebaea326e1281775472dc90e9261b4f2e3c833b882101518d9ac6c2f3\"], [1, \"[14876609489897054829422157069429770602793141000676863721217874692995169811722, 7464025215812679452517163868254246086420297515933793135662608943975258247329]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[12083757948166045319562361715355069175621183180252018945492096600477119412337, \"[246503648539998495097786732842450337355956037342258201821918318832209657027, 70910933999453581709247288595243899772401654886888361787528108522854441090]\", \"[5289285933706369710107698521739561227985251335613297835771759237087885189829, 13868601004619739802381014792490267512500287118235159616615971978828823323866]\"]"
+}

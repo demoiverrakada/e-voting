@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"d82cf720a61cb2688b5d2520107339c4f3b36e4dd0eb39a8c4be48b5e9422a50\", \"50148c388da6f09119d5df9494c808d76347632d4f0d38ac5121243c7ee421af\", \"b859c49b15d5453da26f9481a908a35f92aebd0031a40811cbdb3c39d6de536e\", \"a251d34baa5b706ed5752a3f22513a67680823c82fff797fa1dbc9c4d2839aaf\", \"5424e8aec55e12539ce68ffc2a2fded44b111dd04f20796d1220392fecab9562\", \"d6f0bb243a61a2ed474506fe82dcf60017fee61d29aa73775bc7130f885f46af\"], [1, \"[1624457396948567629494493794474785015367201781364368932669201587294780393121, 8392932613767444881239523436658735504647192604279873670396286005720980249038]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[9524604200830655261152986542108723503186262757383375056375962779373118687316, \"[8609644039434254491781495192785900490602852039608835160060752733087039446607, 13363458541589729527523924258788926243951087868453068765367587635325285084819]\", \"[9971752099656338383378536173284005506174462722414365775723137532292785063606, 6928117989324550663199061495110988893819227812535935428227724003179951616830]\"]"
+}

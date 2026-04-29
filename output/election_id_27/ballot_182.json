@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"4f58f854d6cbd4b2ac0662db8f1ebfae907e1aff06fd940516dbe8b0cfdb14b3\", \"dc900f0c683710a0172b95d50053ccc0c94b2f1e7a1e34d5cfb46ee90d4ab19f\", \"7a6cf1a06e553c9e35d0142465886541dd9aa8bbef23fe456c42e6c9b84fc932\", \"3baf940e8dfb47170acb9d476480b4a60122b6a1d411422c3d596f2c62e5c261\", \"dd7f8d9b4adacc79ebbdb75961e0d7004dcf12d0eba9043430f6b9b804e59039\", \"4bde5d8ed425885d0ae5a2697d7e6907749ea2cee53dc965c1bbc932936feb2d\"], [1, \"[244342746693905555644281351666717474834197104956518514980413972479227734830, 2071850386603422602107977754381491870014305654292580873426251554286290987977]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[14242661368242775619907712653258210060227676383253803786777777440384268482543, \"[6817835388972825872255224679673245686430508615762151604234789625203791732006, 105167884161940104851955382326086018504959374865470636199347119416409875000]\", \"[789485303860613753551446996685918685970068686589507493220268047218121356611, 5181578523116337193506811667959811614682357209658494978839607915902012664841]\"]"
+}

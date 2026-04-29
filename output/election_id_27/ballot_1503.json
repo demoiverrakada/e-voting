@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"2fc883f3a7e61782236412c5c906f8154d7bb64c9854d4b9e9b9ba875680efbe\", \"e494eb37606f7dfcd65cd15fdb92af1bd43f07f5b213c2b0a2213cc4be2cb2fd\", \"5a6d0e02031f3e38d0ef761385a8f863defd269b7a35ced25a858e3143ea05b6\", \"e5c97b120ca3f4f6bc7afa9945a2cc5009a3caf0bee23490b3d1d04b24c9d01a\", \"ebf8625e25486ebed917b1cd9732842cd928f1cfd7c8defab4904e31a7dd9231\", \"1d11674ebdab00abddb8aaa76474dbf16539a5bd7afbf2cce3875f6c7b445fa5\"], [1, \"[15366305853824758649338066465402251867768039787386041271875960094000435555776, 6788153735085174179948353915217790077831436089214264448868582555923505334502]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[8569400266584881122719688344082696816618295503889224519915144308692008461910, \"[16245675551103340799574786447111553798479392743983499755687467682553014343661, 1970472734770895394786901606901084489115073797913837719593574755511380177513]\", \"[5431649325669388159200927559908863056778159029730725894914496341121245758571, 6305391568158297411748517297014084213013052012348841892997878979138968871512]\"]"
+}

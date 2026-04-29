@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"7edd33e494190933fb20876ba26842a4a6a44323a7130917cc06d56d42037d99\", \"c5c2716f50f4bcf7c5a5e7d97bab9b5157955a3e5bae1e4ae30c9a8cb625e58b\", \"edbaba4607d5fdb53eaa84a9c974a053aaa8c6732a1d84d74d13b2c93bf36bf1\", \"3146043a189aa29ff2ee3af73dc0b88b319ce646a926aa67d29f98b371f61631\", \"ca783723266ecc087eedaa90c8fffbf2520c8b662d317be3170302386514cbac\", \"603b82795a35132f9db6cfb0a5e9e5630dc4d77f2ea6037b41cbab2b815a9bab\"], [1, \"[4153632382146862551314198374641222154465187243838890781684544404062487415617, 1509500566883741247995990264214223403204427109903661890715499440041312173480]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[3377946196192716823180747171348670927250088239101121421018499859456257325035, \"[9666464039552614620155207283944918802772196973550249020930176381283690346755, 10532171979293084513289161749372194229367918872261282079311806907384623598053]\", \"[13988595542593365215398256674477810762679904977642526123424642895684591457225, 11097437279706616570743449219084662984206874765106507913475402003865147274412]\"]"
+}

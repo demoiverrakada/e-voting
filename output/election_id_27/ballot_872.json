@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"b6176acf381efe758b54f8546a25ab9842fbf64ed07683ababdf9cc7c697fcce\", \"4d6324bc5710d55d4857d4ae9a52d693a9d0c3566b3d486f4357fc28518d77c1\", \"1613ef5f1d22fb926e2f31e01f57cabe7c3d2558050f1e07adb302a084cc50e1\", \"97f68923443cfb286c8b420ec4e0612eba6b055aac6befd3ff6262da3de84e93\", \"69bb7429949977ec4e21cab043b3839b6176acac90af1facdbd35b53b55aa097\", \"83365e4cb33be4303e9bb122dae55fa80429c1a680951c40f8ed41f09b43e7c2\"], [1, \"[6919485026618801728713781501577366125915894473919118495241181402197340437990, 3904559472045612724484999417766088864883034498782293937898557247309614150616]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[1160053689357658934676855080332182930736275012720290187026192701346424104043, \"[9244470532441183398555990712641388498564292092544927479340301157065782866460, 6908401307873836280419272931924841430592122791137824289436846062895608108185]\", \"[9201598536553957836435123520253871518858583737463457106403773579735657669414, 3829533497650689963715342629469732844660623916124461680567793307079898939317]\"]"
+}

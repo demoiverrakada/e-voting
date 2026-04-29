@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"446447a4ea2653d30f6a37af3a37cb7ba3ab18dcb5bf7a974b04f5aee6ed4d6d\", \"cb31cf510b53421d3fa6a87985d50cd2ea41ec9b040b8c718193eceb8607ca69\", \"c926adb96d77c81783d7c18b16d8d69daa24239a142da3dbb0ed8b6c067f82a6\", \"6ecb4ca33939fcd034fa193a7c62a85766cbd6e19d375e300149e3ae15341da5\", \"71938fe50ba8ef1849102f9a06f859241fcc46bab01ec3c70e7fd5a20954fafb\", \"7178c7ce90a8c57858200d2a0a1a89e437b5c2f0d42653ca965111ceed0a1bef\"], [1, \"[15873384407454253429449161310142137196444874854566594729992426038572296803393, 12661781659988984461635727529478519850699807802489954327042961336971131132661]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[3605782286640404307880191159121720620039391240137575371023110926416826544463, \"[11745003855842161607226366153036437548333500451361567130451698374019223094852, 442274091511589219111545228647805213143664775430113562635529673208896323470]\", \"[2400250156810696206706339829863425734715304436598576823901466083867271505357, 10854238977005211226248625503036101573972803470342875587747330158097220160331]\"]"
+}

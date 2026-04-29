@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"f3fd5b8c2845c31b94ade72ab068ca070c1e7f379346b832b261ae4fd6839b2b\", \"af9ed75e818a76ca482def64d22585ec3fc6000dae87ef98c955b282438bc96d\", \"be0d2c101cca9b0e592644504bf9d42e8214c9b711c43aedffe6f0a148283ff6\", \"f8186ebf6b41a41ad25adfff126282b6bd5985fbde38e00fbd7029986e070cf7\", \"bb9d4c6a231541764b53944e1306df2134ddfa67f6a69905d35dfc78f78d7b79\", \"89a9a26b01395dbfec183e9402b6743835d070e639319231eb68771ffdd92cbd\"], [1, \"[10274464611213245266552966285244435731587761468058070117373967348253197523663, 15766896552930311407501501924817880315448175200728972778303387392657630429270]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[647291572728051236724941666197126851586524761279496530713426178824553531839, \"[9199792166644106359136727641329710391860533037156637129268585784875944619362, 5850374329807463099110664701433994264090099242607376912066254153444939242668]\", \"[7064560230575136694862579492780035510115702478606746315410895454587087101659, 5920627739342363172147214839212472572956415247517801487011505006268451622035]\"]"
+}

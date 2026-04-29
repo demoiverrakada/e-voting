@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"cb0be92819295a66ffc40d881f19cd9a80ea3890840c2eb16d319f1e5f1b8360\", \"1fd8a823f2e39e8e04bd59e78cf8427bb21b09d6c3c0d45605ad2f8c3920050a\", \"ccd482aca433f617665eb2a616ade4932e07fbe4c3b20ccf01c799ea9c1c9f92\", \"e20200b8e50944de6ee3b71883c466288462380d26cab3a84e7a188f6aaee9d0\", \"7ed88c1c0d05ffd517b502e6c6e5acab3136c68bd1c44c30d69091c86e55c526\", \"138ff85834392487dd62006dd3b85005a9b18b084e2cc005b229d4a5c79b3d1d\"], [1, \"[3758644575810567554892342561409525957688267008730305865402178864431933695517, 7099749782573257080013993626846413970604665268250497797918553485968448127977]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[10973003679309963912146639524236389273222556674556398581680606951930072787699, \"[8564537173535526380434157076788963011439434589966156126714314531373331481442, 1065001884871111741889570044167098839243586230732745351578788715175766979932]\", \"[10346584508497705585363228206576628100045021841937139280108254353679808019896, 11970338052606897539920351175365827810693881440704864815586916481665816403041]\"]"
+}

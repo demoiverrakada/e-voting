@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"ac09649e8a0aca315b4d3a92e7bcf3463e6a836af540152dd1c372a0e47b1944\", \"9960b6b2b801c1390876bc66f1abd6c5ae64766fbb7795c341c1706b88f66158\", \"3d8c341171fdcd6aca80c10369f2ccb2f9877bafdbcb788b82437b65419ba4a5\", \"483321a14f3228edf5789696ebc2db38cdbf73e789d23aac14bd9c9ab191cbde\", \"7a21afe5f65e438517b3b3ca4f30094b406eee81e8cdd6016c1d2f43bd69359a\", \"0b7cf954b0f46691229571c899e4c5f37d877d7c20ab0e2b7641009b7964fed7\"], [1, \"[3165406027002493277030781276685566362049456680902558067601626435393045578678, 461473033083173368790655203538604222080915273901807097714969183757188028307]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[12889471628178133914782708370217203991918227397575137039446154493553346329592, \"[6044808927922240685088727619590728539134430360125544686481877071388973863277, 4361467252315496084842878845761973620404440689354402669981383836856867531101]\", \"[1087154149390456637475353898866106438715635841254856570279097413674754031797, 6887727025681481155130248429642090491740673080415517585782999902254552066626]\"]"
+}

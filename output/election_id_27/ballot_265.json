@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"eabc56ba2031b682eabb80681c610a7380945b2198858681cabfd510fe5d6d14\", \"c0639d96bd1ab486c70c24f40f5a78f298da663ff248b438a99a2cd7de28773c\", \"5fbdcf88918937b0b46d52e41d1f5f1c59425514aafb9c38db6706b54af4eaba\", \"2ae17124276135f37a38facf9826092b213627de4bcc3d582a6dca5f398ec7fb\", \"a76133487ef0169012228f0398a133123236c7fa334b2a6ad7d5d201cbb676a6\", \"58b68ab6dddb500ae6a4fa96818f5f4d5834dbb21601b2e06e529dad56aad82c\"], [1, \"[12719858458578198725778688028338162322458703623464804050145248043737667887661, 7685529818749034999811450218212633014864237419749610993948485319520634355039]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[7647310581495624392000864622110013140648633363288178988844466603043503776073, \"[16182313509321242212078942919332874481749410557936200439762762542219251134725, 10005720363312527319644408743227021442429673159044347743524952771784152725665]\", \"[12170272293502816051945276320013621298704723321160744070762914082712791655728, 9636679830314409775173936761666453039206039482995246116006930516316677344379]\"]"
+}

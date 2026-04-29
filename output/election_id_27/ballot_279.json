@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"5e60c2ec001d1c6d0267022f168a952323542eafd7b8d9b44f50b7cd7790b67d\", \"886ff328622241b853a9ef85428883fb15c78b11dd305906194a4ed9832edb84\", \"0d64547ce5f88bb91151c243c0c36d90ba9bab2031824027b682ea08643083fe\", \"61407406a139c47103ea6f020973af0c4b7299dcd707f7eea1a8976045355ab5\", \"9531b914b6d11be688beb85ce3b28185ee0d47d7d1f5158ce84ac698c3d1fcd2\", \"4639a758c815dcd793a2c5ecf758ca68bfd66be8fd82a51ea4769f8a5c0fc126\"], [1, \"[2885432144645393489773379965562350974660447302816071899898144681389260962818, 2807069603620152978564223971203530623878536705013658048457145454763081446957]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[6341587626465654833390846572519217323762692628957028960478894137985241898215, \"[7627874053406503056058361181000794373705547151835075510555534461632652695740, 11181737792269443984880856490100478534384797021947398598795442711454759240090]\", \"[7611743925335563380645651818204865488501784957202053142497312153868375948349, 2962969812102221593457975301970673660157453856807802316741732034842177605432]\"]"
+}

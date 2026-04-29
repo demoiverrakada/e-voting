@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"f5916fbc8f392be881488078a769471fe6c7077d6131381782b3c978ebfb6f6a\", \"6cbf0aed638656bd5a806ed90982762a9838103648f72338322ddd7b3e973f76\", \"c52bad03dd039e0d7a67e519372ac29bad07d9b074787d418dc78a275865b516\", \"e169b0e4c5111fe175e6a9abf005f8002b0c1b00d687984be085ad480bbfe866\", \"58d52f50cee096e61cd568ecabf3594b4e9b47b5b2b50531f62f050a3e853e5b\", \"6844caf050087eeba4495420be0fd1882cd9e16ca18911db6c95a4c939763ddc\"], [1, \"[8658845947040789752324274740669837754591346693626137483137319885271954052165, 10524114219363222476172460992815184712994939065859418873118847029945318765423]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[12926807500866919988952679976518554968425145687788278439540238617985500153938, \"[11220328782155962441199920059940572496038309823678114733458207888339385275367, 15772677782574903126313878535153976184940073038568129305631028880000666465859]\", \"[2370932463540093759763138643011444734510108990764067825407729837471541064903, 12878627742261166450151060898746016805305653468731908479279195455192656435433]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"c5450212c015efd1c5260748bcb81cbdcd35338c1c5838fd36852b49542bdb09\", \"6f9cd5c3ab60ba9f55dfe85a24462574977396f6b211cb3b0d93ca34196bbfc1\", \"75fdb30d2a94d76f78e8fcaf16f0a23ca2f1bb0dbf749a371fd81a0ffb521b24\", \"186192d7d4c27c952ee14de3a91a761289d836b4cb4d542e219faf7fe21eb029\", \"5c64ea83a330c316c2fe75fa2d5d5dd4a0bdbbc20be6d0e078506aa47c22a25e\", \"9d6641432ea8cbca48682bfc30f6a1e5de7a338633d5a9a2fcd8381d483428c9\"], [1, \"[14219868855992411878903857496618368761572482006567757359331191686724322098753, 7659756600128879167581690737961439092624807370348184666446072095843830633794]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[12188649359117216665091625215301172227887794667842860877986414375857990519447, \"[4915650857595901928110049293849552293978239661437614919388695634058732510975, 12432591087173105201931650135380893242732202809755225050346178417754787480093]\", \"[14005832353506528890785504925728048173425872405451532636336045811430781490679, 316818486659063670072924639944842037415235355195549741363906201806941009819]\"]"
+}

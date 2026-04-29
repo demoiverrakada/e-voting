@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"077020ea5ddf80bdee2e16b5da816634098408c4562867a5e73b19c9ea7bf347\", \"afa01d06c5604828aa4f14a455e1190638a998e5dfd2772f4e9d4cb20971a2bf\", \"9b3693d66552e62fc771ffb1b48951619dd94c9a458685b046e17e3d8781516a\", \"0e89d1641ea7fb3e3e76752048bf4cba586ef99cee45be9868471fd5d8f537dc\", \"8aa532bbfe27dea1e54c746a6391c99660e571722a7acf395b0dfb8cdeda2156\", \"5ba04c89d7c1827187e6311e32d83a235192f3413d4baaf0c6c000437ee704d4\"], [1, \"[7295850354333594449984272345430677740880285823782325787152451287758413699776, 11271650545802407222846353169011785134798390629519888790578024441467629022674]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[2505172238649237157606409254604902942782309643532005350999528728011534859858, \"[6166330928572949586891031547163165794387199000450327548525945096849774710151, 2574883069815631055956594022369315382725192782628959780286395396238112008923]\", \"[14821036384141516208710910544238503789071340834487956904465733220042043473629, 10649698412055451540198864929806611086412189057040021113308001718014918903001]\"]"
+}

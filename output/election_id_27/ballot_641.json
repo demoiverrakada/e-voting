@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"e3dca066a3c7b8f2bb7ef6107657d0765d83db43833032a94a32df22c2876b73\", \"812451c5f929ec7a7b4fcde9b6f07d3b7cffc4a77e710d95daea0c2a76224a98\", \"38606ef7c1a37b88ce433ae89d32053b9e11e92ff43a596874321bcbda8b4657\", \"13f3244951111775144e32a588bbd719b3228b7a6863ae0ddc813a0166df7b90\", \"ac30e7664c0cd3cdd0363e986872dbe4fe5f9fec89514aa69f79329076c62b69\", \"84bd2da838f135b59d04bad1b7e547bf076528e174a39a6b14a305387ee60549\"], [1, \"[15789331093502430219267969941207774558223092487988202671674445807724027082232, 10743142028214227768334113399534629556294695199549479089454774101904590374860]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[4906590723170673482906327342684438326359004478794099674278035283615465686879, \"[11950643821469161403438990474376616866936008558016157871987718354473652963051, 10608828291451868091322264151767472638696708926939290201902011160177442085735]\", \"[10215494557893021198086836997221267347852166764156417912886527355302521344689, 2855914768381626128658506120246521550343608422845338008338602701656347834811]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"af577b69e968cbaec5a7554ee47f2af09d78ee794db88612322a05418463616b\", \"767c22212e65de022e933733a963c3c8ddd63c8e8bbe728d17b7c6b92360b6e2\", \"99f0bd76cd8d384a1e839ff4c9aec382784acd863def7ef9428fda7b81ed0045\", \"373870a1303323469ee79ef84fab8275eebea56acdbab27394dc8af0a3ead424\", \"658d92be0377e36044c5c4c002e0c589a73f5adb62e2ceceb337048d745292c9\", \"78a092550cfd3ca84db5fe8d35c87a8306b275721411e6f83b59d24b0598fddc\"], [1, \"[1811553589101928465043411872760896686843387087964596072274083337665054932033, 12403036739407765445679881408348158143872045037735178268821737794477801091717]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[4216985357261310135869677853121703810952245020727379347424064651225545708176, \"[9853850789048886503004398871628300854075592975426503211775871740047333399484, 8749197023518597094733281004679139367163784489436987653498344254831018827252]\", \"[5811569488998072533129194534987683509996683511798989094009270400337594897984, 1356341061390427923576196285248676077919915766365250049451245964814923131511]\"]"
+}

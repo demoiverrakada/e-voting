@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"cf3ee9e9a65f7690de4130c078230f5c16112ff97944b2ddad26d7da7f68216a\", \"1f13672e5991559844b24f6047e19b924b8afddabaeba626185819c2ab670147\", \"d2c1eb238c03e8fd5f8b3eb58f05f7fcbc23a53f863092d7aa89f0a57a64497c\", \"8da71dd2eed0cff75a8f0a5395432e1f75a6ae1d89925ff54918e9eb8377edda\", \"cbd67ca9864e7cb2665c5bce5e6d22b832a04d85699eda8dcd5177ee394c0991\", \"829de5db876d9bffae5fc8626a56dbad9e91908cb17213a4cedfe5264256e32c\"], [1, \"[13399198105045171369432177726169785766674566340392252831189744645998653127628, 15253199212345976454376254906529508001472912199045280166438244289421533141578]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[6470977206963440528469880110077018833299307428416561691230191525950603552357, \"[7987486131039899452083825915259339626149631930291121128097126139705172374639, 11104886091019038272426314383669251561999518769759116349379442716935050685413]\", \"[5965886797994942480618378731625419618805109795167872235111230510619326836424, 4559053386083177700362206147480168205401832071625597046918502210168592856899]\"]"
+}

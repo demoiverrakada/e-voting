@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"41dccc3b94576b898e263d1b8021a5b1043cb2bfc247ee5c47fd7bf49a25eac0\", \"6a55da2f9279fbe3321643ab2c0d4903ea030d51afea07a18cc4be9cee3909ed\", \"b44a32f6d6db2e5eb6719fbc25d91a61fc54dcef8a9cbe93f6f2735edcdd82d0\", \"e7ad219065234f29d369316e2c084ba659f4877493ea54acba2bfb0ed7c8ba2d\", \"38731f044cd6e23044e6c85dfee816b346780c3fbe257fc6be919dd7dbdff2e9\", \"ba8d4524e69925daa21cd7c16aa3cafd7e638274d9d6aa730f591db406e6b5f1\"], [1, \"[7859717677062861083530135011739487984437899653423251395471545393428262525499, 7785930920232535747316713418923679254271926220179826358518888069253922024693]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[13328984135682215371364369274350119375653048813486664171238796863678806457635, \"[11632822756880307653603214833746435563743135189067127564588860174256578426697, 6701142339495303113419711871204642130641406693462750352339432894735065444065]\", \"[5503037898419313071885022465692011153285330830471021479078423182424758688032, 1353579585849160344573072903592886541814381211375428432902579878156260106417]\"]"
+}

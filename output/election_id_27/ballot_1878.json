@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"ecc3021ba559b84ed705ac8a8e8cb2721df0eca6d947839a21a49cce18114e4f\", \"72e4ab559be0f684fe55a7d62fa1b2b2bafb5678030fd579d5e5de3a7293cb0f\", \"544ab883d12a2982b09341a13c24f7dd06863f439e129f7d990b0b45d896ad69\", \"773d28f182b14b209e148de1dd6604f5101d6e711a003539ed2740337ec29830\", \"5df1a4ae8b689ceb3ec3305adb2e4c8e51c91948c3d43c72d7d6c4ed5aaa5cd7\", \"521e8901f86afe6e3e2578b2ae1c010f75a89db164a29ae029e7ad556acd5d76\"], [1, \"[12233502331916103950221965904692174724043850924668990613445027624667978200983, 549001909646764457149024828906273874784090452897422455562278780175790502310]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[6448445126345041598480969718756173744727771038365580388000022827860875862043, \"[8704866277775662760807445648433256172470430809736661433478869572902352393745, 4673626816633660039993747242514488370825240760241417281561299893918452667356]\", \"[2983957820829709683316224542213694859886892950426795946243523158070108436227, 214910283247128865996933804597762297411581611778949565420014559405618029475]\"]"
+}

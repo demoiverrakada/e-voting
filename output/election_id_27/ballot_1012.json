@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"6ec3666f2fea539ec5c96b9668f9fb4cdf9002aff5dc1f86daa267b5e1394aa3\", \"3b6317e441a90455b0224c9883a022ae096a59eee60adffa73612f2c5333f598\", \"bec25cead7e9778cbbf46d058618ccfc909aebfba0c886ade228a48b1fa43679\", \"e2627b7a37810c43ea76cb7cbe01bb865b6966e0e3441d138c0203106c8e4490\", \"c246d76673aa2466377dc8ac0f1f049f5f59c5768b24594fa6de347dff08e268\", \"da49c95c46f86c27b56efe8edccd645a99175832cbe5baeeb90215c2555b78b8\"], [1, \"[4158962741440322206348288081588251649893895440170522638899252821167463381848, 7265747198257869797013199829282178745309765606000224688341853893433088636996]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[260968236952309128532109027905779868460240294176011635796700492867214439187, \"[10249814080890159724988637490241433573320462593377234263065605948842053517409, 14081370421509237859150487978453207075153313885412930077390743514263585613746]\", \"[6236677405875732631096657695206837382521909102997074949409800333020258071379, 4132055518442397614591033052970582898276877538304977522819024194818269206648]\"]"
+}

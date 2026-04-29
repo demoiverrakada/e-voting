@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"aefb4a69578599778211575e7e567b8cee43851c3d5b0b5e01a64f87f06d7101\", \"e5333368caff5138c55268100e3b3158eac3da9dbd4b4be09df89ce78b3a636f\", \"7db2c9d03c9f1863bf2c87b8e4320699b255b4768b59e5f785930d5b82bfaf37\", \"8b5c13530364f915dc5cc8407ea27a7668e8e99b3c2655a408348eceafe63861\", \"487d41a0c9aba980b65588f704a3d6218fa230c00fab2bc0b334b46808845f71\", \"1b58dc70b7af9d6d2ab01dcb24a8a96f74a3ed38c630b13d1fa0a7f3785cb7dc\"], [1, \"[14693214400062468284785762275322000267305889802833127994509089618349253761352, 3684637076343872298713755349460287049499066227294579386263615418799152358269]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[6491530764511937059500234986144113937329873600417001551772779269478156213149, \"[6277427843071454879196223394738693711426221093425629087037161362312030584846, 3557209783096985402601141654420823958024827792202066202586370543780457073275]\", \"[3455232335790930735569949929986210839332121527724052244772254105217916763646, 10278181691161659923057608412563048021121156250605742171369480970967176502978]\"]"
+}

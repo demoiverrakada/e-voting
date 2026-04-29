@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"a0d88ae90dada9ad280420eccdb093b451f38bf83fb31115ca4be7138d993f9e\", \"5735cfa434ac1957cfe883c95fb12199014593fdd39f6bd72e0bc8f7627b53fb\", \"512c0a65df236ba184a31fd48236043fd0a2890609ef8c22c5f81decb790b47e\", \"9ddb5854ae3010be5b79d562b8a92b6bd676a631638e935fe7f602fd35037d4e\", \"3d06f93a1fa07ea2c4b807504b6a255cf97fbc10757d4ef07c278c01059ac4c1\", \"a4a21fa9b808319c3dff9aa1485d47750f0d55873a0827aba749f9edcfc4bde8\"], [1, \"[15450716833075867464482808000111361029948203817404489047247353870305856378886, 3062985722918720426626194704632002266182934542129057125129588567177179240858]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[571584466978032024040731740464900287576581279637968207872063998129455931786, \"[8196917833953822511764007473243651853250456073007571166431424908201361103129, 1629458838157969369899505084400540409872999212041992225489604997311096358750]\", \"[6728935892019916618620693792075487189869455764108801495216931348815320081997, 6235260737673612899379098123800280635177961991013519486594742682787188925951]\"]"
+}

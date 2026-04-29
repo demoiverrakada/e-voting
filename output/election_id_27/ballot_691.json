@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"880ea6026ff8f36563e7cfe41d37dbe47a5697f3b531f3e2f5e3fa06fafaa5bf\", \"fb9e487639d4b17a8ba4a3b9c73db4af77698b5de147029b3e8cf27330b82d90\", \"cd71966fe7bd85c2956532f0b377a4e02b79c42b2e1e31c5cba288786670f120\", \"fb8b4375795f056378bb901cddd28b3bf38e35c450ba0fffc1065fdd913335a6\", \"ea28aa7a2550a53d6a1bcb8cd743ce15ba9e284fdb7ebf32554905fe400c00f3\", \"830c6fced9f5ff9d814ec931fdc05f8ab6fbc77864cce2088afaf4a86281b604\"], [1, \"[6493642500884797618606499703502355215441917689939212007558005696870299045707, 4332906010374939217604250968525632881028666435137647275987691180006910118697]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[9080704561416584403007150060022127717575660059097964684114927302878099414916, \"[11417459892478009027076910821024403706942878208171374637860422182602519690027, 14476493356902408878518863318020855235356807040446178567458669112777840294211]\", \"[10108588009752320732228297249177991580061379722950861448669220240165692257250, 2543580420036153150924297246297789589378982948231448041629408003062687657174]\"]"
+}

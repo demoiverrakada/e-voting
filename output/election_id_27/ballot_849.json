@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"e7d348cd95ccca3ec503c2e446fd374270ee4672c41bd1fa6c50226b1e6222fd\", \"91759e7602947ff1916c7a4ff3c61037b9a5807efbb7b94288a78c1316925e7a\", \"8ce96dd85f51467c78476e49da66e321a7a69224947045638169d72f413c94f7\", \"093b4178fbb5790b7a5a0c24d7f76db9e7f27227a4d2ed792689edcd0eda4f34\", \"f7c0a48bcc535d21cd692afb46e079fb33cef0341dcd36c8332aace53082bcd6\", \"bb5ef50d39a853e1f1dbc83aeeb5f49e65747e02b180e4781bb449be39c64d8b\"], [1, \"[13849459119678203606644839544057495192959399843718151089847962267090518676695, 1806562358276795785647470451165001786770625689592956331225521972012441467094]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[7598103924028127756198120723611384639773651418661511294224933100109876010888, \"[33489827101512039122562869202968929921713690918120026362092187077465598489, 4838649410248375801909928712627418118059444170971459361237278761857940348514]\", \"[6600506206714052707919681238527039290499801964972708199777326522917676705196, 1756945673369169970532332651068025199939156689093194503862140800219772988346]\"]"
+}

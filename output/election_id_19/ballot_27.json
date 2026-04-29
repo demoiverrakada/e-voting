@@ -1,0 +1,30 @@
+{
+    "election_id": "19",
+    "election_name": "Material Science Engineering MS1 - 4th Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"ce611cfc04acdd362aacb161f05ab5f37bccf1be8333b79e043ebe5a73efce8d\", \"14299ba269a086bda9533fb80cb5b2db85e6988f2b8789db4f778ddfc8f222ce\", \"c5cdc9ae2fcb6a85a2030fb95c25aa88dcf992e8dff8ba73ebba28ad4b355dd7\", \"bde7d7712f37857aa938c3bcb88ab9bf02e43fc30e60a01acfed55db82726251\"], [1, \"[12715297995100134629628859592232651351703181986869843687344226023260408207186, 16083057294036206795206749559745623295717462042741622819054724558800077093540]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2023MS10902",
+            "candidate_name": "ANUSHKA AGRAWAL"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2023MS10939",
+            "candidate_name": "ABHISHEK ARNAV"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2023MS11183",
+            "candidate_name": "SHASHWAT"
+        }
+    ],
+    "ballot_id": "[5790757575156422433632474176294562240554865151850739685356889053246467557279, \"[16154219027680890862507957399082191571317853112775055042635816986275514007313, 542940397897685141351153541020943419115665328739222424382558572664969392401]\", \"[6225388964578601341509983416798772956983142170932985931687339568772856781671, 14142059288325408833578413900846839498236449744291402195085554593714095581075]\"]"
+}

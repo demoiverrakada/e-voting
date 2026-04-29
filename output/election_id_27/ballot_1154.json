@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"6df30f18d43a5f9b2d5ed9977f82f8219bc3192a9eeaa22e3019a5a347452113\", \"4623d561dbaad480e188eecb55b2a0824a5d277539dfdf423135df3ccdcd81ea\", \"0b539353db7ab7835aac900a6c996972e8a5ab8e203ada07058e4d669040c39c\", \"02adfdb8f41afecf62560ae05f96cecd7305fc4d12899aaba7bb02947e93b1d2\", \"bee471ea197dc3980af9b7bc2686d60902895dc47e48654482f9c402597db4b3\", \"c91c37d08dc307e285399fdf21dd0bd4d4ab7ccd114ca6d0bb8acf1dcb150067\"], [1, \"[1216872016999292482826433485249170209999304422513912172776841170688893835193, 4048757360156674421824323654190917094055097360073716863896347727852206377892]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[15449496692894549675763008263387999745923041142482423537321512934861478626714, \"[9823813258427384912726452987210779272405795623540201664512008226818883156320, 1885165741179883620882928049389773923881501865449619840014404457373832849539]\", \"[1881104850711143814571045370248208539220027913624439931633121946092525990892, 2881230055800413568838587985251408858940073835290183510899087159717100356508]\"]"
+}

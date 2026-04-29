@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"9f926ecd1af2bc07a70f06d9a5dd74cff9ffcf2ae488bb39179ccc4728d67818\", \"985930b6474e8345f691072f1766ea32ed7b95110fad94fb468b6a08da5bb254\", \"accc2c94f8b1a539d0c8ef350e8d8cc24e9532c9f4f1cbce67c74f6da4a1d183\", \"4314110d984eb39bf03439e457f5c08326d8a984559614a49e2388667fa4d571\", \"cf3bc4b627eb33f80db6ccfb8bd9d49b0ee377cf0e2c3da3a4df81daad4b818f\", \"79314458d74f54b4d44a45d36b8f84a9c72308c82d1f0577456f2c7cd34bfee5\"], [1, \"[13114972109220333473161281084600413254287524088798640644263363471836471773815, 6109029279403072588072436233347337837142383908883580976945469044088389552657]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[1492853635160275430950893835056617219848649709201884906202255048943241032054, \"[8570811646641464234130483899519824832388651135256723727537954101457650873426, 6429333086291776007961803522734872168254266580106729754339932413462435200145]\", \"[5945675494646652725214087774116766859196814852287747000143357252855033529937, 3728979486531719017514287865225232097930709730312909998531987976933076194596]\"]"
+}

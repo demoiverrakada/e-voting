@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"8d8018c77c00fa8c4cab2062d14f66cfc7eb41fe1fb118e134d309dde14d2ec6\", \"83d530fe0c9e657e0afce2ab4f83e8a58fb0d59774d19ec0b82e2151cf921a2b\", \"8ef44f8dba56f6ddb1d9e1eb24925a1d37b6414ab56a1dd57c7be21f1cb2856b\", \"3b09aa015888c49ae51e312d225664ef191fb9df2a0f66071a200d6a17ceb2ab\", \"44c44c57740a0afa1bc17ed192f2247ce031f604d8fc7d7b750c6761efdadec1\", \"c093948c451249c16b7c6f431ec01eb9d41b83aab39a74925e88732778a9ad02\"], [1, \"[6038694630160315083010799758588789873510009478071330546213898609149920180217, 580041941209451063323820840338225455302966381212321959740555203044721449240]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[8091531055443684576879394187407356533657868159392241850858257516625984645722, \"[5760982704345613435506298724426918802309437770392942069270554873562026937090, 7865083991108923726668399969045245553785513937435172318169068028348074020198]\", \"[7145048593972535390135711546585120665853483572468939928315425843542413253780, 2818808555181116720747298030546082743867513018623902873247843480126251098141]\"]"
+}
