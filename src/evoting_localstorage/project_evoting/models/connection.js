@@ -1,17 +1,24 @@
 const mongoose = require('mongoose');
 const { mongoUrl } = require('../keys');
 
-const dbConnection = mongoose.createConnection(mongoUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+let dbConnection;
+
+if (process.env.NODE_ENV === 'test') {
+    dbConnection = mongoose.connection;
+} else {
+    dbConnection = mongoose.createConnection(mongoUrl);
+}
 
 dbConnection.on('connected', () => {
-    console.log('Connected to MongoDB');
+    if (process.env.NODE_ENV !== 'test') {
+        console.log('Connected to MongoDB');
+    }
 });
 
 dbConnection.on('error', (err) => {
-    console.log('Error connecting to MongoDB', err);
+    if (process.env.NODE_ENV !== 'test') {
+        console.log('Error connecting to MongoDB', err);
+    }
 });
 
 module.exports = dbConnection;
