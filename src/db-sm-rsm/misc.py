@@ -4,7 +4,7 @@ from collections.abc import Iterable
 import gmpy2
 import base64
 
-from globals import CALLDEPTH, group
+from globals import CALLDEPTH, group, pai_group
 from charm.toolbox.pairinggroup import PairingGroup
 
 
