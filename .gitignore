@@ -1,3 +1,8 @@
-**/node_modules/
-output/
+.env
+*.env
+*.log
+node_modules/
+encrypted_output/
+__pycache__/
+*.pyc
 .DS_Store
