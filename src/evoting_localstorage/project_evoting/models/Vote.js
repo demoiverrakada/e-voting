@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const dbConnection = require('./connection');
 
 const VotesSchema = new mongoose.Schema({
+    org_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        required: true,
+        index: true
+    },
     election_id:        { type: Number, required: true },
     voter_id:           { type: String, required: true },
     pref_id:            { type: String, required: true },
@@ -18,7 +24,7 @@ const VotesSchema = new mongoose.Schema({
     pfs_enc_msg_share:  { type: String, required: true },
     pfs_enc_rand_share: { type: String, required: true }
 });
-VotesSchema.index({ voter_id: 1, election_id: 1, pref_id: 1 }, { unique: true });
+VotesSchema.index({ org_id: 1, voter_id: 1, election_id: 1, pref_id: 1 }, { unique: true });
 
 const Votes = dbConnection.model('Votes', VotesSchema);
 

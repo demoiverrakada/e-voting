@@ -1,5 +1,6 @@
 const Votes = require('./Vote');
 const Admin = require('./Admin');
+const Organization = require('./Organization');
 const Candidate = require('./Candidate');
 const Voter = require('./Voter');
 const Receipt = require('./Receipt');
@@ -11,6 +12,7 @@ const { BMDPublicKey, ServerKey, AESKey } = require('./ServerKey');
 module.exports = {
     Votes,
     Admin,
+    Organization,
     Candidate,
     Voter,
     Receipt,
