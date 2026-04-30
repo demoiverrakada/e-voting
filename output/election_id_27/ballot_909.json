@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"4926ba90fac6501589d833a92e74271f33bfddbcc5db1bf6f9bd97e124c5f31f\", \"da141e9e5b4fe84d133662be627bfc7160a4b76357db70586879cc588b144931\", \"3f2ba3f310a47d73640774f42cba07621669d4623b07572eed1b4c1e62c2cfbc\", \"8415fccdb1c25d9dde2477acb73e4ddb82a1af07683dcf8a5d7aaef8d3ee9176\", \"fc9e391945ae5bf0969ddd52ac4f482261c89f346adf32670a6fdf2d3d92c95b\", \"2cce522e4caa674f6e35534fceb43c2abe629546e2a91b73e00d9857ada91c1c\"], [1, \"[13908230327007930641545882403596013246270323561679134459710481090494688839612, 842076703570539861792209285778242254254819983912449681182874499969766873301]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[3360902952443012597212204259645936597609557574059366229930365791313773684010, \"[1075456931762275331291867246027457415632806658761658748238173541403659467255, 8310202721209774250207032678390526230335783203091304969030795984557937784261]\", \"[3633689480656730885348110694625183288279236075331951564800125061454234727208, 8410324873665052606130814245897537808358315738789089794929957993626383444884]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"63cadd806959b5dc66a09927c527fbab980e0886c9e404751b5b71a8c8fa6371\", \"83195f3ceedaf3f6f8db6c243365e7c74ddee4d53f1881734b1b07b965d54cee\", \"9ad41ba721199cc9f69072a959e666c92484775aad888a4d3083aabbd50f9ec7\", \"f3f58856dcf7b9ac6b162fa01109f1c41f5f4d2c890da8c0b0f360eef2e6b985\", \"1a4ae390cd831a1061bc0bcc8da6e1584a72487178fff52e8c8dcdc9fb93666e\", \"f760e6a8bae503ae2d16218a5e301d00e554ae220a24b80dbd68c6eb22339732\"], [1, \"[834736432181375175686449774695799479606357315763126730523553323997829421006, 11358765572840103468989214690561892674724613899816356219735406241277998311529]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[2206283256850006055903873233520545787059495747259515694975618429356350781246, \"[4951313794677168669857866255737857150433325074742384581307791847317232642177, 1604215732640730455535243887808809352325218678784424440078554499385726113617]\", \"[7410157020352631764397243544501001839916230873705944982780418721743741648892, 1698488535775660137844167434275770060756481770551945837530646500674165902333]\"]"
+}

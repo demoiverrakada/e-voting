@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"3c9ff238847a09e57129326c2f4b0b7586f5ab26707041d38c787bcfa8570696\", \"5429134c933474b77264b06597a460bd19c6c586a361a28e2bf7f8efae55bfc0\", \"9956dd631f5bb5c2595027dfb073fd8e438f669bb0b20d43f80784065bcd7d53\", \"90e08c8181ad7480cbbb87d3d529b855817d15f40ff7d9dee830c7140d12cc45\", \"dda152962623cf5215106c1a0c29583d7b450fcf64c872643367b8d774573703\", \"76aa0dc3eeabee221faadc89af8140a30589b9c41e5d18ddb6effaf605a387dd\"], [1, \"[3403902848791477596168105092543035105079356003540754554531363121555408608100, 7721123183379369468695376420556539881199905147578548852621055668527701117332]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[7442697729568069311899426596801676028225172048670170846499792945060343664779, \"[8143027247348394895688759883653998305644457529915429423971508601773653098394, 13657123755178299228732622914748651141484570079299256712967865398652155137074]\", \"[12861062307950095850244377372999890899328511516906423060018250713239608152847, 4303344997681892059411290258871938491335649605822530576931300300241475916370]\"]"
+}

@@ -1,19 +1,40 @@
 const express=require('express');
 const cors=require('cors');
+const helmet=require('helmet');
+const rateLimit=require('express-rate-limit');
 const bodyParser=require('body-parser')
 const mongoose =require('mongoose')
+const logger = require('./lib/logger');
 const PORT=5000;
 
 const app=express();
 
-app.use(cors());
+const corsOptions = {
+    origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : 'http://localhost:3000'
+};
+app.use(cors(corsOptions));
+app.use(helmet());
 
-require('./models/User')
+const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: 'Too many requests from this IP, please try again after 15 minutes'
+});
+app.use(generalLimiter);
+
+const voteLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: 'Too many vote requests from this IP, please try again after 15 minutes'
+});
+app.use('/vote*', voteLimiter);
+
+require('./models')
 //routes will come below this
-const requireToken=require('./middelware/requireToken')
+const requireToken=require('./middleware/requireToken')
 const authRoutes=require('./routes/authRoutes')
-app.use(bodyParser.json({ limit: '200mb' })); // Set a higher limit, e.g., 50MB
-app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
+app.use(bodyParser.json({ limit: '1mb' }));
+app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 app.use(authRoutes)
 
 
@@ -30,5 +51,5 @@ app.post('/',(req,res)=>
 })
 
 app.listen(PORT, () => {
-    console.log('Server is running on', PORT);
+    logger.info(`Server is running on ${PORT}`);
 });

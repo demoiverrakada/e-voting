@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"d6050639f0ee0e67c7b0af29182f7b9ef1c421ad2df9cd20359a532d2c241950\", \"ef3fb86413226fdda6040dfb34e728ba9fd6fac4bba18fe0a7d9e8aacad501fb\", \"69aff9015e8a6e73eca4d8293f8af8fffa1bc440f4da44696cb2a2e4fdba7b43\", \"b2ee878d07f8be36b4c00197df9bbcbcabcc14c6a2f7bb4586e077c4a2a4c4c5\", \"db9224aa1a330a1a18a52eafbe8a87ab59d6762482561105d882945fb1562bc2\", \"33e628ecbc5fc78887d32e1c4b9cb1c7de3f83d95ef6f5dd146f283c89974ed4\"], [1, \"[15822572775195680510702254038163790323118681841663509889286768890598203133657, 9935762449192934706760703787336621282313627378407716919861519494032614933533]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[9324482564392288503828091897931479211390509377948263374636961350301573151580, \"[9009087335839093832308800493165831579093777167810007386070784771469942980671, 5576645611936380577942236997618259034006213200334606032984457839607400059246]\", \"[5217120909106676725627344935579848342201326278917442190392754368508118190474, 7716363032188730035827658450135770540698734767586981387946556066610189351936]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"5748d036d13dfd7b9e1512314e98428bb7dadbe5411d8698fe7dd439e4991bf2\", \"2166e332445921ccf7a40d5e29f9eb22a6d983bbb7e350e97857ad00fa34d442\", \"ac981c13f38179c7384c1efa2d7e0f7e392d04a0dc6ed551a8f24db59a386e55\", \"dceae946f23e637c56eb2b64a8a07c2070e7edb4ef08f6c74cfc4b55566f9393\", \"d8f1daf4bc739c136df398bbbf2b9118b73ebc1dc1c03c0093be0570d8f7034a\", \"c1499b4f4f222e97128f1ef89652452c07637a0a1f6e10e51123b089aba5f33a\"], [1, \"[4841295175159720327000588827102260468086796543993414685607801577665238746551, 7391867635534193463458964746143501886144305011679806974569483208229569861125]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[15850212592974272212307719912575462363065204441857499500135260845871180661509, \"[14014727311114708664651557889984423876338089870459660944996770800046902994604, 4342796273572119212844251688985873016999519158237628785791163547636204006536]\", \"[11818389349784722069554209481415083593792920990639645124395921088072836273533, 12062361034365061180126221086708945406677631690384734399979012127245140402997]\"]"
+}

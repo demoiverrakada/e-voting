@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"de349a221dda46a7a635a15bcbf767953bfe3b3841ce6ba0d140c250fdd40293\", \"b2c3e3aedbf4a6f2cbef5644796dcf032cd5e05028f96664f366b6fcaa0058e2\", \"e42e1c3e419e11c758b3e633e9c72e2307b2db21cab8083a08007f846a69b52c\", \"0504cd36b1659a8dfa2ff62e1a6f504293eefa86fc9cebb22e8bcd7497178628\", \"db69bd81941ab6b2d04edd5ce5b559b7b82b754eb1a8ec2f2ea6edb2383cc3fd\", \"1b88736b35942d2bacd8197f1227183a52ceb07d796b6b8770eb8d7d2c8b389a\"], [1, \"[14163864829394931355176779127503975250886132046431775274640081396404234759711, 4857421614356736159569227472558264089700530525925309942131060841823440688622]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[367921449974228463436020170684252516113155561869945281751930953025699480926, \"[1231894740895045449172161031359499481271790897297042561504632097344815162094, 12397225101870978849697400910554962274541531211622584153232181804351098454643]\", \"[2226794129523846772026464686114127511327524114096808675145796625684010561206, 3699440524842825952066769694705798134190009977197683691264308976395539623135]\"]"
+}

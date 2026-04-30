@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"e1dcbdec06c487ee1d2bccdbc27aba81347eb4fec30ccb0ec16acf8dabc7e773\", \"085f75635d0522be05a5bd4c0cf0fb9f5745a4d5b41dba3dc3e3ff3646961c22\", \"1c9f48c74e405e7223617a7f1ce48fd80894bdc6db96a24c1c66b47b8d9e2f4d\", \"56d87ad9a8064349b6936c425e283be723d4ec3f2864f751d3c841c520ac4a4f\", \"43eaab7a850e1de1673e3c9c53b3fbd2ff3791ebce73f686843eef018700f1bf\", \"98858c861e3bc4a3a4f6d26e1c9746913662bcc94e39174da5811d1aac4ee928\"], [1, \"[8392642753726708069842835394107910665575719896946652497068085815684019141716, 10769277746580918234287356025847577759307279357971340480969981287597621768720]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[2692062393223393872465616682490719731037676048091654479684500565315551863180, \"[3418599452924906739863216388537222706353562228203619266620060555606057097282, 9504630347288960259705798961837315656228757486968514624351964602292667677455]\", \"[12877931575306654965492412478356708820649119124004652653812549051659605152358, 11162520412548566016138579803224848203556441266952313783402770086466019434439]\"]"
+}

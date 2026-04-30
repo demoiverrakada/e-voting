@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"e85315aec92b7d4af9124d6ef533911e65462966ae96dd89cd4e50911eca2949\", \"c98fe587ed47de313af95b44499e758af1e8d5a1d3dc12de162b2e0239fdeff5\", \"c55901730d87c0b38252fd4e8da67608846a4075a21fd87302698885dcde7dfd\", \"8eaf204469e9a11855524ba944959635a5fdf47f7f8a764d7c433e0d0116d654\", \"733e96eb11c8e69a5aaea258ad3a9be87e57f5363def4ffa3aa4d1aff71c9409\", \"b9a6dcbbdf3e738e09e2b32d202ea8dfa66fc1ae481c7d9c2022536b0c234887\"], [1, \"[614335586721616299172671349732221387727485967543753699652806430521779719165, 8776290894834113611658131709202059838133642758345359658453884730559078791860]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[2460496058017880520280278228087661516777873860908164848124865271302825781211, \"[15460393684769421429261717794446128683809310914838559385240671984966170093168, 8818849168287668772204780674576094897883759405492640365616437162072794103089]\", \"[12202497720360289802970839581088427380501603833862983249930473184210877038775, 606775111553875905193693496394099887546253904074310751743331800445502827353]\"]"
+}

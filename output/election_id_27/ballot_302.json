@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"8e57e1db290dc933d825eb52f3861a09a646fc6b240d033f9b7386f66d74a3e8\", \"ea61fcba2ba690620ac365b22ce50eae4543478d189f3a4a9bedba0633f05526\", \"2759637621fdd2b509378474130bd9cb9fda0f0cf81ad536d3f3843928c9900b\", \"055ba8866b660aacf20e35c0c5ac037ae5d7a419b74401c001c378f01bfd261c\", \"016917d97e80159e63c131a8d0018d4f6d50acbc9d2f2abad60db11932a33c7b\", \"5fc1013353d7b16ba6d00fc1a0a79abaa219548c4a1fbb5a594992dee1992eab\"], [1, \"[6018194853278688970937926480930661285500914162208170151888540180656124931287, 11192432848837212142043677082007617611504200121172697867141571057186277572139]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[11257921574038917947456007496601999666908741202172092999999165856575173283687, \"[12975318001902376203158576287432255108531280126542727518367717000692646263843, 3585946551467058715098883827256890336048806452897677897576396413250363406051]\", \"[3338907246441486449069704313752644666289981535190140032202843440387631355044, 9575051431067652255844139523415857750892898199066623499929907297456234833122]\"]"
+}

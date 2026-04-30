@@ -2,6 +2,8 @@ from pymongo import MongoClient
 from misc import serialize_wrapper, deserialize_wrapper
 import os
 import ast
+import json
+import base64
 function_map = {
         "setup": 'keys',
         "mix": 'decs',
@@ -11,11 +13,17 @@ function_map = {
         "receipt":'receipts',
 }
 
+_mongo_client = None
 
 def init():
-    client = MongoClient('mongodb://root:pass@eadb:27017')
-    db = client['test']
-    return db
+    global _mongo_client
+    if _mongo_client is None:
+        username = os.environ.get("MONGO_USERNAME")
+        password = os.environ.get("MONGO_PASSWORD")
+        host     = os.environ.get("MONGO_HOST")
+        port     = os.environ.get("MONGO_PORT", "27017")
+        _mongo_client = MongoClient(f'mongodb://{username}:{password}@{host}:{port}/test?authSource=admin')
+    return _mongo_client['test']
 
 def store(funcs,params):
     db=init()
@@ -46,13 +54,13 @@ def store(funcs,params):
             "_elg_sklist":(serialize_wrapper(params[6])),
             "election_id":(params[7])
         })
-    elif(function_map[funcs]=='decs'):
+    elif function_map[funcs] == 'decs':
         collection.insert_one({
-        "election_id": params[0],  # First parameter is election_id
-        "msgs_out_dec": serialize_wrapper(params[1]),
-        "msgs_out": serialize_wrapper(params[2]),
-        "_msg_shares": serialize_wrapper(params[3]),
-        "_rand_shares": serialize_wrapper(params[4])
+            "election_id":  params[0],
+            "msgs_out_dec": (serialize_wrapper(params[1])),
+            "msgs_out":     (serialize_wrapper(params[2])),
+            "_msg_shares":  (serialize_wrapper(params[3])),
+            "_rand_shares": (serialize_wrapper(params[4]))
         })
 
 
@@ -90,14 +98,14 @@ def load(funcs, params, election_id):
         elif collection_name == 'votes':
             result = {}
             for param in params:
-                #print(param)
                 result[param] = []
-                # Create a fresh cursor for each parameter
-                parameter_documents = collection.find({"election_id": election_id})
+                parameter_documents = collection.find(
+                    {"election_id": election_id}
+                ).sort("enc_hash", 1)  # sort by enc_hash for consistent ordering
                 for doc in parameter_documents:
                     deserialized = deserialize_wrapper(doc[param])
                     result[param].append(deserialized)
-        
+            return result
         elif collection_name == 'candidates':
             result=[]
             documents = collection.find({"election_id": election_id})
@@ -126,3 +134,76 @@ def load(funcs, params, election_id):
         print(f"Error loading data: {str(e)}")
         return {}
     return result
+
+
+def process_bulletins(election_id):
+    db = init()
+    bulletins_collection = db['bulletins']
+    receipts_collection  = db['receipts']
+    votes_collection     = db['votes']
+
+    count = bulletins_collection.count_documents({"election_id": election_id})
+    print(f"Found {count} bulletins for election {election_id}")
+
+    for bulletin in bulletins_collection.find({"election_id": election_id}):
+        try:
+            commitment = bulletin.get("commitment")
+            if not commitment:
+                print(f"No commitment in bulletin {bulletin.get('_id')}")
+                continue
+
+            pref_id = bulletin.get("pref_id")
+            if not pref_id:
+                print(f"No pref_id in bulletin {bulletin.get('_id')}")
+                continue
+
+            receipt = receipts_collection.find_one({
+                "enc_hash":   commitment,
+                "election_id": election_id
+            })
+
+            if not receipt:
+                receipt = receipts_collection.find_one({"enc_hash": commitment})
+                if not receipt:
+                    print(f"Missing receipt for commitment {commitment[:16]}...")
+                    continue
+
+            print(f"Found receipt for voter {bulletin['voter_id']} pref {pref_id} election {election_id}")
+
+            vote_doc = {
+                "election_id":        bulletin["election_id"],
+                "voter_id":           bulletin["voter_id"],
+                "pref_id":            bulletin["pref_id"],       # ← added
+                "ov_hash":            receipt["ov_hash"],
+                "enc_hash":           receipt["enc_hash"],
+                "enc_msg":            receipt["enc_msg"],
+                "comm":               receipt["comm"],
+                "enc_msg_share":      receipt["enc_msg_share"],
+                "enc_rand_share":     receipt["enc_rand_share"],
+                "pfcomm":             receipt["pfcomm"],
+                "enc_rand":           receipt["enc_rand"],
+                "pf_encmsg":          receipt["pf_encmsg"],
+                "pf_encrand":         receipt["pf_encrand"],
+                "pfs_enc_msg_share":  receipt["pfs_enc_msg_share"],
+                "pfs_enc_rand_share": receipt["pfs_enc_rand_share"]
+            }
+
+            result = votes_collection.update_one(
+                {
+                    "voter_id":    bulletin["voter_id"],
+                    "election_id": bulletin["election_id"],
+                    "pref_id":     bulletin["pref_id"]           # ← added
+                },
+                {"$setOnInsert": vote_doc},
+                upsert=True
+            )
+            print(f"Upsert result: matched={result.matched_count}, upserted={result.upserted_id}")
+
+        except KeyError as e:
+            print(f"Missing field {str(e)} in bulletin {bulletin.get('_id')}")
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error in bulletin {bulletin.get('_id')}: {str(e)}")
+        except Exception as e:
+            print(f"Error processing bulletin {bulletin.get('_id')}: {str(e)}")
+
+    print("Bulletin processing completed")

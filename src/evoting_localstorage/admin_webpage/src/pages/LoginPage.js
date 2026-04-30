@@ -15,7 +15,7 @@ function LoginPage() {
     }),
     onSubmit: async (values) => {
       try {
-        const res = await axios.post('/api/signin/admin', values);
+        const res = await axios.post('http://10.208.20.91:5002/signin/Admin', values);
         sessionStorage.setItem('access_token', res.data.token);
         navigate('/options');
       } catch (err) {

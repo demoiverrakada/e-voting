@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"0dade19211f3a115c2cccdbafb18113b0cb57a62917e5315714f466387b8c706\", \"dcf9f1e2031b91006219064f58b030953e833246a8496028864970e1911a7157\", \"d5573abcdf8d39cc7d612ad6ed7d49d6769c04bbe025e6b7a789c53407ad1860\", \"eb8a0b6c88d35a614a9ea9f61132c90988ea9d9f32c44c74471bde7839674971\", \"633362e986e01adc2c1c6795b8cd2f6ba5bcaa94f50c478c1ecbfa284fca9730\", \"84d683d7c16005612821b11b26adaebbd9d411ff5fa50fb25f2eb946a6f88df2\"], [1, \"[3556502199193712663204660617305213898154196098236772653818083033656066396245, 12959934034178568531679795359185171118267495217042387633297882250892774919550]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[3407708029042698167370741842707707965331049655606123481005167193121533161973, \"[2326569326738106704313736547431411970960721767858076274716903924792632767881, 10954555333125325899674311799872184533890316094323625244328579450463640673942]\", \"[1721308234670808281024108119695800440673742096898974348087258580069405318353, 6836043001154908641996960360850799675932416856972403826787280977815423062176]\"]"
+}

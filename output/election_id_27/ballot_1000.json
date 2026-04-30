@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"fde663bb322cf0ffa989bf2618a3b6884f43884fcd26a93bd15fc984db350d84\", \"37663dca2ef39d4161eaa079dc80ad936d1cda926403b951d1694616cb1984e7\", \"a6ffa79139cda021e55dbafcd9243685513e960d5ef16132a3c2ee73a26a2e92\", \"ba81d5acee8a62c5f2c2a986b4563527204ee1b259e7738f355781917fbe4663\", \"30f7e1a545ecf97ef1e3b6163cf1f7456c2aec67710df05d8b8a39c9d2815693\", \"a127b7af7ac5c1eddf2d9532017b14d82324993565c9fcbe4fd791cb61f566d8\"], [1, \"[4769833923777291807563094408214500214576466127263700243901202114047503530295, 9731915906291987777333100572617404484161227691517412029982572762119522978655]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[10940985925265906064057943117853033776796325678443398461100947464387297556468, \"[1909275289680129793345924754755621229794843025096881266793167117306790051475, 14345174899458915153759153338590226456819275947878374160213141918612015220492]\", \"[624172370455313712740592396895979981682523287629565780593918956506886909467, 14101498785742142901136581223199505229496773020227864706804928489973416179783]\"]"
+}

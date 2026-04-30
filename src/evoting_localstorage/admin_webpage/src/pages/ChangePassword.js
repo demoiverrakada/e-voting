@@ -29,7 +29,7 @@ useEffect(() => {
     onSubmit: async (values, { resetForm }) => {
       try {
         const token = sessionStorage.getItem('access_token');
-        const response = await axios.post('/api/update-password', values, {
+        const response = await axios.post('http://10.208.20.91:5002/update-password', values, {
         headers:{
         authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',

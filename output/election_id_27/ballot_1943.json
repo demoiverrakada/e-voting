@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"5812bed8736b20dea4eecc3751277493069b5f35374a3c6ece12b117d6be6c41\", \"6293d5ce05ba7dce6a71861bd9a8df56b76ab06ca487e9be063039a4858f3a12\", \"2a000a14709688a06a830ac98b3bcde5b948a33c4b778f3d1f383807969ddd4f\", \"bafeab1d6f9fe7cbe59705ca2bc3172af093b09a517efc59f0fa47a02af91694\", \"d7f9b5f121b1a892038da996c48c2594f38edc8d0f2314173c5dba1fc914a767\", \"853527da65c581df1cfab5367eaafedcf186801b69b1053fef40d0a97a599519\"], [1, \"[5576162204897445914023813272649054285792846414997052943456941303652443581093, 14095695828323042595976590404258379861251732744281363539899232684710835654998]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[11772526892154799911489963350541889734685138163621680219531558427965939047833, \"[6130938846495118316535517093896410946127411140017421899493628200772870371035, 10374049395040471332754583131650990902111847769221146369502699713294291728735]\", \"[7377358281567419894759156414702102321533903186863896863103003435488471552559, 5394101245367239830329996910331378730317909672607320670147807672632403626061]\"]"
+}

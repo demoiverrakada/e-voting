@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"388d9fd7ff91a1efb9db9cd7bd05de06c822a168236da0682c096ed0f1d1468b\", \"06e1f728d4c7c21a31309dc2b1d07c9cba953fec382494e0efd058ced2e4af26\", \"8536f09291418fb9744caff1ea46c43937f1efa7d6107fc9a2db98101e86d5d3\", \"2ae492eb657501d1b41a755e0ec5109e2dcb88e69349703b967cfda7f67af00c\", \"9f62dafeb595715d7aea6b73497dca4fa385343a7ff7ff6cc500ab6e42495872\", \"2bb36f838d7a2070595ad2d6abc939db8a73a0befee369bac49bf61e7797f45e\"], [1, \"[15704221145814166436188872026050157864985761221210732745612320006664971461376, 4563433666161468486009915754674055866143882954925371777720621371056878681560]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[12009492512937881999551676096247638008992421448935317933650587390680789441381, \"[5660838370845464018238850374222251476144904988800646749540887415180314328431, 779896129259391021762517860952861204377686905164158393674322899811412569691]\", \"[5145986323738972679319984959294421405064250228168112824196689046736168819044, 847001730367167206959491291167215094697320134213388124459537102769711508578]\"]"
+}

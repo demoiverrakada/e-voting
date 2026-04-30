@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"ef7ceadee1115714a709039df8728bc722d71489700dc7de53ab94681124d203\", \"601ea8aaa17fdb7a4a71c959fea0e06165ea44c6645c26de1763f8a0bd7cda58\", \"1c0b69a81981474d5c500017cabe40bc879d7b049c30a3a89ca87900aa1fb097\", \"90a309da4f71aae352912e71c7a5c925fb82f1ffc0934df7c2ce63a21592b5ce\", \"8aa22132b7e1ebc4e1e3f1a9840f7c52ae2236b1de8550b6cd31d0c128cae14e\", \"c5e4ebf427b347b301445ff474ad31bc4f1cf76e04fd829dbe3c2cb6ca5dbfb7\"], [1, \"[3743727343522836615283407803129652376620478920421263993660117558418560067092, 9072267890869295385107226942151454939316705143487128825384730921143762714073]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[3616387458963378053222316861572248344038877494418220232683742775191540748612, \"[12219002106457649681752927982857620174090792832855824305593170765068445763324, 1322833944024832004084796997226205772591611560904986257623685796910076063272]\", \"[9630707517391643491458682875638986087827121585930710460727265771227073756901, 4627021837415560609921453162069779393402111421756094575540190060598157898395]\"]"
+}

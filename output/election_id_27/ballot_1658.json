@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"4d2eabbe488c4f51af28a588a693b6bb5b7c553577c5b229c37753b4122b98f7\", \"25b78a754763a5058dfedaadd0e8fdde6f1f4454515e46a59c1c1b855337adaa\", \"7dcbbf15060935190abeb217d8c4a0731feb25f79d73ac32955795270b5addde\", \"7c18b16b9d4be7baf824685061c7b22830f857f7d83ce403b475358ff5209968\", \"acf5cb1ee2a75a4e9484efd563343c36c5dc4b2df626cd387d71c2511441b936\", \"18de7f7d9fc7e69ad27f162b2394ce01156ff917e8e6a43d3dae700942d03582\"], [1, \"[10557540615150145901581568270077414472097312405911064823688329009429693939116, 295014427486805911754551125348471265767028499857586176498970062649660651880]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[10076732245982600141103737737081700745062139581856915163784744418176218051346, \"[12617996040448641932494541809819781810879889912321645843423333693333789337765, 16204507026214581092735445096885753083406903606485186406150200972469373701838]\", \"[9667094183048917559406141097351465938278944659702747707411456102359920697273, 6968437015415831476927403296696585605726765663642786657292296851231080178961]\"]"
+}

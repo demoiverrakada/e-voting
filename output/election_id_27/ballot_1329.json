@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"56b0bfa76c0d4554b6deb475bde3e768458492cb3b2b7c68fa990cc48dae4b1f\", \"187b69dfeb5cb573274a806b084bac1be8d2ad322672d35733ae1bcc85f0fa2b\", \"e59cec90a36b807f4a36e6a373fa0eda829bffec04546d4399a5744f5dab0d25\", \"d3f894624f45819158a7dfcee2453e1a35e74af8f2b6ba8ef51938e7ed58e19c\", \"6b7bb4c794810b7be13c60f9033c7ef8986880774eb21bb715113ada83501b59\", \"1fc1f1332dca5badd5e2be273c1325b5a1679611d824a240f77c0b1a68f34cef\"], [1, \"[2356134674103970572964928612808169355379238377220715220781799310794833855743, 10892215597636633667693179394840169928731476375205484697754212219862111365819]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[15530582861824266835885669719512518158833185026348101985549664426407786113462, \"[8891003503474876299951466944972843758179266585386537236700987988395499168286, 189611458241723026615328634745005520440943925563060692607744852279443928630]\", \"[12307866154005366988948193224284881793878204837819916689818239116221106487248, 345393450500658819453760637489225461640716412368165965473911017110306511639]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"2d18a706898a187b4f2f456d25a9d516d538f05d2c8522f7a7761afd916eae02\", \"e13d9f8a9fd8a86f386b3a895ba484ff53286051c959b88797cef85560523e4d\", \"cb6bc5e293ca77794039c30815864b4fc1dc46d2b3e61944766f4175a0b3821a\", \"1cf7b84e49d435b1567576e3042ddb55afde8f5370f2f1f08b68be71a962947c\", \"3724aa07a0c7e9632a6e713ed8f3480d4575aaa40c8fd0608dc91f59163cb16d\", \"70fa3b9a631d83023a73323327daeef235e9987e63a87b2e306bfeeaa3f950da\"], [1, \"[3931428951252001531309348089294618646286446941370798953493680055397574895199, 10186634111803264875794310990227694515731555528048077765748046078202937151095]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[7227911042141920906058925913115406510474488988118070975052600826012670980498, \"[15313907391655676649262999929148074481821085391970972328213068399413617297784, 3676535060296024670131125649930182523971100946245653653604153259782754846981]\", \"[9177760643021005560603803890912148071703713555639716255568492597607994450306, 8087063832586850262988320197633119597977925745745467347075430477685001748700]\"]"
+}

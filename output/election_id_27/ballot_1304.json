@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"6826047dfc3e39707dbfa18dab5a14ddc3ea8010ad9ef575adba1e5388330bc7\", \"3a601caa6e4633c960ad1408ac3916feca34e1c1894b7a94de2a161eb628158b\", \"dd027c0d347ccf18f9c26d69a598b2d4e5a864856900985ea8bd20bcdaf5a914\", \"7f5eb367d1941121aecd6b77beabf45dae839ac312e9f8bab3f95d9b6a17519c\", \"2522c3b1e07728f7fa818bc2c7240cd5877cd30caddc6bec0fa2431d0483f2c1\", \"7e4b1889665134815fc4d4a95ddb7fc842919dbf1bf767923fd0efe873c250d9\"], [1, \"[12861725854743470151032228452633962133243629434931942141401433362394511862058, 1313963481401199627052896664953800496154901645114340211986876727927896275517]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[545458981386709466951330557826775098197528963622539213329328692003784678719, \"[14227762976309699185311065439210332382697149742673947821062618338027623339020, 6521689187353759016610389097812775752879457250584765104190361790816519859700]\", \"[5355304719995737345745463080308887250686828128383566854740302744650067490811, 5640231443230677097259861434573722863677980407381086809208586880540095122826]\"]"
+}

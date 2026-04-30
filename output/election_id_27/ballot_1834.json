@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"a86ddeba9ab885587e1011bd0500d672c969a76bc737cc9a70894bde7aaa6845\", \"451cb735c27036526aa10871268c5a3fc9af367f32d1c9e8b00548e705c9df12\", \"2151e14d6725f36a9a1752cd82ba065208ef22b2f65b9610c752cb6d1f92b740\", \"ac6c45a85233adc7a109b70970c3977487e4515646e618ef74b3785910d2fcdb\", \"9c0a58ef4c402f1d7562124141ccac08954e37c7b822c1a203dede801499cd96\", \"a4615dd0362682d723d6b8ba8dee1f429ff917081ccd24003f12dfcdd4d23c6a\"], [1, \"[6379745111944701339002696821421717820301205627437328906811065914526301485377, 653705472267962012953986511392302114824173724875701469192178731822313146234]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[15279495017650234318887983078422154648042049190565401069755535091125868720469, \"[3687494196372087753101543237374401635796201796171897131289507301478900593539, 6216694267627534054046701056763092693260570778510700487720095623804607604247]\", \"[14899820037211057754622600517354773879542258722798307065933075896172349333474, 11794368361229810689629339245951960266858615251178728637466461811032882039617]\"]"
+}

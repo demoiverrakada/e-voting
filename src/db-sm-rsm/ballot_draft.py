@@ -19,7 +19,7 @@ from gmpy2 import mpz
 import pymongo
 from misc import serialize_wrapper, deserialize_wrapper
 import sys
-from db import load,store
+from db import load,store,init
 import zipfile
 import logging
 from time import sleep
@@ -83,7 +83,7 @@ def create_ballot_json(m, collection, filename, candidates, pai_sklist, pai_pk_o
         target_cand = candidates[y]
         
         candidates_list.append({  # Fixed Position on Paper
-            "serial_id": str(i),          # Original Index
+            "pref_id": str(i),          # Original Index
             "entry_number": target_cand["entry_number"], # <--- NEW FIELD
             "candidate_name": target_cand["name"]        # <--- UPDATED
         })
@@ -103,13 +103,11 @@ def create_ballot_json(m, collection, filename, candidates, pai_sklist, pai_pk_o
     json_output = {
         "election_id": str(election_id),
         "election_name": election_name,
-        
+        "election_type":candidates[0]["election_type"],
+        "number_of_preferences":candidates[0]["number_of_preferences"],
         # This will now look like "[['hash1', ...], [1, ['sig...']]]"
-        "hash_string": right_qr_string, 
-        
+        "commitments": right_qr_string, 
         "candidates": candidates_list,
-        
-        # Left-side QR string
         "ballot_id": left_qr_string
     }
 
@@ -121,11 +119,6 @@ def create_ballot_json(m, collection, filename, candidates, pai_sklist, pai_pk_o
     except Exception as e:
         print(f"Error saving JSON: {str(e)}")
         return False
-
-def init():
-    client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
-    db = client["test"]
-    return db
 
 def clean_for_json(obj):
     """
@@ -145,11 +138,7 @@ def clean_for_json(obj):
         return str(obj)
 
 def connect_to_mongodb():
-    # Connect to MongoDB
-    client = pymongo.MongoClient('mongodb://root:pass@eadb:27017')
-    # Create or use existing database
-    db = client['test']
-    # Create or use existing collection
+    db=init()
     collection = db['receipts']
     return collection
 
@@ -363,9 +352,6 @@ def create_pdf(m, collection, filename, candidates, pai_sklist, pai_pk_optthpail
     
     # Draw a line to divide the page vertically into two halves
     #c.line(width / 2, 0, width / 2, height)
-    
-    
-    
     # Save the PDF
     #c.save()
 
@@ -378,7 +364,7 @@ def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m, election_id):
     _sk = group.random(ZR)
     sigma_bid = g1**(1/(bid+_sk))
     
-    # Prepare the exact list used for the "Left QR" (Ballot ID QR)
+    # Left QR data (unchanged)
     qr_data_booth = [bid, gamma_booth, sigma_bid]
     
     eps_v_w_ls = []
@@ -390,39 +376,33 @@ def G1(gamma_booth, candidates, pai_pk_optthpaillier, pai_pk, m, election_id):
     for i, candidate in enumerate(candidates):
         v_w_bar = bid + i
         r_w = group.random(ZR)
-        gamma_w = (g1**v_w_bar)*(h1**r_w)
+
+        # Commitment
+        gamma_w = (g1**v_w_bar) * (h1**r_w)
         gamma_w_ls.append(gamma_w)
         
+        # Paillier encryptions
         epsilon_v_w_bar = optthpaillier.pai_encrypt(pai_pk_optthpaillier, v_w_bar)
         epsilon_r_w = optthpaillier.pai_encrypt(pai_pk_optthpaillier, r_w)
         eps_v_w_ls.append(epsilon_v_w_bar)
         eps_r_w_ls.append(epsilon_r_w)
         
+        # Secret sharing
         v_w_bar_k = secretsharing.share(v_w_bar, m)
         r_w_k = secretsharing.share(r_w, m)
         
         evr_kw_ls_sub2 = []
         evr_rw_ls_sub2 = []
+
         for j in range(m):
             ev_w_k = optpaillier.pai_encrypt(pai_pk[j], v_w_bar_k[j])
             er_w_k = optpaillier.pai_encrypt(pai_pk[j], r_w_k[j])
-            
-            # --- THE FIX IS HERE ---
-            # We create the pair [EncryptedVoteShare, EncryptedRandomnessShare]
-            evr_kw_ls_sub = [ev_w_k, er_w_k]
-            
-            # Append it to the first list
-            evr_kw_ls_sub2.append(evr_kw_ls_sub)
-            
-            # Append THE SAME pair to the second list (or you can create a new one if logic requires)
-            # Previously, you tried to append 'evr_rw_ls_sub' which was undefined.
-            evr_rw_ls_sub2.append(evr_kw_ls_sub) 
-            # -----------------------
+            evr_kw_ls_sub2.append([ev_w_k])   # vote share ONLY
+            evr_rw_ls_sub2.append([er_w_k])   # randomness share ONLY
         
         evr_kw_ls.append(evr_kw_ls_sub2)
-        evr_rw_ls.append(evr_rw_ls_sub2)        
+        evr_rw_ls.append(evr_rw_ls_sub2)
 
-    # Return the QR list
     return eps_v_w_ls, gamma_w_ls, evr_kw_ls, eps_r_w_ls, evr_rw_ls, bid, qr_data_booth
         
 def G2_part1(election_id):
@@ -516,7 +496,9 @@ def ballot_draft(num, election_id):
         for document in documents:
             candidates_data.append({
                 "name": document["name"],
-                "entry_number": document.get("entry_number", "N/A")
+                "entry_number": document.get("entry_number", "N/A"),
+                "election_type":document["election_type"],
+                "number_of_preferences":document["number_of_preferences"]
             })
             if election_name == "Unknown Election":
                 election_name = document.get("election_name", "Unknown Election")
@@ -525,10 +507,10 @@ def ballot_draft(num, election_id):
         m, pai_pk, pai_sk, pai_sklist, pai_pk_optthpaillier = load2(election_id).values()
         collection = connect_to_mongodb()
         
-        output_dir = "/output"
-        
+        output_dir = f"/output/election_id_{election_id}"
+        os.makedirs(output_dir, exist_ok=True)
         for i in range(num):
-            json_filename = f"election_id_{election_id}_ballot_{i+1}.json"
+            json_filename = f"ballot_{i+1}.json"
             json_path = os.path.join(output_dir, json_filename)
             
             # Pass candidates_data instead of just names

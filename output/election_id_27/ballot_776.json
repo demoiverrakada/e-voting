@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"576ebd1e0e7e4451fcbb6003231d33d0f69206cfc7efec7a8f4c7b8f08168c1a\", \"f83c6adb2ec9735b7d8dfd1c1ed2758151be6aca08cb345ca20462bd3527ef97\", \"f292e00ef4bd3da82a9b592001fde45490aaa3fa1e41a59e552ad56297473cba\", \"cca9b3740b5529c9ad0797c2e5ba0c576286d4952405dfbef47f2719c464df5f\", \"2bb7f071b378dd9a4d9c0ef8c5b183f24f9b7464d838df174fac8ec67c3f8e0b\", \"62472fbe933b75221482d817db3839e3146e24560d361d4b52dba28a9724a50c\"], [1, \"[16103654288358299041949639105973075204296624145578718775442725844353502991689, 9528856095482305160555565671395623875918249760258767923940396608384313827055]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[1874368347432169528406727290049624639830968579880412209193816632924765095881, \"[15444195484662185042217888175119193636523933405194030790239345782565198377010, 8638013609340503977132969490068651236608062323511888464938669527668597249707]\", \"[7289303136255145529974951643603970077797398245772583996328360954794177065847, 9194874514435507688048620304848594667527633656548611871720060688654999101821]\"]"
+}

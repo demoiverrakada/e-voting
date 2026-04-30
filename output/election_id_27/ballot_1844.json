@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"8e7db5f0e7e07d8e5a39aa9fe043ac9395a0aa2be1db517d197d9d363feefd02\", \"df7dccf3d1fd09492836212b67a5c36c74c87d7ec0ec767ec1c6419e078e4d4c\", \"6b72c8be1f527f38c8da378daf48efc1650ad1f3152f2e2238b4f346fa27a221\", \"5fe9824b432d32e0620e30ef1af47251273a500ef3e422344aaa15f625e3493b\", \"9a241840b257e1c648cf9973a779ae45358ec5bb58b444184bf36986500ed288\", \"541ef569cc83f7eaa036c724d4c4a43c26b9612e13f7b6569ccd2c219186cf80\"], [1, \"[3653010166736238044141846265303191900994219803292064059584913846617718516130, 9048820500722872026496600697501974062795319530803574426230212305144907295247]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[6277985239851798793623168167632828959734434541765794349083402429357645870717, \"[15138319222932034712503677323104660178562295235895277926821021611853096377619, 3638122483842629281343109091539844068515961831000243596153716219240321325604]\", \"[11003751382769493423992690802122961123718281664385049128953876842681487415890, 4148784394062302180656888053207539387696761960491563866057489739235817487440]\"]"
+}

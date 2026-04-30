@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"65dcce61d5553df68d7e0c3d9ce0492bf211bea784a189ca7e311ca776aecebd\", \"788ef726a01263726a07685cd08f77e3ffc225317897fdff5a48bba5e9d1dfaf\", \"25f8efd127e8b57aafcc64468dfb39d415ee5b9cd7c0a414072da4f8057fd0b6\", \"4701cad8ad9ace2a23dff2ee1b1b20be889fd37ae25bd9684f4f85122b999836\", \"9a2b9423d962ff8f5523abb85dba999167570c4a3eb278c5d6882cfc5ea66fc8\", \"7555ea69ae43326bb8767bdece958922b795a734bca321c5eba7f903c8758ee7\"], [1, \"[9767075523443124529137349402248939297232359542498650576998751821436336664525, 1021173367650731006713386257075037212270020631265490653961814621412502820944]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[14014784340581922233161632183767841374975048580699242332411375231748087805274, \"[15952517212999395463218918531137174371038542541171093355303464412370534748231, 13607243178292417600520083519051803914887388874262365233234232512144313877977]\", \"[13421450233948138020679337798606683076407635953269183781572834895903796281541, 1718269884931809304465355507831058723649056018411515240628008309342443977802]\"]"
+}

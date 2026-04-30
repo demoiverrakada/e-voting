@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"69c844c11cb384685ab42ef3f1a6a58eb7133398c1d445c5dad1ee4a9d894198\", \"8fa03b987cb8d14ada74df2008d33d419a5b3628fe1713d19f596acc95d1b4a4\", \"4136ec2c335a1954e0df9f01e33c567269171fdb45820dd22612c9481d265249\", \"5af08e0c81ff349752635794ddcb656baf287aebecf5302d13c964bea6186a8b\", \"c30edaeff190027522ea3ec45f814f70bc5134b7d802e05978263236a200a0da\", \"47145ce10c51a1859ced4d1c9218bb9a2264315da27d76e5951a2bfbcd4c4e76\"], [1, \"[15569948096200600074462314534051263432794972616849566647113131132236110622261, 2621924475233459484995085655143722868888320382743265692247775571607059489611]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[12910735747753266700314350793192650716670371870451357109951873431239657272435, \"[7820437155145038328160586708267511668882627729995093651868334803889023624721, 15082283129032092144973032138916718663772219506967527004678421872962751550237]\", \"[12472434440074474757223952831965788195341720818913727201234011253750116434757, 681694179506115379647368729468138223063674486082913727611597650741093121808]\"]"
+}

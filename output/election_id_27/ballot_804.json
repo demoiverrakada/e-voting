@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"84088dde78f83ab4eacff0d3964beafb8459707af48847c95a4bb2fff8a8222d\", \"dbb644c19ff07b81ef07d7429ef408c8d1825d1bda938a671f2a964a94ae6733\", \"96cb24cfbdd0312d9753b7c13970e733910d321c3c0e41e4729339791249a89c\", \"7dfddbaf0e470605c7d82f4d2dfcd2b8222236f481f68ea2633e365e6fc567a5\", \"f573027990f4deaf96d06c242d4265f1e09bd49c0581df5e49d8786f353a744b\", \"96cb386a038e430ce2751bd6c39ab06b1e7b0fad6998bae855ae70595e48f597\"], [1, \"[523752118624238461961446107566134488261245502160649594377270153928172808094, 13086427821546516885706925058492920403735471506963214166581100357265805146399]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[6849965599365652236535170106428028983690299383384878135406766370804229284377, \"[6887814134782709946919641036618964264449556523906454829299865073451705844884, 1155325272578272285222350711112505934874348243334651235166874485160180996527]\", \"[4806011582967529460663667983998299330017458027100013124769395808046208974666, 6559108951274950970139000624382573707499241783546004429608294906010236923207]\"]"
+}

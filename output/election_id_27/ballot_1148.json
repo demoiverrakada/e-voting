@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"864f68cfcc33f4b92c07c410b7d494b98b626eee2f51a9605d044f33aa9ffadf\", \"04a8b77b905d38c830d180ff491395766ebb7fc3e189371c6661e25e5b4643af\", \"5b1b782481a83b2a6a72d0206de3c6c8c9f29b31b67eab73c01a5d299c461f0e\", \"c683c1967f898e7f31b7b22184ca00df179ae163f47f7ec15a199945c432f014\", \"be6474714cbfa10c7c1e80a3ceca6c7945e9508239ca8a9ec762d72e71b48c90\", \"00ca3aa68f9c9b8fea9c7a34b1a635a88822d748457063a28a0296b6f071746f\"], [1, \"[1107357322281525217665123903845794491587016322380098017333873829419191953594, 11231661621330016379869018068227402828260897899648106448478503715979847781122]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[8601832870130214680237157211767283012687970582488926254619913721132801846947, \"[5716385574763692265012553495517341494084143911916955175368663646096251913407, 8136600876564991739487612879691737843485943510293021978349603482870960200315]\", \"[7741791830139583203118809749453515521246561861280473737537448489196923529728, 13771821995456594458297909742826351277019314225078402152352560832303966716406]\"]"
+}

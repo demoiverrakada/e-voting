@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"8a206670b5d43a70e5cdff0fc15c08214e7dd1c2bbdb315bcbfc2b7010fd01ea\", \"e5d58dd0ca6797b00a5b42fbba777ec6a37258d89f2e50eca4dd14c227cd7213\", \"0cb133506ac8908a892f4531cd11a44b33eb3c7c7b847f77ced2ad9f002c2ab9\", \"809f6d114ed2f416d7c78334337cad0404af5b5f26b48be4402b22311ec81254\", \"2ec78f6b622c2b15c21c6c4ffa24cd2252439cab6b2723cd8e0ee118483136fc\", \"2f4764dd6f8562dde69cfdd5bf27e6915f126a42aaf652dd6ce83c47d723cb81\"], [1, \"[15110657965580467363919838336802430394471235221946061689588886223997666664887, 3164862513768703498968049692254731419284038587954545714917063434188417306382]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[10074979892728166490629596126493252192388912075392409016200664033714499562840, \"[188611151044026706271897177777307865419135892931714858853957234685319288358, 4383232041530778111104119075858523052083830751827983161521004883467483337617]\", \"[8674803781309448942920277075144496496971849437381161933110806227263828881579, 14805201493112063834088437202419226765126977413698687009451529750015384068770]\"]"
+}

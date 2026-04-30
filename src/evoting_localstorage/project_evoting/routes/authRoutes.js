@@ -2,8 +2,10 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { jwtkey } = require('../keys');
 const router = express.Router();
-const requireAuth = require('../middelware/requireToken');
-const { PO, Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,Verf,VerfP} = require('../models/User');
+const requireAuth = require('../middleware/requireToken');
+const validate = require('../middleware/validate');
+const { loginSchema } = require('../validators/authValidator');
+const { Votes, Admin, Candidate, Voter, Receipt, Bulletin,Keys,Dec,BMDPublicKey,AESKey,ServerKey,Generator} = require('../models');
 const cors = require('cors');
 const { spawnSync } = require('child_process');
 const fs = require('fs');
@@ -14,6 +16,7 @@ const archiver = require('archiver');
 router.use(cors());
 const async = require('async');
 const os = require('os');
+const multer = require('multer');
 // function for running api.py python script
 function callPythonFunction(functionName, ...params) {
     const scriptPath = join(__dirname, '../../../db-sm-rsm/api.py');
@@ -46,7 +49,16 @@ function callPythonFunction(functionName, ...params) {
         throw error;
     }
 }
-
+const upload = multer({ 
+    dest: '/tmp/uploads/',
+    fileFilter: (req, file, cb) => {
+        if (file.originalname.endsWith('.enc.json')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only .enc.json files are accepted'), false);
+        }
+    }
+});
 function callPythonFunction2(functionName, ...params){
     const scriptPath = join(__dirname, '../../../db-sm-rsm/data_generation.py');
     const pythonExecutable = 'python3';
@@ -78,7 +90,26 @@ function callPythonFunction2(functionName, ...params){
         throw error;
     }
 }
-
+function callPythonEncrypt() {
+    const scriptPath = join(__dirname, '../../../db-sm-rsm/encrypt_json.py');
+    const pythonExecutable = 'python3';
+    console.log(`Running: ${pythonExecutable} ${scriptPath}`);
+    const pythonProcess = spawnSync(pythonExecutable, [scriptPath], {
+        cwd: '/',   // <-- so ./output resolves to /output and ./encrypted_output to /encrypted_output
+        env: { ...process.env, precomputing: '1' },
+        maxBuffer: 1024 * 1024 * 10
+    });
+    if (pythonProcess.error) {
+        throw pythonProcess.error;
+    }
+    const stdout = pythonProcess.stdout.toString().trim();
+    const stderr = pythonProcess.stderr.toString().trim();
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+    console.log("Python output:", stdout);
+    return stdout;
+}
 let requestStatus = {"generate":"pending","upload":"pending","decryption":"pending"};
 
 
@@ -111,68 +142,119 @@ router.post('/setup', requireAuth, async (req, res) => {
 });
 
 // Generate ballots for multiple elections
-// Generate ballots for multiple elections
 router.post('/generate', requireAuth, async (req, res) => {
     const { n, electionId } = req.body;
     const numBallots = Number(n);
     const numElections = Number(electionId);
     const outputDirectory = '/output';
+    const encryptedOutputDirectory = '/encrypted_output';
 
     try {
-        // 1. Run the Python script (which now generates JSONs)
-        const result = await callPythonFunction("generate", numBallots, numElections);
-        
+        // Step 1: Generate ballots
+        await callPythonFunction("generate", numBallots, numElections);
+        console.log('Ballot generation complete');
+
+        // Step 2: Encrypt
+        await callPythonEncrypt();
+        console.log('Encryption complete');
+
+        // Step 3: Build per-BMD ZIPs
+        // Structure: /encrypted_output/<bmd_id>/<election_id>/ballot/*.enc.json
+        //                              <bmd_id>/<election_id>/aes_key.enc
+        if (!fs.existsSync(encryptedOutputDirectory)) {
+            return res.status(404).json({ error: 'No encrypted output found' });
+        }
+
+        const bmdDirs = fs.readdirSync(encryptedOutputDirectory)
+            .filter(entry =>
+                fs.statSync(path.join(encryptedOutputDirectory, entry)).isDirectory()
+            );
+
+        if (bmdDirs.length === 0) {
+            return res.status(404).json({ error: 'No BMD directories found in encrypted output' });
+        }
+
         const concurrencyLimit = Math.min(os.cpus().length, 20);
-        const electionIds = Array.from({ length: numElections }, (_, i) => i + 1);
+        const bmdZipPaths = [];
 
-        await async.eachLimit(electionIds, concurrencyLimit, async (i) => {
-            console.log(`Ballots generated for election ${i}`);
+        await async.eachLimit(bmdDirs, concurrencyLimit, async (bmdId) => {
+            const bmdDir = path.join(encryptedOutputDirectory, bmdId);
+            const bmdZipName = `ballot_${bmdId}.zip`;
+            const bmdZipPath = path.join(outputDirectory, bmdZipName);
 
-            // --- THE FIX IS HERE --- 
-            // CHANGED: .endsWith('.pdf') -> .endsWith('.json')
-            const electionFiles = fs.readdirSync(outputDirectory)
-                .filter(file => file.startsWith(`election_id_${i}_`) && file.endsWith('.json'));
-
-            if (electionFiles.length === 0) {
-                console.warn(`No JSON files found for election ${i}`);
-                return;
-            }
-
-            // Create individual ZIP
-            const individualZipName = `election_id_${i}_ballots.zip`;
-            const individualZipPath = path.join(outputDirectory, individualZipName);
-            
             await new Promise((resolve, reject) => {
-                const output = fs.createWriteStream(individualZipPath);
+                const output = fs.createWriteStream(bmdZipPath);
                 const archive = archiver('zip', { zlib: { level: 9 } });
 
                 output.on('close', () => {
-                    console.log(`Created individual ZIP for election ${i}`);
+                    console.log(`Created ZIP for ${bmdId}`);
                     resolve();
                 });
 
                 archive.on('error', reject);
                 archive.pipe(output);
-                
-                electionFiles.forEach(file => {
-                    archive.file(path.join(outputDirectory, file), { name: file });
+
+                // Walk: /encrypted_output/<bmdId>/<electionId>/
+                const electionDirs = fs.readdirSync(bmdDir)
+                    .filter(entry =>
+                        fs.statSync(path.join(bmdDir, entry)).isDirectory()
+                    );
+
+                let aesKeyAdded = false;
+
+                const electionCandidatePromises = electionDirs.map(async (electionId) => {
+                    const electionDir = path.join(bmdDir, electionId);
+
+                    // ✅ Include aes_key.enc at archive root (once)
+                    if (!aesKeyAdded) {
+                        const aesKeyFile = path.join(electionDir, 'aes_key.enc');
+                        if (fs.existsSync(aesKeyFile)) {
+                            archive.file(aesKeyFile, { name: 'aes_key.enc' });
+                            console.log(`Added AES key file for BMD ${bmdId}`);
+                            aesKeyAdded = true;
+                        } else {
+                            console.warn(`Missing aes_key.enc for BMD ${bmdId}, election ${electionId}`);
+                        }
+                    }
+
+                    // ✅ Include ballot/*.enc.json files
+                    const ballotDir = path.join(electionDir, 'ballot');
+                    if (fs.existsSync(ballotDir)) {
+                        const encFiles = fs.readdirSync(ballotDir)
+                            .filter(file => file.endsWith('.enc.json'));
+                        encFiles.forEach(file => {
+                            archive.file(
+                                path.join(ballotDir, file),
+                                { name: `${electionId}/ballot/${file}` }
+                            );
+                        });
+                    }
+
+                    // ✅ Include candidates.json fetched from MongoDB
+                    const numericId = parseInt(electionId.replace('election_id_', ''));
+                    if (!isNaN(numericId)) {
+                        const candidates = await Candidate.find({ election_id: numericId }).lean();
+                        if (candidates.length > 0) {
+                            archive.append(JSON.stringify(candidates, null, 2), { name: `${electionId}/candidates.json` });
+                            console.log(`Added candidates.json for ${electionId} (${candidates.length} candidates)`);
+                        } else {
+                            console.warn(`No candidates found in DB for ${electionId}`);
+                        }
+                    }
                 });
 
-                archive.finalize();
+                Promise.all(electionCandidatePromises)
+                    .then(() => archive.finalize())
+                    .catch(reject);
             });
+
+            bmdZipPaths.push({ name: bmdZipName, filePath: bmdZipPath });
         });
 
-        // 2. Create master ZIP (This logic stays the same, it zips the zips)
-        const zipFiles = fs.readdirSync(outputDirectory)
-            .filter(file => file.startsWith('election_id_') && file.endsWith('_ballots.zip'));
-
-        if (zipFiles.length === 0) {
-            return res.status(404).json({ error: 'No ballots generated to download' });
-        }
-
-        const masterZipName = 'all_elections_combined.zip';
+        // Step 4: Master ZIP of all BMD ZIPs
+        const masterZipName = 'all_bmds_encrypted.zip';
         const masterZipPath = path.join(outputDirectory, masterZipName);
-        
+
         await new Promise((resolve, reject) => {
             const outputStream = fs.createWriteStream(masterZipPath);
             const archive = archiver('zip', { zlib: { level: 9 } });
@@ -180,19 +262,20 @@ router.post('/generate', requireAuth, async (req, res) => {
             outputStream.on('close', resolve);
             archive.on('error', reject);
             archive.pipe(outputStream);
-            
-            zipFiles.forEach(file => {
-                archive.file(path.join(outputDirectory, file), { name: file });
+
+            bmdZipPaths.forEach(({ name, filePath }) => {
+                archive.file(filePath, { name });
             });
 
             archive.finalize();
         });
 
-        // 3. Send the master ZIP
         res.download(masterZipPath, masterZipName, (err) => {
             if (err) {
                 console.error('Download error:', err);
-                res.status(500).json({ error: 'Failed to download ballots' });
+                if (!res.headersSent) {
+                    res.status(500).json({ error: 'Failed to download ballots' });
+                }
             }
         });
 
@@ -204,10 +287,56 @@ router.post('/generate', requireAuth, async (req, res) => {
 
 
 const BATCH_SIZE = 1000;
-router.post('/upload', requireAuth, async (req, res) => {
+
+function callPythonDecrypt(encryptedFilePath) {
+    const scriptPath = join(__dirname, '../../../db-sm-rsm/decrypt_json.py');
+    const pythonExecutable = 'python3';
+    console.log(`Running: ${pythonExecutable} ${scriptPath} ${encryptedFilePath}`);
+    const pythonProcess = spawnSync(pythonExecutable, [scriptPath, encryptedFilePath], {
+        cwd: '/',
+        env: { ...process.env },
+        maxBuffer: 1024 * 1024 * 50
+    });
+    if (pythonProcess.error) {
+        throw pythonProcess.error;
+    }
+    const stderr = pythonProcess.stderr.toString().trim();
+    if (stderr) {
+        console.error('Python stderr:', stderr);
+    }
+    if (pythonProcess.status !== 0) {
+        throw new Error(`Decryption failed with exit code ${pythonProcess.status}: ${stderr}`);
+    }
+    const stdout = pythonProcess.stdout.toString().trim();
+    return JSON.parse(stdout);
+}
+function parseTimestamp(ts) {
+    // Handle ISO format: '2026-03-28T03:54:14.559751'
+    if (ts.includes('T') || ts.length > 17) {
+        const d = new Date(ts);
+        if (!isNaN(d.getTime())) return d;
+    }
+    // Handle legacy format: '26-03-26 04:12:06' → '2026-03-26T04:12:06'
+    const [datePart, timePart] = ts.split(' ');
+    const [yy, mm, dd] = datePart.split('-');
+    return new Date(`20${yy}-${mm}-${dd}T${timePart}`);
+}
+
+
+router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
     try {
-        // 1. Validate and extract 'votes' array from payload
-        const { votes } = req.body;
+        const uploadedFile = req.file;
+        let votes;
+
+        // ── 1. Decrypt or parse votes ────────────────────────────────────────
+        if (uploadedFile) {
+            console.log(`Decrypting uploaded file: ${uploadedFile.path}`);
+            votes = await callPythonDecrypt(uploadedFile.path);
+            console.log(`Decryption complete, got ${votes.length} votes`);
+        } else {
+            votes = req.body.votes;
+        }
+
         if (!Array.isArray(votes) || votes.length === 0) {
             return res.status(400).json({
                 status: 'Error',
@@ -215,87 +344,218 @@ router.post('/upload', requireAuth, async (req, res) => {
             });
         }
 
+        // ── 2. Group votes by election_id ─────────────────────────────────────
+        const votesByElection = votes.reduce((acc, doc) => {
+            const eid = Number(doc.election_id);
+            if (!acc[eid]) acc[eid] = [];
+            acc[eid].push(doc);
+            return acc;
+        }, {});
+
+        const electionIds = Object.keys(votesByElection).map(Number);
+
+        // ── 3. Fetch all election metadata in one query ───────────────────────
+        const electionMetas = await Candidate.find({ election_id: { $in: electionIds } });
+
+        // Map election_id -> metadata
+        const metaByElection = electionMetas.reduce((acc, meta) => {
+            acc[meta.election_id] = meta;
+            return acc;
+        }, {});
+
+        // Ensure all elections exist
+        const missingElections = electionIds.filter(eid => !metaByElection[eid]);
+        if (missingElections.length > 0) {
+            return res.status(400).json({
+                status: 'Error',
+                message: `No candidates found for elections: ${missingElections.join(', ')}`
+            });
+        }
+
+        // ── 4. Per-election validation ────────────────────────────────────────
+        for (const electionId of electionIds) {
+            const electionVotes  = votesByElection[electionId];
+            const meta           = metaByElection[electionId];
+            const isBlockVoting  = meta.election_type === 'block';
+            const maxPreferences = meta.number_of_preferences;
+
+            // Deduplicate within this election's votes
+            const seen = new Set();
+            votesByElection[electionId] = electionVotes.filter(doc => {
+                const key = isBlockVoting
+                    ? `${doc.voter_id}__${electionId}__${doc.pref_id}`
+                    : `${doc.voter_id}__${electionId}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+
+            const dedupedElectionVotes = votesByElection[electionId];
+            const voterIds = [...new Set(dedupedElectionVotes.map(doc => doc.voter_id))];
+
+            if (!isBlockVoting) {
+                // ── Majority / Preferential: one vote per voter ───────────────
+
+                // Reject if payload has multiple votes for same voter
+                const multiVoters = voterIds.filter(vid =>
+                    dedupedElectionVotes.filter(d => d.voter_id === vid).length > 1
+                );
+                if (multiVoters.length > 0) {
+                    return res.status(400).json({
+                        status: 'Error',
+                        message: `Election ${electionId} (${meta.election_type}): multiple votes in payload for voters: ${multiVoters.join(', ')}`
+                    });
+                }
+
+                // Reject if voter has already voted in DB
+                const alreadyVoted = await Bulletin.find({
+                    voter_id:    { $in: voterIds },
+                    election_id: electionId
+                }).distinct('voter_id');
+
+                if (alreadyVoted.length > 0) {
+                    return res.status(400).json({
+                        status: 'Error',
+                        message: `Election ${electionId} (${meta.election_type}): voters already voted: ${alreadyVoted.join(', ')}`
+                    });
+                }
+
+            } else {
+                // ── Block voting: enforce number_of_preferences cap ───────────
+
+                const voteCountByVoter = dedupedElectionVotes.reduce((acc, doc) => {
+                    acc[doc.voter_id] = (acc[doc.voter_id] || 0) + 1;
+                    return acc;
+                }, {});
+
+                // Check payload alone doesn't exceed cap
+                const exceedingInPayload = Object.entries(voteCountByVoter)
+                    .filter(([_, count]) => count > maxPreferences)
+                    .map(([voter_id]) => voter_id);
+
+                if (exceedingInPayload.length > 0) {
+                    return res.status(400).json({
+                        status: 'Error',
+                        message: `Election ${electionId} (block): voters exceeded max preferences (${maxPreferences}) in payload: ${exceedingInPayload.join(', ')}`
+                    });
+                }
+
+                // Check payload + existing DB votes don't exceed cap
+                const existingCounts = await Bulletin.aggregate([
+                    { $match: { voter_id: { $in: voterIds }, election_id: electionId } },
+                    { $group: { _id: '$voter_id', count: { $sum: 1 } } }
+                ]);
+
+                const exceedingInDB = existingCounts.filter(e =>
+                    (e.count + (voteCountByVoter[e._id] || 0)) > maxPreferences
+                );
+
+                if (exceedingInDB.length > 0) {
+                    return res.status(400).json({
+                        status: 'Error',
+                        message: `Election ${electionId} (block): voters would exceed max preferences (${maxPreferences}): ${exceedingInDB.map(e => e._id).join(', ')}`
+                    });
+                }
+            }
+        }
+
+        // ── 5. Batch processing across all elections ──────────────────────────
         let totalInserted = 0;
-        let totalMatched = 0;
+        let totalMatched  = 0;
         let totalModified = 0;
 
-        // 2. Process in batches
-        for (let i = 0; i < votes.length; i += BATCH_SIZE) {
-            const batch = votes.slice(i, i + BATCH_SIZE);
+        // Flatten back to single array (already deduped per election)
+        const dedupedVotes = Object.values(votesByElection).flat();
 
-            // 3. Prepare bulk write operations
-            const bulkOps = batch.map(doc => ({
-                updateOne: {
-                    filter: {
-                        voter_id: doc.voter_id,
-                        election_id: doc.election_id
-                    },
-                    update: {
-                        $setOnInsert: {
-                            ...doc,
-                            timestamp: new Date(doc.timestamp)
-                        }
-                    },
-                    upsert: true,
-                    hint: { voter_id: 1, election_id: 1 }
-                }
-            }));
+        for (let i = 0; i < dedupedVotes.length; i += BATCH_SIZE) {
+            const batch = dedupedVotes.slice(i, i + BATCH_SIZE);
 
-            // 4. Execute bulk write
+            const bulkOps = batch.map(doc => {
+                const eid           = Number(doc.election_id);
+                const isBlockVoting = metaByElection[eid].election_type === 'block';
+
+                return {
+                    updateOne: {
+                        filter: isBlockVoting
+                            ? { voter_id: doc.voter_id, election_id: eid, pref_id: doc.pref_id }
+                            : { voter_id: doc.voter_id, election_id: eid },
+                        update: {
+                            $setOnInsert: {
+                                election_id: eid,
+                                voter_id:    doc.voter_id,
+                                booth_num:   Number(doc.booth_num),
+                                commitment:  doc.commitment,
+                                pref_id:     doc.pref_id,
+                                hash_value:  doc.hash_value,
+                                timestamp:   parseTimestamp(doc.timestamp)
+                            }
+                        },
+                        upsert: true
+                    }
+                };
+            });
+
             const bulkResult = await Bulletin.bulkWrite(bulkOps, {
                 ordered: false,
                 bypassDocumentValidation: true
             });
 
+            console.log(`Bulk result: inserted=${bulkResult.upsertedCount}, matched=${bulkResult.matchedCount}, modified=${bulkResult.modifiedCount}`);
             totalInserted += bulkResult.upsertedCount || 0;
-            totalMatched += bulkResult.matchedCount || 0;
+            totalMatched  += bulkResult.matchedCount  || 0;
             totalModified += bulkResult.modifiedCount || 0;
 
-            // 5. Process successful inserts (if any)
+            // ── 6. Update receipts for newly inserted docs ────────────────────
             const insertedIds = Object.values(bulkResult.upsertedIds || {});
             if (insertedIds.length > 0) {
-                const insertedDocs = await Bulletin.find({
-                    _id: { $in: insertedIds }
-                });
+                const insertedDocs = await Bulletin.find({ _id: { $in: insertedIds } });
 
-                // 6. Update receipts for newly inserted documents
                 await Promise.all(insertedDocs.map(async (entry) => {
-                    const { commitment } = entry;
-                    const receipt = await Receipt.findOne({ enc_hash: commitment });
-
+                    const receipt = await Receipt.findOne({ enc_hash: entry.commitment });
                     if (receipt) {
-                        const { ov_hash } = receipt;
                         const updatedReceipts = await Receipt.updateMany(
-                            { ov_hash },
-                            { accessed: true }
+                            { ov_hash: receipt.ov_hash },
+                            { $set: { accessed: true } }
                         );
-                        console.log(`Updated ${updatedReceipts.modifiedCount} Receipts with ov_hash: ${ov_hash}`);
+                        console.log(`Updated ${updatedReceipts.modifiedCount} receipts with ov_hash: ${receipt.ov_hash}`);
                     }
                 }));
             }
-            // New voter status update
+
+            // ── 7. Mark voters as having voted ───────────────────────────────
             const updateVoterConditions = batch.map(doc => ({
-                voter_id: doc.voter_id,
-                election_id: doc.election_id
+                voter_id:    doc.voter_id,
+                election_id: Number(doc.election_id)
             }));
 
-            const voterUpdateResult = await Voter.updateMany(
+            await Voter.updateMany(
                 { $or: updateVoterConditions },
-                { $set: { vote: true } },
-                { multi: true }
+                { $set: { vote: true } }
             );
+        }
+
+        // ── 8. Cleanup temp file ──────────────────────────────────────────────
+        if (uploadedFile && fs.existsSync(uploadedFile.path)) {
+            fs.unlinkSync(uploadedFile.path);
+            console.log(`Cleaned up temp file: ${uploadedFile.path}`);
         }
 
         res.send({
             status: 'OK',
-            message: 'Upload process completed with timestamp-based conflict resolution.',
+            message: 'Upload process completed successfully.',
+            electionsProcessed: electionIds,
             insertedCount: totalInserted,
-            matchedCount: totalMatched,
+            matchedCount:  totalMatched,
             modifiedCount: totalModified
         });
+
         requestStatus["upload"] = "success";
+
     } catch (err) {
         console.error(err);
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         res.status(500).send({
             status: 'Error',
             message: 'An error occurred while processing the request.',
@@ -305,129 +565,153 @@ router.post('/upload', requireAuth, async (req, res) => {
     }
 });
 
-module.exports = router;
+
+async function generateAndInsertCombinations({
+    electionId,
+    election_name,
+    election_type,
+    number_of_preferences,
+    candidateObjects
+}) {
+    const INSERT_BATCH = 5000;
+    let buffer = [];
+    let nextId = 0;
+    const NAFS = { name: "NOTA", entry_number: "012" };
+
+    async function flushIfNeeded() {
+        if (buffer.length >= INSERT_BATCH) {
+            await Candidate.insertMany(buffer, { ordered: false });
+            buffer = [];
+        }
+    }
+
+    function makeRecord(path) {
+        return {
+            election_id: electionId,
+            election_name,
+            election_type,
+            number_of_preferences,
+            name: path.map(c => c.name).join(","),
+            entry_number: path.map(c => c.entry_number).join(","),
+            cand_id: (nextId++).toString()
+        };
+    }
+
+    async function backtrack(path, used) {
+        if (path.length === number_of_preferences) {
+            buffer.push(makeRecord(path));
+            await flushIfNeeded();
+            return;
+        }
+
+        // Place NAFS at this position
+        path.push(NAFS);
+        await backtrack(path, used);
+        path.pop();
+
+        // Place any unused real candidate at this position
+        for (let i = 0; i < candidateObjects.length; i++) {
+            if (!used[i]) {
+                used[i] = true;
+                path.push(candidateObjects[i]);
+                await backtrack(path, used);
+                path.pop();
+                used[i] = false;
+            }
+        }
+    }
+
+    await backtrack([], new Array(candidateObjects.length).fill(false));
+
+    if (buffer.length > 0) {
+        await Candidate.insertMany(buffer, { ordered: false });
+    }
+}
+
 
 // Updated upload route
 router.post('/upload_candidate', requireAuth, async (req, res) => {
     try {
         const jsonData = req.body;
         const BATCH_SIZE = 1000;
-
         for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
             const batch = jsonData.slice(i, i + BATCH_SIZE);
-            
-            // 1. Insert main candidates
-            await Candidate.insertMany(batch, { ordered: false });
-
-            // 2. Process NOTA candidates for this batch
+            // Group by election_id
             const electionMap = new Map();
-            
-            // Get unique elections and their names
             batch.forEach(candidate => {
                 if (!electionMap.has(candidate.election_id)) {
-                    electionMap.set(candidate.election_id, {
-                        name: candidate.election_name,
-                        maxId: -1
-                    });
+                    electionMap.set(candidate.election_id, []);
                 }
+                electionMap.get(candidate.election_id).push(candidate);
             });
+            for (const [electionId, candidates] of electionMap) {
+                const {
+                    election_name,
+                    election_type,
+                    number_of_preferences
+                } = candidates[0];
+                if (election_type !== "preferential") {
+                    await Candidate.insertMany(candidates, { ordered: false });
 
-            // Get all election IDs from current batch
-            const electionIds = Array.from(electionMap.keys());
-
-            // Find maximum cand_id for each election (existing + new)
-            const aggregation = await Candidate.aggregate([
-                { $match: { election_id: { $in: electionIds } } },
-                {
-                    $addFields: {
-                        numeric_id: { $toInt: "$cand_id" }
-                    }
-                },
-                {
-                    $group: {
-                        _id: "$election_id",
-                        maxId: { $max: "$numeric_id" },
-                        election_name: { $first: "$election_name" }
-                    }
-                }
-            ]);
-
-            // Update electionMap with max IDs from aggregation
-            aggregation.forEach(result => {
-                if (electionMap.has(result._id)) {
-                    electionMap.get(result._id).maxId = result.maxId;
-                }
-            });
-
-            // Check current batch for higher IDs
-            batch.forEach(candidate => {
-                const election = electionMap.get(candidate.election_id);
-                const currentId = parseInt(candidate.cand_id, 10);
-                if (currentId > election.maxId) {
-                    election.maxId = currentId;
-                }
-            });
-
-            // Generate NOTA candidates
-            const notaCandidates = [];
-            for (const [electionId, data] of electionMap) {
-                // Check if NOTA already exists
-                const existingNota = await Candidate.findOne({
-                    election_id: electionId,
-                    name: 'NAFS'
-                });
-
-                if (!existingNota) {
-                    const nextId = data.maxId + 1;
-                    notaCandidates.push({
+                    // Add NAFS
+                    const maxId = Math.max(
+                        ...candidates.map(c => parseInt(c.cand_id))
+                    );
+                    await Candidate.insertMany([{
                         election_id: electionId,
-                        election_name: data.name,
-                        name: 'NAFS',
-                        entry_number:"012",
-                        cand_id: nextId.toString()
+                        election_name,
+                        election_type,
+                        number_of_preferences,
+                        name: "NOTA",
+                        entry_number: "012",
+                        cand_id: (maxId + 1).toString()
+                    }], { ordered: false });
+                }
+                else {
+                    const candidateObjects = candidates.map(c => ({
+                        name: c.name,
+                        entry_number: c.entry_number
+                    }));
+                    const n = candidateObjects.length;
+                    const k = number_of_preferences;
+                    if (k > n) {
+                        return res.status(400).send({
+                            status: 'Error',
+                            message: `number_of_preferences (${k}) cannot exceed candidate count (${n})`
+                        });
+                    }
+                    if (n > 10 || k > 5) {
+                        return res.status(400).send({
+                            status: 'Error',
+                            message: `Maximum allowed: 10 candidates and 5 preferences. Got n=${n}, k=${k}`
+                        });
+                    }
+                    await generateAndInsertCombinations({
+                        electionId,
+                        election_name,
+                        election_type,
+                        number_of_preferences,
+                        candidateObjects
                     });
                 }
-            }
-
-            // Insert new NOTA candidates
-            if (notaCandidates.length > 0) {
-                await Candidate.insertMany(notaCandidates, { ordered: false });
             }
         }
-
-        return res.status(200).send({ 
-            status: 'OK', 
-            message: 'Candidates uploaded successfully with sequential NOTA entries'
+        return res.status(200).send({
+            status: 'OK',
+            message: 'Candidates processed successfully'
         });
-        
     } catch (err) {
         console.error(err);
-        return res.status(500).send({ 
-            status: 'Error', 
-            message: err.code === 11000 
-                ? 'Duplicate candidate detected' 
+        return res.status(500).send({
+            status: 'Error',
+            message: err.code === 11000
+                ? 'Duplicate candidate detected'
                 : 'Processing failed'
         });
     }
 });
 
 
-router.post('/upload_PO', requireAuth, async (req, res) => {
-    try {
-        const jsonData = req.body;
-        const BATCH_SIZE = 1000;
-        // Batch insert polling officers
-        for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
-            const batch = jsonData.slice(i, i + BATCH_SIZE);
-            await PO.insertMany(batch);
-        }
-
-        return res.status(200).send({ status: 'OK', message: 'Polling Officers uploaded successfully' });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).send({ status: 'Error', message: 'An error occurred while processing the request.' });
-    }
-});
 
 router.post('/upload_voters', requireAuth, async (req, res) => {
     try {
@@ -446,7 +730,27 @@ router.post('/upload_voters', requireAuth, async (req, res) => {
     }
 });
 
+router.post('/upload_bmd_keys', requireAuth, async (req, res) => {
+    try {
+        const jsonData = req.body;
 
+        if (!Array.isArray(jsonData) || jsonData.length === 0) {
+            return res.status(400).json({ status: 'Error', message: 'Payload must be a non-empty array.' });
+        }
+        await BMDPublicKey.insertMany(jsonData);
+        return res.status(200).json({
+            status: 'OK',
+            message: 'BMD public keys uploaded successfully.',
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            status: 'Error',
+            message: 'An error occurred while processing the request.',
+            detailedError: err.message
+        });
+    }
+});
 
 // endpoint to 
 router.post('/mix', requireAuth, async (req, res) => {
@@ -483,99 +787,99 @@ router.get('/bulletin', async (req, res) => {
 
 router.get('/getVotes', async (req, res) => {
     try {
-      const decs = await Dec.find().lean();
-      const candidates = await Candidate.find().lean();
-  
-      // Create election ID (string) to name mapping
-      const electionNameMap = candidates.reduce((acc, candidate) => {
-        acc[candidate.election_id.toString()] = candidate.election_name;
-        return acc;
-      }, {});
-  
-      // Group votes by election_id (string)
-      const groupedVotes = decs.reduce((acc, dec) => {
-        const electionId = dec.election_id.toString();
-        if (!acc[electionId]) acc[electionId] = [];
-        
-        if (Array.isArray(dec.msgs_out_dec) && dec.msgs_out_dec.length > 1) {
-          dec.msgs_out_dec[1].forEach(item => {
-            if (Array.isArray(item) && item.length >= 2) {
-              acc[electionId].push(item[1]);
+        const decs = await Dec.find().lean();
+        const candidates = await Candidate.find().lean();
+        // Create election ID to name mapping
+        const electionNameMap = candidates.reduce((acc, candidate) => {
+            acc[candidate.election_id.toString()] = candidate.election_name;
+            return acc;
+        }, {});
+        // Create election ID to type mapping
+        const electionTypeMap = candidates.reduce((acc, candidate) => {
+            acc[candidate.election_id.toString()] = candidate.election_type;
+            return acc;
+        }, {});
+        // Group votes by election_id
+        const groupedVotes = decs.reduce((acc, dec) => {
+            const electionId = dec.election_id.toString();
+            if (!acc[electionId]) acc[electionId] = [];
+
+            if (Array.isArray(dec.msgs_out_dec) && dec.msgs_out_dec.length > 1) {
+                dec.msgs_out_dec[1].forEach(item => {
+                    if (Array.isArray(item) && item.length >= 2) {
+                        acc[electionId].push(item[1]);
+                    }
+                });
             }
-          });
+            return acc;
+        }, {});
+        const response = {};
+        for (const electionId of Object.keys(groupedVotes)) {
+            const electionType = electionTypeMap[electionId];
+            const electionName = electionNameMap[electionId] || "Unknown Election";
+            const electionCandidates = candidates
+                .filter(c => c.election_id.toString() === electionId)
+                .sort((a, b) => parseInt(a.cand_id) - parseInt(b.cand_id)); // must be sorted by cand_id
+            if (electionType === "preferential") {
+                try {
+                    const rawResult = await callPythonFunction("count", electionId);
+                    const preferentialResult = JSON.parse(rawResult);
+                    response[electionId] = {
+                        election_name: electionName,
+                        election_type: electionType,
+                        is_preferential: true,
+                        winner: preferentialResult.winner,
+                        total_voters: preferentialResult.total_voters,
+                        total_rounds: preferentialResult.total_rounds,
+                        rounds: preferentialResult.rounds
+                    };
+                } catch (parseErr) {
+                    console.error(`Failed to parse preferential result for election ${electionId}:`, parseErr);
+                    response[electionId] = {
+                        election_name: electionName,
+                        election_type: electionType,
+                        is_preferential: true,
+                        error: "Failed to process preferential vote count"
+                    };
+                }
+            }
+            else {
+                const voteCounts = new Array(electionCandidates.length).fill(0);
+                groupedVotes[electionId].forEach(vote => {
+                    if (vote >= 0 && vote < voteCounts.length) {
+                        voteCounts[vote]++;
+                    }
+                });
+                response[electionId] = {
+                    election_name: electionName,
+                    election_type: electionType,
+                    is_preferential: false,
+                    candidates: electionCandidates.map((candidate, index) => ({
+                        name: candidate.name,
+                        entry_number: candidate.entry_number,
+                        votes: voteCounts[index] || 0
+                    }))
+                };
+            }
         }
-        return acc;
-      }, {});
-  
-      // Prepare response with string keys
-      const response = Object.keys(groupedVotes).reduce((acc, electionId) => {
-        const electionCandidates = candidates.filter(c => 
-          c.election_id.toString() === electionId
-        );
-        
-        const voteCounts = new Array(electionCandidates.length).fill(0);
-        groupedVotes[electionId].forEach(vote => {
-          if (vote >= 0 && vote < voteCounts.length) {
-            voteCounts[vote]++;
-          }
-        });
-  
-        acc[electionId] = {
-          election_name: electionNameMap[electionId] || "Unknown Election",
-          candidates: electionCandidates.map((candidate, index) => ({
-            name: candidate.name,
-            entry_number:candidate.entry_number,
-            votes: voteCounts[index] || 0
-          }))
-        };
-        return acc;
-      }, {});
-  
-      res.json(response);
+        res.json(response);
     } catch (err) {
-      console.error('Error fetching data:', err);
-      res.status(500).json({ error: err.message });
+        console.error('Error fetching data:', err);
+        res.status(500).json({ error: err.message });
     }
-  });
+});
   
   
       
 
-// for signing in Polling Officer
-router.post('/signin/PO', async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(422).send({ error: "Must provide email or password" });
-    }
-
-    try {
-        const newPO = await PO.findOne({ email });
-        if (!newPO) {
-            return res.status(422).send({ error: "Polling Officer doesn't exist with this email" });
-        }
-
-        const isMatch = await newPO.comparePassword(password);
-        if (!isMatch) {
-            return res.status(422).send({ error: "Invalid password" });
-        }
-        const token = jwt.sign({ userId: newPO._id }, jwtkey);
-        res.send({ token });
-    } catch (err) {
-        console.error(err);
-        return res.status(422).send(err.message);
-    }
-});
 
 // for signing in Admin
-router.post('/signin/Admin', async (req, res) => {
+router.post('/signin/Admin', validate(loginSchema), async (req, res) => {
     console.log("---------------- DEBUG START ----------------");
     const { email, password } = req.body;
     console.log("1. Login Attempt for:", email);
     console.log("2. Password Length:", password ? password.length : "Missing");
-    if (!email || !password) {
-        console.log("3. ERROR: Missing credentials");
-        return res.status(422).send({ error: "Must provide email or password" });
-    }
+
     const newAdmin = await Admin.findOne({ email });
     if (!newAdmin) {
         console.log("4. ERROR: Admin doesn't exist with this email");
@@ -703,6 +1007,40 @@ router.post('/runBuild1', async (req, res) => {
 
 router.get("/status", (req, res) => {
     res.json(requestStatus);
+});
+
+
+router.post('/reset-election', requireAuth, async (req, res) => {
+    try {
+        await Promise.all([
+            Votes.deleteMany({}),
+            Candidate.deleteMany({}),
+            Voter.deleteMany({}),
+            Receipt.deleteMany({}),
+            Bulletin.deleteMany({}),
+            Keys.deleteMany({}),
+            Dec.deleteMany({}),
+            BMDPublicKey.deleteMany({}),
+            AESKey.deleteMany({}),
+            ServerKey.deleteMany({}),
+            Generator.deleteMany({}),
+        ]);
+
+        const clearDir = (dirPath) => {
+            if (fs.existsSync(dirPath)) {
+                for (const file of fs.readdirSync(dirPath)) {
+                    fs.rmSync(path.join(dirPath, file), { recursive: true, force: true });
+                }
+            }
+        };
+        clearDir('/output');
+        clearDir('/encrypted_output');
+
+        res.json({ message: 'Election reset successful.' });
+    } catch (err) {
+        console.error('Error resetting election:', err.message);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 

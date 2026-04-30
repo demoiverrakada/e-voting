@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from optthpaillier import pai_th_keygen
 from optpaillier import pai_keygen as pai_keygen_single
 from elgamal import elgamal_th_keygen
@@ -10,31 +12,16 @@ from db_sm_rsm import check_encs, mix, check_verfsigs, get_blsigs, dpk_bbsig_niz
 from pok import dpk_bbsplussig_nizkproofs,dpk_bbsig_nizkverifs,dpk_bbsplussig_nizkverifs
 import sys
 import json
-from db import store,load,init
-from bulletin_to_votes import process_bulletins
+from db import store,load,init,process_bulletins
+#from bulletin_to_votes import process_bulletins
 from ballot_draft import ballot_draft
 from misc import timer
 from elgamal import elgamal_th_keygen,elgamal_encrypt
 from optpaillier import pai_decrypt as pai_decrypt_single
 import ast
 from misc import serialize_wrapper, deserialize_wrapper,pprint
-from bbsig import bbbatchverify
 import pymongo
-from multiprocessing import Pool
-import traceback
 import logging
-from multiprocessing import cpu_count
-from concurrent.futures import ProcessPoolExecutor
-import subprocess
-import os
-import multiprocessing
-
-# Set spawn method for Docker compatibility
-# multiprocessing.set_start_method('spawn')
-
-#g = group.init(ZR, 5564993445756101503206304700110936918638328897597942591925129910965597995003)
-#h = group.init(ZR, 12653160894039224234691306368807880269056474991426613178779481321437840969124)
-
 import io
 import contextlib
 
@@ -86,67 +73,60 @@ def setup(alpha,election_id):
 
 
 def mixer():
-    """Begin the process of mixing the encrypted votes and decrypting them for all elections"""
-    db=init()
-    # Get all distinct election IDs from keys collection
+    db = init()
     election_ids = db.keys.distinct("election_id")
-    
+
     for election_id in election_ids:
+        election_id_int = int(election_id)
+        election_id_str = str(election_id)
+
         dec_collection = db.decs
-        if dec_collection.find_one({"election_id": election_id}):
+        if dec_collection.find_one({"election_id": {"$in": [election_id_int, election_id_str]}}):
             print(f"Decryption already done for election {election_id}")
             continue
 
         print(f"Processing election {election_id}")
+
         f = io.StringIO()
-        with contextlib.redirect_stdout(f):
-        #if True:
+        e = io.StringIO()
+        with contextlib.redirect_stdout(f), contextlib.redirect_stderr(e):
             try:
-                # Load election-specific parameters
-                process_bulletins(election_id) 
-                keys_data = load("setup", ["alpha", "pai_pk", "pai_pklist_single", 
-                                        "_pai_sklist", "_pai_sklist_single"], election_id)
+                process_bulletins(election_id)
+                keys_data = load("setup", ["alpha", "pai_pk", "pai_pklist_single",
+                                           "_pai_sklist", "_pai_sklist_single"], election_id)
                 alpha = keys_data["alpha"]
                 pai_pk = keys_data["pai_pk"]
                 pai_pklist_single = keys_data["pai_pklist_single"]
                 _pai_sklist = keys_data["_pai_sklist"]
                 _pai_sklist_single = keys_data["_pai_sklist_single"]
-                #print(alpha, pai_pk,pai_pklist_single,_pai_sklist,_pai_sklist_single)
-                # Load encrypted data for this election
+
                 votes_data = load("enc", ['enc_msg', 'enc_msg_share', 'enc_rand_share'], election_id)
-                print(votes_data)
                 enc_msgs = votes_data["enc_msg"]
                 enc_msg_shares = votes_data["enc_msg_share"]
                 enc_rand_shares = votes_data["enc_rand_share"]
-                print("length of enc_msg_shares",len(enc_msg_shares))
-                print("length of enc_msgs",len(enc_msgs))
+
                 n = len(enc_msgs)
                 if n == 0:
-                    print(f"No votes found for election {election_id}")
+                    sys.stderr.write(f"No votes found for election {election_id}\n")
                     continue
 
-                # Generate Beaver triples
                 beaver_a_shares, beaver_b_shares, beaver_c_shares = gen_beaver_triples(n, alpha)
 
-                # Generate permutation commitment
-                ck = commkey(n,election_id)
+                ck = commkey(n, election_id)
                 ck_fo = commkey_fo(n, N=pai_pk[0])
                 _pi, _re_pi = genperms(n, alpha)
                 _svecperm = [[group.random(ZR) for _ in range(n)] for _ in range(alpha)]
                 permcomm = [commit_perm(ck, _re_pi[a], _svecperm[a]) for a in range(alpha)]
 
-                # Generate permutation proofs
                 evec = [[group.init(ZR, random.getrandbits(kappa_e)) for _ in range(n)] for _ in range(alpha)]
-                pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a],election_id) for a in range(alpha)]
-                
-                # Verify permutation proofs
+                pf_permcomm = [perm_nizkproof(ck, permcomm, evec[a], _pi[a], _svecperm[a], election_id) for a in range(alpha)]
+
                 status_permcomm = all(
-                    perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a],election_id)
+                    perm_nizkverif(ck, permcomm[a], evec[a], pf_permcomm[a], election_id)
                     for a in range(alpha)
                 )
                 assert status_permcomm, f"Permutation proof verification failed for election {election_id}"
 
-                # Update keys with new parameters
                 update_keys_with_n(
                     ck, ck_fo, _pi, _re_pi, _svecperm, permcomm,
                     beaver_a_shares, beaver_b_shares, beaver_c_shares, election_id
@@ -157,24 +137,125 @@ def mixer():
                     alpha, pai_pk, pai_pklist_single, _pai_sklist, _pai_sklist_single,
                     _pi, _svecperm
                 )
-                # Decrypt messages
-                res = load("load", [], election_id) # Ensure proper election ID handling
+
+                res = load("load", [], election_id)
                 if not res or len(res) == 0:
-                    print(f"Warning: No data found in 'load' collection for election {election_id}")
+                    sys.stderr.write(f"Warning: No candidates found for election {election_id}\n")
+
                 msgs_out_dec = []
                 for j in range(len(msgs_out)):
                     i = int(str(msgs_out[j])) % len(res)
                     msgs_out_dec.append(i)
 
-                # Store results with election ID
                 store("mix", [election_id, msgs_out_dec, msgs_out, _msg_shares, _rand_shares])
-                
-            except Exception as e:
-                print(f"Error processing election {election_id}: {str(e)}")
+
+            except Exception as e_exc:
+                import traceback
+                # Write real errors to the REAL stderr (bypassing redirect)
+                sys.__stderr__.write(f"ERROR in election {election_id}: {str(e_exc)}\n")
+                traceback.print_exc(file=sys.__stderr__)
                 continue
+
     print("Mixing and decryption was successful")
 
+#time complexity analysis O(n*t)
+#also do for set and reverse set membership
+def count_process(election_id):
+    election_id = int(election_id)
+    candidate_data = load("load", [], election_id)
 
+    if not candidate_data or len(candidate_data) == 0:
+        print(json.dumps({"error": f"No candidates found for election {election_id}"}))
+        return
+
+    votes_data = load("mix", ["msgs_out_dec"], election_id)
+
+    if not votes_data or "msgs_out_dec" not in votes_data:
+        print(json.dumps({"error": f"No decrypted votes found for election {election_id}"}))
+        return
+
+    msgs_out_dec = votes_data["msgs_out_dec"]
+    if isinstance(msgs_out_dec, (list, tuple)) and len(msgs_out_dec) == 2 and isinstance(msgs_out_dec[0], str):
+        msgs_out_dec = msgs_out_dec[1]
+
+    n = len(msgs_out_dec)
+    if n == 0:
+        print(json.dumps({"error": "No votes to count"}))
+        return
+
+    # candidate_data is list of combo strings like ["D,E,F", "D,NAFS,E", ...]
+    # msgs_out_dec[i] is an integer index into candidate_data
+    # parsed[i] = ["D", "E", "F"] — the preference order for voter i
+    parsed = [candidate_data[int(cand_id)].split(",") for cand_id in msgs_out_dec]
+
+    # Get all real candidates — exclude NAFS
+    all_candidates = set()
+    for combo in candidate_data:
+        for name in combo.split(","):
+            if name != "NOTA":
+                all_candidates.add(name)
+
+    active_candidates = set(all_candidates)
+    rounds = []
+    round_number = 1
+
+    def get_top_preference(voter_prefs, active):
+        """Get highest ranked active candidate for a voter, skipping NAFS and eliminated."""
+        for pref in voter_prefs:
+            if pref in active:
+                return pref
+        return None
+    while len(active_candidates) > 1:
+        vote_counts = {c: 0 for c in active_candidates}
+        for i in range(n):
+            top = get_top_preference(parsed[i], active_candidates)
+            if top is not None:
+                vote_counts[top] += 1
+        # Check if any candidate has majority
+        total_valid_votes = sum(vote_counts.values())
+        for c, v in vote_counts.items():
+            if total_valid_votes > 0 and v > total_valid_votes / 2:
+                rounds.append({
+                    "round": round_number,
+                    "vote_counts": dict(vote_counts),
+                    "eliminated": None
+                })
+                print(json.dumps({
+                    "election_id": election_id,
+                    "winner": c,
+                    "total_voters": n,
+                    "total_rounds": round_number,
+                    "rounds": rounds
+                }))
+                return
+        # Eliminate candidate with fewest votes
+        min_candidate = min(active_candidates, key=lambda c: vote_counts[c])
+        rounds.append({
+            "round": round_number,
+            "vote_counts": dict(vote_counts),
+            "eliminated": min_candidate
+        })
+        active_candidates.remove(min_candidate)
+        round_number += 1
+    # Last remaining candidate is the winner
+    winner = next(iter(active_candidates))
+    final_counts = {winner: 0}
+    for i in range(n):
+        top = get_top_preference(parsed[i], active_candidates)
+        if top is not None:
+            final_counts[top] += 1
+    rounds.append({
+        "round": round_number,
+        "vote_counts": final_counts,
+        "eliminated": None
+    })
+    print(json.dumps({
+        "election_id": election_id,
+        "winner": winner,
+        "total_voters": n,
+        "total_rounds": round_number,
+        "rounds": rounds
+    }))
 def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
     """ZK proofs for encrypted votes across all elections"""
     f = io.StringIO()
@@ -189,9 +270,34 @@ def pf_zksm(verfpk, sigs, enc_sigs, enc_sigs_rands,election_id):
         enc_sigs_rands = deserialize_wrapper(ast.literal_eval(enc_sigs_rands))   
         # Get encryption commitments
         enc_data = load("enc", ["comm"], election_id)
-        comms = enc_data["comm"]
-        #print("setup_data",setup_data)
-        #print("enc_data",enc_data)
+        comms = enc_data.get("comm", [])
+        alpha        = setup_data["alpha"]
+        _msg_shares  = mix_data["_msg_shares"]
+        _rand_shares = mix_data["_rand_shares"]
+
+        g1, h1 = load("generators", ["g1", "h1"], election_id).values()
+        sys.__stderr__.write(f"=== pf_zksm debug election {election_id} ===\n")
+        sys.__stderr__.write(f"comms length: {len(comms)}\n")
+        sys.__stderr__.write(f"_msg_shares alpha={len(_msg_shares)}, n={len(_msg_shares[0])}\n")
+        sys.__stderr__.write(f"_rand_shares alpha={len(_rand_shares)}, n={len(_rand_shares[0])}\n")
+        sys.__stderr__.write(f"msgs_out length: {len(mix_data['msgs_out'])}\n")
+
+        # Check if comms[i] == g1^(sum msg_shares)[i] * h1^(sum rand_shares)[i]
+        for i in range(len(comms)):
+            msg_sum  = sum(_msg_shares[a][i]  for a in range(alpha))
+            rand_sum = sum(_rand_shares[a][i] for a in range(alpha))
+            reconstructed = (g1 ** msg_sum) * (h1 ** rand_sum)
+            match = (comms[i] == reconstructed)
+            sys.__stderr__.write(f"  comm[{i}] matches reconstructed: {match}\n")
+            if not match:
+                sys.__stderr__.write(f"    comms[{i}]:        {str(comms[i])[:60]}\n")
+                sys.__stderr__.write(f"    reconstructed[{i}]: {str(reconstructed)[:60]}\n")
+
+        status_verfsigs = check_verfsigs(
+            mix_data["msgs_out"], sigs, verfpk, enc_sigs, enc_sigs_rands,
+            setup_data["elg_pk"], alpha, election_id
+        )
+        sys.__stderr__.write(f"status_verfsigs: {status_verfsigs}\n")
         status_verfsigs = check_verfsigs(mix_data["msgs_out"],sigs,verfpk,enc_sigs,enc_sigs_rands,setup_data["elg_pk"],setup_data["alpha"],election_id)
         assert status_verfsigs, f"Signature verification failed for election {election_id}"
         blsigs, _blshares = get_blsigs(enc_sigs,setup_data["ck"],setup_data["permcomm"],setup_data["alpha"],setup_data["elg_pk"],setup_data["_svecperm"],setup_data["_pi"], 
@@ -371,7 +477,8 @@ if __name__ == "__main__":
         "mix": mixer,
         "pf_zksm": pf_zksm,
         "pf_zkrsm": pf_zkrsm,
-        "generate":generate_ballots
+        "generate":generate_ballots,
+        "count":count_process
     }
 
     func_name = sys.argv[1]

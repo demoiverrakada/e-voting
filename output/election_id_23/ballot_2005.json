@@ -1,0 +1,30 @@
+{
+    "election_id": "23",
+    "election_name": "Mathematics and Computing - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"228fcca0e8deafbfcbddf4c30d6f84ebeab17ebdad937500ccc0bf1949615be4\", \"429d6646bc23391e8628e84c0cb054acddf0a366d313888041ab6af12d42f59f\", \"1c4f1a3dcf4f23a58794f28ba41c14ed20febeceb3adebbaeed69fa483aa2c4d\", \"af2d554e08afefec33b19bb97970ad51338b69a55ebf72e3d10daef00122ceed\"], [1, \"[8028528690397396224664718475437975054144298255697575474071170783192823067566, 10225300170210617002265414551369992308796221406084423740320248134411845917258]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024MT10435",
+            "candidate_name": "VISHWAS MIDDHA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024MT60662",
+            "candidate_name": "AKSHATA KABRA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024MT60812",
+            "candidate_name": "DHRUV MITTAL"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[700535542749980522664941641247565480291250174883063614255742569961333049236, \"[5918246993573073322685387988878989159995747422137659898572403019318334799318, 958305029653010693431280739393703407716658720848966969992447880905039571278]\", \"[1622162549112075309232076146790408472882486405934406067513494562033885064719, 7793540377175332745946170314151221730511773468950540066535343498157884374340]\"]"
+}

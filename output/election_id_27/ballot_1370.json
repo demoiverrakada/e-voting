@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"c80ac77eb43630afc049de80462721c6c4467ae39f66a3dc87c61b9c9947d283\", \"e135c6ed6f992514009d9e8c55a93417c7f9c8f4e9381a0016471e0004be74ac\", \"f31489c8e310c86b63298a92f75109142e8ec1040e01d8c9763b95c279ef6737\", \"bf9be3b77495a22fa490d7891f7d8af6a194ecba413075a620ca2d1d303a1b63\", \"eccfd422b35770bad60b3755beb03293363df94a6ff9169b0809086a456d75e4\", \"c858ebc3a067cadba511e2be60465ca7bd44a8b3b70a58a235ec3798eeb15750\"], [1, \"[9973287090165380177241694362164234886404927952701788633685383487089159183886, 14880362823156003322669505557685160654497514735479399759752365227124576518452]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[13850323921533727265648247538487436076955944466012526873069147573938907810721, \"[7023749126011100912152847979148244272477240469385752224923275865823674881094, 7776824226436656848989457170426864723863284609684623119269228070378038176225]\", \"[3291891637154841906237693004310371459505907581279786184642601345113048469164, 1945629580722331825661028751055325051722704205522074843470479980279362473651]\"]"
+}

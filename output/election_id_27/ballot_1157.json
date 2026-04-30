@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"4338db297b607444b7ab2339c9e9d93066324fab9863751802563228da2ca522\", \"eee60ab9cac979b11557b0958b5375ba37cdaab2220d1e19eeb147118a0673ba\", \"e5b7b8e7aa0c8a41e0de75b62247b2b00039370d27122265751ad31883d0a687\", \"0ebf459af542e3c61ce1f5269fd325c43ed6f4a4b263abcf2fd95db5882edac1\", \"22be0b78ebafd4a71d0dfbdde64931752623b48d57c265f511e35a988b854ebd\", \"32f58aa8e02c4ebcfc45aaf7e4f497f0ab5883983d78ce0363a6045cb3d88009\"], [1, \"[3581426170070556657778868769831633164906234719843289707900199239134673553339, 14426488730599111688661258488681701423223350341149040943921859863267565215477]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[3631952775466836229917264728433918869302900655500803847222564508923935157324, \"[3822698441736613285313176503682594902671113916293509515156748594038201979038, 3203688339313638350475145840581165258052482127019460430676794933730755987023]\", \"[12746869658031398423683532795685167421339953048578654935834182720080421219672, 1662358739821616685534979036209221787416442419107583388880389731197365986993]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"b50c131b35e17453257198bec0c03e06ac8bba4332f1ad9db0a7ba3492deec1c\", \"b640093ea060eef5e7267d2545ea2311c34a0996f3061512124313c481759682\", \"d3b40406c1eb921651bf9de92a8fe1a6554ac602e1d6a939f0cea5144bc8a28a\", \"3d786eeb7f0b9df514e403a8a3eed95b23e3075d2e7537773bfd12cd3d8da1f9\", \"60a65b1601f7b30a6c7c473242590dde7b5c5a2985454ec191aa1e046e16663f\", \"5a33700e2a2e4ce0fff7e3484d00dddf4b6e00736cfc2c1d522ea65183f34961\"], [1, \"[6826442658372710297485385648578646722082289607074388618535320109071936963575, 12367465891510390982765713862688396476541009449346542534485366752608639315835]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[15927492327884346854806984583701200825210519884917424857830684098371865847408, \"[2805327335481520083711595406249452982057211074052845839091633448237457600642, 4832700518325540641009326963820299821324641628494196045107389980012921041943]\", \"[3973419675386413950323647455650608098812033504616326158921097027185822629397, 9476341279010309910745149932609517910094664524062642747146810948409459060752]\"]"
+}

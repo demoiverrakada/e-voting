@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"9769a56b446c5eac1108f370b3bb04fe44b1beb2dd11b8dd68ac63fe568a4ba9\", \"b440d4f93b7fa70189808a41c8e8d034ebd5a5a2b2a74dae04b52aca7459afff\", \"cffdbb45f7913a5047e67a7b27f7a18771bed240d4ad89dd4b91e6001bfba526\", \"b9f3ba2e8e1efc8049c11e3669539958ff570c63c4549012bb1ddbe68f8bc643\", \"b0ac2c3d20f976e2994786baf1166c4e1db6b4eecdad8a1c3a88eae221edd6ec\", \"b68fd011e13f017303235a4610deb5e5e0b387c70c2e14561976ae683c930335\"], [1, \"[11160765626851022525566772510390879271430836623848196252028782602043614472237, 11971625375068072366696991252074503882659362796128676173430323491498850191242]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[14701531162203946467629772074168657612717542584689949077704058508460831374231, \"[260555270237939077963484814219107352052934266638282445927944307812389917698, 11573501792058436185042184202109203905057654199224056268422449148278579618188]\", \"[15574302470660058409465446326067335603470597201078527982375717662790496002911, 14343646294015527878069682359864518140857037889703625499070407627988642759307]\"]"
+}

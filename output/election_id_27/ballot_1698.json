@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"d63709409f6d91d891bbf4b81b81f0a4a8d00b3506e8d1762a26d03f81101351\", \"5b873f84f472c4a0b1157b0fcac29b8dd82c6774f9b89fb7d1d983890d3957f6\", \"9c8848cc50e2e93b3912ce3eeb3b0e05f1fbe03127f4b33a9bac651bc782af70\", \"b19dd76edbc59feb9fbff72fbf9efb5a3bc1a25d4fe311e4c8d40ee56c9e200d\", \"26725e8565369b7d1bef642ecedf95b2a5d4786f427b633ee26f289bbeb4e55f\", \"d23ac102633bbca86e07bffa45cb59bc236dc1162bc01055cbc5807dbafd1c97\"], [1, \"[8858397056526862573281891619703476076973813192677514028321270582751449726378, 12817466608441239495646748164896557831880625644480679152431923847749299328117]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[4907241682706012796463418906866691771606267786556130231495863355881782603160, \"[7881739407614519611881071643545178867505273351946603716756534985347738813708, 11498147330333230401989211035592308288841261227970674985163249349119339602462]\", \"[10885504785424431538915800432393480155377189395057915006978431102761198424358, 5437142619277767824443874882802323867111564996440093458472901781659438378836]\"]"
+}

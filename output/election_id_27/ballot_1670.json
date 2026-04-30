@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"9296fbb8733179a50c8974ae85ddd06175d2ddef6c9656a4b7c30b89eecc0c93\", \"96b9380aa3b1866b456b142327f0c7c1cc45b6dcadd438518dab0083d81c3da7\", \"c4fc30f0ca6e3fd8fc132a16ea93f743070eeeedcfb90e1c4519b53fcdb7329d\", \"7fd6bf45f1e8791d449f0dfde8b18dc68051e7a15a34413688e11edc5f72707c\", \"9fffeb78a4c917192968602d047350ae000d2669cc523995cdbb687000345f14\", \"b0b5052509935b27608ac0f26ae611185f24670527ff9a404c815ec4e2e48552\"], [1, \"[489462427805986238203930807903320483391885954907901040648875425248368777661, 16149091496218165203502744293443625307407951546075458994467406646731695250190]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[10347409923915400387234318782536153256643244796396866457745675559064097383259, \"[6019754663869099214655133234699778463763291762683328414551522407044120415423, 1478226055005761657248332062826860911959977639023889304453585998710685447843]\", \"[12052010594914171549891317785758682436831285061047560997797720507793232309675, 13245982964942193272263633421841537186629009465513412513487097259116484353801]\"]"
+}

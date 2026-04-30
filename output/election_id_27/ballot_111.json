@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"23479c950440cedd56da6c9de8f86998fb01a10dae08abae41dce9902af37e3e\", \"97fe609b49c6caf1f60409edefa20bb399bca28a31308e14ac29a1d4d2cfab7e\", \"3c45ff9aacb087f614528cbd4e0edd5dc086fb28bf3b01e7f14e91fa8973f133\", \"9a63b3c1a2daafa135f8e6d2f84c0336d0e61dc5e9d2fbac3009caf2a23142f8\", \"266e511dca4431c79e52a060d954fbb4745a312fd44d7b8b8da54363ca9f5673\", \"f6a0014c64e171a1efd44a96bcfafd5cf5b2daf2f87aa499b9e203b2e401602d\"], [1, \"[8328062895103530343556399619408725610915867785530762116338517764503984153680, 4970182830872010222666762252327476906240362461580435450810781476391422385228]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[4090069433394110573520980146936547334642058835916310244777053084640181162156, \"[16114642367152073513328513216415120407501512125289340498825403131709740011810, 12329112344864972645720789381740332452857330748993051679255224969153470978076]\", \"[9838838074826160038261906581568731983588099986965089296999659704249937672321, 5340540867695912722651850900671187606545717433873099383167610493826333353744]\"]"
+}

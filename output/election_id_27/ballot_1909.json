@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"af8668dcce831ec94d8de4bac6aaacd0bc0172cf50a92e812b338d9b1a0e3120\", \"c3cd912f6c593af85c0c3f997ba33b67bf71cbed5137f505dca7b0a4ba91811e\", \"083dd04511d9ab552d10564408864a19c5b8600c579dc557faf567dad5369896\", \"c3c0d4bd8d8f0b8eaa40e965ca6cd06c02d4e8ecd7c2d988f40f9664da50e6b4\", \"d6c5571bd10e1e2fca76ca50aa73002549c70f886fb9dc43ec70cba311c01cf2\", \"66371f133a5a99a01769ba08a6aadae1e19b46000388c71d525be8db5742d476\"], [1, \"[10330552724031460255742148705797317602661277531144892810002912206871108206157, 15788970243915784393261500727578485007716696444175908466512824323199571454948]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[13359734272160124671972259125592710776035432140603548414637151764428728484788, \"[15340461580015876956197827227061392547595156171288797010584999392024611804710, 2387518927704417162813154507022386863115311836475665475852961802613559780805]\", \"[12789539796208028538742832325914466730895073790816732865450970891141799818992, 1757301695214653523367800104279248973504526466634016744599578834060730207515]\"]"
+}

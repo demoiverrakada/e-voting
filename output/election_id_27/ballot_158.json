@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"9efee6512da40753a4ce5afffd8addd6fcbbd7a6d96d6d38cfdfc5d855fcdda6\", \"0fbbdac6b518ddaf7e0a5704b104c270d0a6423847fad4efa98772221dcc1f25\", \"7788770d0dad093df20b48915619ccf0fbbcc7ddbfef7db0371f1fd4047d5eef\", \"ecdd61680e36b7ee2b3d2ecb4ddb9f008d285a72e3a863dbe5033ea9f82c58c0\", \"6dd51d8d6861872687008bcd135bd11e6b5838270028d6b70356084dcfa3d99b\", \"1a02d398dcb5a64f2cd34b2b24b960ebd88981e154cd6b38186404b12c51115c\"], [1, \"[13648163045218540602468437351522658171306602375893461084833263472546294370337, 5390647405880933158350151540162985342476440779197330343866601101969788142904]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[6416090892804237670788155585490674064082037148697441189304922041139063041739, \"[867109330313323290553012697475409895612505855912936575830585845400441818104, 14589160023149526251148168054521903946792523978229841307176654284433365511189]\", \"[13311127149514808387645994550394138884356486590724344211007557335033032040133, 3940361097329117041814594592263711430789928163655174043974987134216618350671]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"a423d510e3234f00b6be8e414c7723c32d9c29653674b960a64ea54097db3fa2\", \"088433e4716a14649b99935579d29254a0ab4e991793e70889a03148c4bc68a8\", \"1b29fbb1d8151be057375beab8f4f3eeaf1945bea97ebf39aa0622a99ab6d9a2\", \"127e7f4a74253009fbaf04f780a6f16f07d8af36c987fcbe96dd8d871fc04baf\", \"9bba4bdc90d570affe83f698f77ec58acc515d1e12417e3a51f48be212dd0dd5\", \"a88d635e898e26c36bf19de835ce088a0dc14c060d46be053916e19352a28549\"], [1, \"[6190813951991866119135859716930929631245611729884973281582770031386684229585, 11849624707603878395372832656586869648520972978844978874897720862363638929683]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[4775185507975381097631676243299760835025261742464408131223499388487889285439, \"[6460731851074144074305119558038891794920892979532265416903459645444090477133, 14354591314780847704991656807834345550373162127025417508974198514925325402895]\", \"[4875795182019940919111392006891503036417229158810366069397740630563576419658, 5230594280215453961533972625732947414596707200558919978678530084937281048616]\"]"
+}

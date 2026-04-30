@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"d7b680cc2532314ee03b5aca96b03e90889a4467d9537e2d09b35543b467e305\", \"24813c585a34e948991aad5dd468feac8666888770ac1685d3e7f79a8838562c\", \"4179de82a206755bca9c86910e40b46fe74961d38cf9adca2ddc94ce5ec65b35\", \"36b4d6b46b733350d74ffc3aae53cc0d3b6147f85e4cd66d240c966e89b747bc\", \"2c73f6d3ed009028ecd69a977f39ec4653f8187c8fad059588b0dd8bf4fdb242\", \"227466fc48442e02db4f49444508e72d945f955bab59d784cfa987da202db0bc\"], [1, \"[2883627644812669560776421197427955231086804446435762538728460349657304160868, 184903762045347580022194868033234134758292861189285343625736157360991146355]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[1067477215014571973882808764523740054909556852635171816011313534851794478847, \"[4154552855931645543561156740417640384281652181263636958642553084201676834339, 1887781699007244646106006341816521648952549690093469812409444218236515662984]\", \"[6285377906319404930031009064099171946570715901742422040822088276900835695009, 13625027293300199661774731230717380006298159668512142238550677308493301253090]\"]"
+}

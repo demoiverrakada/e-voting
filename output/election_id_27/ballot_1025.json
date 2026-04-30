@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"2adf55df29a61c062ae25bbb76a25b82b86451b24cc28767d047145e39510830\", \"6dce225c2e6f9118e1b0307ac98deea8cdd8ce314371c96499936a041cb14e60\", \"bb7de341e44fe56a023550c1076e424fc0c612ab5a11f1a5a774d2e8be3fbca5\", \"706922fc24f3ded741d8d1c61b4f5af7e2ddc35134b7d01c54e3830a8a254fce\", \"4bebc04d9e7cfcc27f20f70140a724ab646a56b2dcb6a85ae7bbb3e0cbdaee9f\", \"1e0c217539e6f1a87aa15220cf81e3c591b252afb04261fbc86938ab2ba98c2d\"], [1, \"[634590647444064063313620012395336357671571489112242378001423495856459320829, 7043541275607477148505677006492029492552319277884350831038318030459898042890]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[8370686839045350829700421997728705514905997988334153923835311113759513449945, \"[5734624023419771783874185070413906216223488817417701648206063284480425878439, 5014698189431314326032292180079939223110861762006340857439824347210464865433]\", \"[8353195629036596536064650007723050764554603180165309582829428768480953467986, 14163773736974751042951688316291686513627982243362949199789861390978337581566]\"]"
+}

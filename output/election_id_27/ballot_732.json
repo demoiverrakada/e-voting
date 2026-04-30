@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"4da3ca774a3493ffd8380fda4a7c5059623cc83fdfd9bd45123d192a529c6d8f\", \"696a097fb2396e12116e0c3759b71e28ad5e550d0fed645f2ce0af0386f9ea71\", \"8e2ecc1abf9244255c13667fde5dd405983c49a371b57e7333422b9464b45718\", \"24ae8ba8a5698025d4f118d260f7e46a1df151efb727eafe03eaa6ae7c9b28d0\", \"d17ace907653ec875648624ecbc5afdabc7433643b815cfedb4f331b9402e89e\", \"00032a41022046c01e9953119d990e1769a691fce376160bde99517dbaadfc28\"], [1, \"[7970633522972693500896636336403712528648593589967343584620007656377962727823, 11160748039087245473956934351342570846950269673972875842005058484467264692789]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[4983929520254304869466080846125501126027941526198019143376591197143634659697, \"[3361337024464650061756225029784066546126446030953117701589080202947408136185, 13851372300051302294346801711509230144018469591455882733722302609804943834575]\", \"[14204462331146777841095567159445428298380812066655365478520615911838922436279, 3070509343368285357625290450354765939054742530987798566374606924112040242402]\"]"
+}

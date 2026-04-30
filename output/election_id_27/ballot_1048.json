@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"f3774673e6d7ffe0604da010f42a2a23c5448618be3c6e40a309262b82b7c22c\", \"a338038f368e3a27a7f36b63ffc065b6e8385fa9bfbfcf68e0dbcc56798708c3\", \"ddd7893af6864f1184a48a4582922ed8c1a5926af4877e0745b90ad77d1d8f66\", \"863326f6e3cc487d3f82873f56a2e2b993cabb8559e4410c1fd6f176dc0559f4\", \"0e239868097edcb6806c5e041ee96318fa29b673d59058e2766d43e280b7abf8\", \"b7024f2db956a293da94f23df13292d42d2b635edabea64944d28d226f0820fd\"], [1, \"[9520346290598719485707685448161686312580434594403754277549398825215799043505, 6587192412518897548144465347392200486789395286717340141708008799773966935169]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[14139962192502710749559811980615775773845804286659237765492798196609627787578, \"[9872241134132573285637111373009254416946854717526716825526069283857515070444, 4924548885179547720368412407591713037066501891402195650215420683525657792623]\", \"[12818336663386072085292868739474597278800665588477490343432152776193649856356, 4450687191634479071182931653134098162620090317213323900408219719645029058072]\"]"
+}

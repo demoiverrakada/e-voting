@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"9d1f7a64f02547ee088fe0ea761191e952d6744be005047365bcd1911e2dc31e\", \"94d2667cc400218467421440b15ce11622bacd8f9973f2c74eeff491ea000a25\", \"d69ec95a0a9318b248916fd4ef21b2fcdde7bb2129010e59129d85f6fe94c736\", \"9d4e02580aee7c68c52667ff910258c52fc88b00286b0da450e9fa4f21793d61\", \"182320cbebd7fc4b48f33acf637828a13d6d9c3d9515f67c8c9a6601a146f7fc\", \"02866c9ba47f2a95d8157e61226ace2cf280908cf2dc9feaae317cc9a00baab0\"], [1, \"[4543510646439524920940583842760192306712259212691664414306745337575434595032, 3798864148680569739080395380019135474876364784378150781765524743352829558114]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[14595394024379763367797067113061306427134946398818452037906725166335022060420, \"[3927640161959053589052708255382039907238115110138298907657693836816187512690, 3773563360442438088624195305205390990188794741090420148347869342695723738203]\", \"[5485378587031404221234576950610162303170693558307011834465294893162370435921, 9712796119366861031018075787306773499509111487083894491609167199409479487753]\"]"
+}

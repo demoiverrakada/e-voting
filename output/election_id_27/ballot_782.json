@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"59a4c895b946dc50278b55bee38ea70bd02ab0e4fdb804d3b6ea9f7211917963\", \"3616ff308c799d42e33a88945cde5b6f72d2c66132543fbe683fd6f7007ec5b8\", \"b405d52ef2ea7aef444389ed8452488cae6a6369aa43725fa6476f3596b21670\", \"22c28fb699f0eb8b7da709e7c5686b558cef6695b8223525c665116a7d92d798\", \"7f7c637e08ab4e04d782824d78df90b5734c20ef6f9f4d850652272f2c4d7446\", \"8b93787bbcd4b63960f59f8a343a33b011a87b6d86a956bcff48e2c12dfd49c2\"], [1, \"[9404372375956843705864027522968742410916879109858648471760838937636371736642, 755549479888805059252166688879271180208090217734351222786432059469469263995]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[4290178923649129303072604195573959340524273077536456305819393057020594934703, \"[14029438347944672578952481000127258795200025467186146140209274616950185028521, 424309114508796447381360142334937066926057896370097382441573604307532500165]\", \"[14507092479466328278967820150149896024576585705989495697889641962282879720195, 3492645831033065302681271355720576418771245406123314458579741600763519010689]\"]"
+}

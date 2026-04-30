@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"3ca9b2d2d82a07cc5d9651a28a63723a4c56bd9e6da43aed4f0e086128e37b78\", \"fe5a919f79ba80a39d62479338db21b14c93fe72bcfff4280dd6703f4bf16361\", \"80390c5ab9bfa92eb3a32a569f0ee2dd2efc6653ff4e1b746ed7b6390b5a2375\", \"ed5fa4d78c1c9388b382326f1c63804a4ee0e39b19492f98d67b83a2b7ed8e5b\", \"0a18bb33f2180ae723a2702d7734e031a42556c59f5aac0620d3aa3ff1dcad9c\", \"22e959a3182321603655e72def2291f2c60a192d68c212289dfdd79655161975\"], [1, \"[13978581934166830844073458927559565178889910552046675170496584049988617347212, 1280203459860673282536675880441324530003455339262684811638932247448663813731]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        }
+    ],
+    "ballot_id": "[9150245593644605723918747348711120391241679895590065703145875603908642737040, \"[10251449843254610094224215677002133756324933971582721902862778447114081355780, 9532080869153391207093293360827112907826696886572212634215471942640451855584]\", \"[1923868082695638638737257485826256294297920306311046088075640280597855437661, 2253618072086082392413899593124295494750072213159782048767189371205992884281]\"]"
+}

@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"f15c61c544828f1c9175884ada81ef67ae7868711c5f9e1b671cf2fddfd6416d\", \"e844f91e76598cbf3db8df787a7d176196c224518155babafe638fceb919c512\", \"d7a272ec07384570810bd35792fae45001763808e59fb6cbfb16662a6894ed37\", \"1ac92ef109cff0b4fc8f63597cb85c5a55d29ee9f32e307290273c8e1f61db32\", \"45a35b91e4888e00d7a1217e998eca6a484aa58a54c530cef89ade02a5270230\", \"c72c9eb29c3ea70c252a993b047498b081f3fa23ec6dcb8fc9ad0ce41b6ba893\"], [1, \"[13586429501526084731881766924586067407416711845731821836158966815939965844896, 11077632909345439015192826214161772383450374162206489658629272875689639932848]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        }
+    ],
+    "ballot_id": "[11551874573854201626275202930138930222191295285383093675159395144895748012920, \"[9901403783375331085949822716405520610931396665949704782036842286308939816799, 3775989309477819050661214458917945872143184735659939102188990250710251418208]\", \"[6270861297678482794150944102246160766151817837836862631756922317486342374830, 9030208372173119147368253468294112320519697483186490914026408881441117334528]\"]"
+}

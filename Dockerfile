@@ -52,6 +52,11 @@ RUN apt-get update --fix-missing && \
     rm -rf /var/lib/apt/lists/*
 
 # ============================================================
+# Install Python dependencies
+# ============================================================
+RUN pip install cryptography --break-system-packages
+
+# ============================================================
 # Install Node dependencies (backend / web components)
 # ============================================================
 RUN /bin/bash --login -c "cd evoting_localstorage/project_evoting && npm install"

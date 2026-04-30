@@ -18,19 +18,21 @@ services:
   ea-server:
     build: .
     working_dir: /app/evoting_localstorage/project_evoting
-    command: /root/.nvm/versions/node/v22.3.0/bin/node index
+    command: /root/.nvm/versions/node/v22.3.0/bin/node --watch index
     ports:
-      - "5000:5000"
+      - "5002:5000"
     links:
       - ea-db
     volumes:
     - ./output:/output
+    - ./encrypted_output:/encrypted_output
+    - ./src/evoting_localstorage/project_evoting:/app/evoting_localstorage/project_evoting
     - /app/evoting_localstorage/project_evoting/node_modules
-    cpu_count: 8  # Explicit core allocation
-    cpus: 8.0     # Alternative: 8.0 = 8 cores (100% per core)
-    cpu_shares: 1024  # Default priority
+    cpu_count: 4
+    cpus: 4.0
+    cpu_shares: 1024
     mem_limit: 32G
-  
+
   ea-db:
     image: mongo:latest
     hostname: eadb
@@ -40,17 +42,18 @@ services:
     volumes:
       - ./mongo-init:/docker-entrypoint-initdb.d
     ports:
-      - 27017:27017
-  
+      - 27018:27017
+
   verif-server:
     build: .
     working_dir: /app/evoting_localstorage/verification_server
-    command: /root/.nvm/versions/node/v22.3.0/bin/node index
+    command: /root/.nvm/versions/node/v22.3.0/bin/node --watch index
     ports:
       - "7000:7000"
     volumes:
     - ./output:/output
-  
+    - ./src/evoting_localstorage/verification_server:/app/evoting_localstorage/verification_server
+    - /app/evoting_localstorage/verification_server/node_modules
 
   bulletin:
       build: .
@@ -58,6 +61,9 @@ services:
       command: /root/.nvm/versions/node/v22.3.0/bin/npm start
       ports:
         - "5001:3000"
+      volumes:
+        - ./src/evoting_localstorage/bulletin:/app/evoting_localstorage/bulletin
+        - /app/evoting_localstorage/bulletin/node_modules
 
   admin-webpage:
       build: .
@@ -65,14 +71,20 @@ services:
       command: /root/.nvm/versions/node/v22.3.0/bin/npm start
       ports:
         - "3000:3000"
+      volumes:
+        - ./src/evoting_localstorage/admin_webpage:/app/evoting_localstorage/admin_webpage
+        - /app/evoting_localstorage/admin_webpage/node_modules
 
   verification-webpage:
       build: .
       working_dir: /app/evoting_localstorage/verification-webpage
       command: /root/.nvm/versions/node/v22.3.0/bin/npm start
       ports:
-        - "7001:3000" 
-        
+        - "7001:3000"
+      volumes:
+        - ./src/evoting_localstorage/verification-webpage:/app/evoting_localstorage/verification-webpage
+        - /app/evoting_localstorage/verification-webpage/node_modules
+
   demo:
     build: .
     working_dir: /app/evoting_localstorage/demo
@@ -81,4 +93,7 @@ services:
       - "8080:3000"
     environment:
     - BROWSER=none
+    volumes:
+      - ./src/evoting_localstorage/demo:/app/evoting_localstorage/demo
+      - /app/evoting_localstorage/demo/node_modules
   

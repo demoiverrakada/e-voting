@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"0a8607e1d69036010a74a1bdc9c33a035c4127561f42901c8e2cc2ef436e40bf\", \"cbc56ff05cb6864a609b5ce0d782fbd5ef3158cbb14862dd397bf81aed2d3a7c\", \"cce669b6efc015713a239f22b120c20b063db61f007740b83d50fb7856ae4551\", \"5f500a31a4487776541ea5bd4b2f26da212a6cb2567d07ea8ee940fc018c258d\", \"beda9d57d484eb46f0729b749b59bf4fe4509de2a8de04fff3fafebb6198cb54\", \"77584b670daef7c343ae49e23899384b98dbcfcb8048ac78929517141e0b97c6\"], [1, \"[5922372002457916122358969067193875889755311504620389206135089641477345596044, 14201168837936250898954548646285419246830174250416217405674271172408263683380]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[7333128567780287717359248812504218974241510964349568751030069292515077188977, \"[10203533165834442730852327921507352542725236338281829321235599527181868681947, 12709077207811785526793848998219195528689934223227495002349384691170705365602]\", \"[3537128616560849864730738269517272360519216151181141063094363813019602467471, 10926115604089134544474069817588598555537329810828602238252987056812719331263]\"]"
+}

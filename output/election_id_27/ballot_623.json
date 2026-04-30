@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"f141e1ac57db16a79eaf884a8906e6ec91e929fe0997f1f5b4d0e075c986b385\", \"19a49bc6157b4769ecfcf49b674723fa523dc4ce0e7f43bdd2e31f1696bc9e95\", \"9761ef6bad70e309277a1eec45651495a2eadf521068f1760c9f01c027b64bb2\", \"79ba6644fa4f1442916d7f42813da4ddff2837498ecce117744aa5560fefd536\", \"8fc5d9e5533c249f31eda63349f4a88137765f3a74102651ddfe4e272d1e526a\", \"ab2efaf25e9d0a374e5885eb3d96f3453089a2f8cfe132add1ca918944817377\"], [1, \"[12815347502856011879128785553318740768678351112570203194183674327807007520487, 1263555703245301780271901905965471250728322958264438348288960390174949868319]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        }
+    ],
+    "ballot_id": "[1731584648813469027803722407093413164284996167524115285405000711227741502437, \"[3526643104838796846689709131908452840916476952505197449459012280174718981957, 12979337984155557542366748573097047298038964433470939388490826292816291363135]\", \"[11893651475981749613192016189439315904834337645466443996576869076380647965262, 9251952729582127163609790639662473019121284136536502691942379713295090767128]\"]"
+}

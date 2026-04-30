@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"2d8684aa8a42b2fd0111fefa6418819f3d3873b3395b4bc963de0b8263d6a747\", \"7ad8e1d36a2c1d176aa8d410b4a963cc1c860b8919a2d4d1043c315966fc5279\", \"2e03445b3a7a7d88603ff03fbe5b033ae3e46cb382c82bb1f824c06392dba071\", \"d282ca29cddad1d6e01c6af5bd27b43ebd49e2c5d8c9253f71e7d10dd6f4cb0d\", \"9c0a0d186c9248a756b74c96c6cb81bd333b2438b6bf58a8c9241ccc12db87b6\", \"d2da2760420be07ac4f58c1efe005761d90c1a9c2aaa4524be3780e612fece0f\"], [1, \"[1236169539670882218705373083794297233703728994486053663737166874396353528189, 8230312095739568002392222357482012045059974777017011060849740711701918486377]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[5418088866240276082525189255665577776043380760121424573591177360508133183213, \"[3160604533405699956107321873152977644588227663415764239061771689053077129704, 14794819446100884566097918587058958068844700374150903692950849220321259365737]\", \"[3912526380239864893867261462339348424036230866333679342735576396703240228830, 12418916637429021714204519981224550726026000783446552211455689753634133419503]\"]"
+}

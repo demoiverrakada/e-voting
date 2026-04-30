@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"3b3a7768c53a5fe1770310b4ce11ddbf755865ffa85676823fd87346ede95bb6\", \"60b47776e8f36853f029915a37f27dca1b5acc14980bf8ac910d11be3c439543\", \"cc3d0aa2920800cd75f27400339550eea5c9e156714cb23d594e334e9384bbe6\", \"f4cbb84576ba0bf561f513c760df1b8922bc3a0bfaa1a4430de0f637308e9441\", \"85a1dba9f99856b096a46693caa503e36a99316a60a5b879419f45734fe87563\", \"1b4573721467e44a737792bd22dceadbbb5eeb318c9a70e860586be6b0de01a5\"], [1, \"[164309707027534198750120277098011374415599595052101174588490863508731122472, 5154107473226205198119321763156580584288287743480103284451221584657768295784]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        }
+    ],
+    "ballot_id": "[10727608554716768877893627869335372013600193190693428771414062399233496893869, \"[1914556368561412899688104692409850293359674073737754265288396957813822014388, 340341321064636587547971389239587733955503709131891154499546899436978226047]\", \"[10023099080953723254738101238557730422523733077306993514766390812642107434843, 8587358428078567963780547300932875937491992727299759243925242805369191071353]\"]"
+}

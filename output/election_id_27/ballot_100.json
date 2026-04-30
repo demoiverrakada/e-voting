@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"b05a34a039fb253a2cd5ac3f7847c110e75ec6060dd6c37e739e2bdc35fb5264\", \"631e904f4c93afa571b8281498d276d1e2bb8b859a1f201682a70c748d80eddf\", \"bab039dababee99005e6ef69285fa6683c8416ae769d8c461a22139194a68385\", \"cbf6d0938af0c794dca7ad59f86d74e3671b2a03a8c77f86a321da815e35650d\", \"472580b38011f5a34ba7873ae97cb496c52820ea2b51fde5d0f2778f0bb3840a\", \"fb2b74f1f3447616c8816bd8d0b24d17367b8db41889f3e0169cd3372a11af4a\"], [1, \"[306520641767463002627028530535322864255972573233154399814581816775416895015, 4271448520812550776055018058166558846232663927605862070998263625098848598937]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[3657753862928313190835622800432321429340817404049856365469878001607321283116, \"[34526909640236900405957975842601247404659706122508309631815673314879020877, 1645783834494675134962003996052895182219068030449531083291025296773877141993]\", \"[6879657233130791973513072774476232352241412652903429454281195272810759982379, 2896303481672741859376186240617172417034026551175262124901802527209132662783]\"]"
+}

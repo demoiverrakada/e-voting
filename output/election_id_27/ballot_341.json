@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"cf88af4f2b73e41b2539e52b12bdf59488ba2bd3a77fad67967af659224ffce8\", \"a441d571acbd911235d9ba0c9d504b858c7de939d31b2b2b76443d63d66caa3a\", \"c7a3595d41bacd7045ac8437efebe6d1c28b2197d25b9b69e5ffc1ae3aecd806\", \"889c3c780c1a6a2e4d1845b9228fc00bbdd7f8b5c800ad920464d44d0a42c724\", \"331c09d32aface6bf44fa35acd439cdb0e34e6556254ff3569ade35eae743acb\", \"8e68577a22c9e8ce1a3433617cbdeb1e7f1d945d29bd04b314cbeea2728b16c1\"], [1, \"[13791248190502691406257097048912520966195090411877713150097220776668732582876, 15965995861288609201437611107061911978870790241363518866245706391500130516350]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[8614600928743874473523095868315451198332206558242627628800534884930250675702, \"[1479688314885316089281102501330375308705855217452699906749599629530753539139, 1830739939952757734661824034382947174542670477473556458782541897043698451101]\", \"[10851653155117368081820095827092825480733364359534023523326870218821876817993, 8837081827087105405560890735486962534332030597212601990597103481920446833001]\"]"
+}

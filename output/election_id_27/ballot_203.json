@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"c1aaa6454a432e7531f66ae44ace88faba73c99051b17ef8b004d7e07ddd8584\", \"11dc8518ce44f0c4e41e4973720fe225a4d3773e9a97468d93d9c03fcb8950e7\", \"960fe11a79ae5e1e98b7ad0f911f9662aeff56ed62698e5747a80a5fdd16b2f7\", \"a2fac877f8599244c55e70d58564b9ea38744040d01aa09bb8de1975d94801e4\", \"c925d7a6db46f45f9d5285e72642e2a4e554ec1b7aa62549fbbd3b344c0759f9\", \"370a756c41fd1be3b68f6dd85a40f00f4fa3309426725d636ee11800a1a38b11\"], [1, \"[11822038860290926108770771066115407963589882007565814138404290303300510625496, 8445885687498808179155580489978978085215006238572393025429180871276833194326]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        }
+    ],
+    "ballot_id": "[10410201815434567806172063940675722769755915944621451571315259301064393077488, \"[8225498318946264328235584650199427341574379922565046276886544459300730787837, 10619189390022474787555388082002948201622933345665287413542890728419690864340]\", \"[7996433114826892401190585980820578266426633623817710733862678002684264895418, 15822362349667965510877374891287251294699495124304949230354971292536442934196]\"]"
+}

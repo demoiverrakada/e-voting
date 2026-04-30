@@ -1,0 +1,40 @@
+{
+    "election_id": "27",
+    "election_name": "Textile Engineering - 3rd Year (UG)",
+    "election_type": "fptp",
+    "number_of_preferences": 1,
+    "commitments": "[[\"dce66a715a8dfb84f0ce6150525f83d6ee9bc47e1c7cba6dde462cee037c4ceb\", \"8ec62683817c9035cb080ba4002993bb0b6e7cdef66454339329761052480f46\", \"61203d60614c8dc337dc037cc02a4ce16145b43c548a5062c7cb71792c26cc72\", \"64f7d495a2b271fe8bffba017d882e76763f5d663a61d706c82e498c2b0cd99a\", \"12c847b8a91ed95efde7fd626c38931031bad2823ed480f07174ddb3b2cd6048\", \"bd7998490bd718ddc78421d003ecf8375dfd5c19cd86ce8ce586d8829f2f0fd8\"], [1, \"[8494033372461329505672289638349332627936487137829797894506088370326439013894, 9413925551356824283603430279834859444911062289677255390172933869231103826070]\"]]",
+    "candidates": [
+        {
+            "pref_id": "0",
+            "entry_number": "2024TT10830",
+            "candidate_name": "ANUSHKA PANDA"
+        },
+        {
+            "pref_id": "1",
+            "entry_number": "2024TT10356",
+            "candidate_name": "PRATYAKSH KHANNA"
+        },
+        {
+            "pref_id": "2",
+            "entry_number": "012",
+            "candidate_name": "NOTA"
+        },
+        {
+            "pref_id": "3",
+            "entry_number": "2024TT10752",
+            "candidate_name": "ISHANK GUPTA"
+        },
+        {
+            "pref_id": "4",
+            "entry_number": "2024TT11081",
+            "candidate_name": "VIVEK RAJ"
+        },
+        {
+            "pref_id": "5",
+            "entry_number": "2024TT11137",
+            "candidate_name": "DEVINDER"
+        }
+    ],
+    "ballot_id": "[12894100810589986857518578111657648314651367622184872430804844457158470682695, \"[1835979704419483717225434833199883123312338159209361818045321413502999415208, 5524573553246071571603479873281516338523245414997227023819744385403149995848]\", \"[2169918938251913264304928880916519646111268126943299837732044460368481324837, 9327121545958530026001289259080357708120516375266571544963444900480311502010]\"]"
+}
