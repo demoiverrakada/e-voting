@@ -1,4 +1,4 @@
-export const API = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+export const API = process.env.REACT_APP_API_BASE_URL ?? '';
 
 export function getOrgToken() {
   return sessionStorage.getItem('org_token');
