@@ -3,6 +3,7 @@ const Admin = require('./Admin');
 const Organization = require('./Organization');
 const Candidate = require('./Candidate');
 const Voter = require('./Voter');
+const WebVote = require('./WebVote');
 const Receipt = require('./Receipt');
 const Bulletin = require('./Bulletin');
 const { Keys, Generator } = require('./Keys');
@@ -15,6 +16,7 @@ module.exports = {
     Organization,
     Candidate,
     Voter,
+    WebVote,
     Receipt,
     Bulletin,
     Keys,

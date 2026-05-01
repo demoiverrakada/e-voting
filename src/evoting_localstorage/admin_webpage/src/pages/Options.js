@@ -57,6 +57,7 @@ function OptionsPage() {
           <h2>Polling process</h2>
           <div className="buttons">
           <button onClick={() => handleNavigation('/upload_votes')}>Upload Votes</button>
+          <button onClick={() => handleNavigation('/web_vote_results')}>Web Vote Turnout</button>
           </div>
         </div>
         <div className="section post-poll">
@@ -77,4 +78,3 @@ function OptionsPage() {
 }
 
 export default OptionsPage;
-

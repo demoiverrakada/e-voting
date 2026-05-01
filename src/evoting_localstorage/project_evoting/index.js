@@ -35,11 +35,13 @@ const requireToken=require('./middleware/requireToken')
 const authRoutes=require('./routes/authRoutes')
 const orgRoutes = require('./routes/orgRoutes')
 const voterAuthRoutes = require('./routes/voterAuthRoutes')
+const webVoteRoutes = require('./routes/webVoteRoutes')
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 app.use(authRoutes)
 app.use(orgRoutes)
 app.use(voterAuthRoutes)
+app.use(webVoteRoutes)
 
 
 /*app.get('/',(req,res)=>

@@ -11,6 +11,8 @@ import UploadVoters from './pages/UploadVoter';
 import FinalVotes from './pages/FinalVotes';
 import ChangePasswordPage from './pages/ChangePassword';
 import UploadBMDKeys from './pages/UploadBMDKeys';
+import VotePage from './pages/VotePage';
+import WebVoteResults from './pages/WebVoteResults';
 function App() {
   return (
     <Router>
@@ -26,6 +28,8 @@ function App() {
         <Route path="/final_votes" element={<FinalVotes />} />
         <Route path="/change_password" element={<ChangePasswordPage />} />
         <Route path="/upload_bmd_keys" element={<UploadBMDKeys />} />
+        <Route path="/vote" element={<VotePage />} />
+        <Route path="/web_vote_results" element={<WebVoteResults />} />
       </Routes>
     </Router>
   );
