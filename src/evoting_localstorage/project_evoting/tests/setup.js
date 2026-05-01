@@ -11,6 +11,8 @@ const beforeAllHook = async () => {
   const uri = mongoServer.getUri();
   process.env.MONGO_URI = uri;
   process.env.NODE_ENV = 'test';
+  process.env.RAZORPAY_KEY_ID = 'rzp_test_placeholder';
+  process.env.RAZORPAY_KEY_SECRET = 'placeholder_secret_for_tests';
   await mongoose.connect(uri);
 };
 

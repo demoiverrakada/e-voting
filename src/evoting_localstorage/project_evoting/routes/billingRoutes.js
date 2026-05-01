@@ -6,10 +6,12 @@ const requireOrgToken = require('../middleware/requireOrgToken');
 const { Organization } = require('../models');
 const logger = require('../lib/logger');
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+function getRazorpay() {
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+    key_secret: process.env.RAZORPAY_KEY_SECRET || 'placeholder_secret',
+  });
+}
 
 // GET /billing/status — get current plan info
 router.get('/status', requireOrgToken, async (req, res) => {
@@ -34,7 +36,7 @@ router.post('/create-order', requireOrgToken, async (req, res) => {
       return res.status(400).json({ error: 'Already on paid plan' });
     }
 
-    const order = await razorpay.orders.create({
+    const order = await getRazorpay().orders.create({
       amount: 99900, // ₹999 in paise
       currency: 'INR',
       receipt: `org_${org._id}_${Date.now()}`,
