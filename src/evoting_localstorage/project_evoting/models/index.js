@@ -1,6 +1,7 @@
 const Votes = require('./Vote');
 const Admin = require('./Admin');
 const Organization = require('./Organization');
+const Election = require('./Election');
 const Candidate = require('./Candidate');
 const Voter = require('./Voter');
 const WebVote = require('./WebVote');
@@ -14,6 +15,7 @@ module.exports = {
     Votes,
     Admin,
     Organization,
+    Election,
     Candidate,
     Voter,
     WebVote,
@@ -26,3 +28,4 @@ module.exports = {
     ServerKey,
     AESKey
 };
+
