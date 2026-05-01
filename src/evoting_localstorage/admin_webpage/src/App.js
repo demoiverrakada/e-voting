@@ -13,6 +13,12 @@ import ChangePasswordPage from './pages/ChangePassword';
 import UploadBMDKeys from './pages/UploadBMDKeys';
 import VotePage from './pages/VotePage';
 import WebVoteResults from './pages/WebVoteResults';
+import OrgLogin from './org/OrgLogin';
+import OrgSignup from './org/OrgSignup';
+import RequireOrg from './org/RequireOrg';
+import OrgDashboard from './org/OrgDashboard';
+import OrgElectionDetail from './org/OrgElectionDetail';
+
 function App() {
   return (
     <Router>
@@ -30,6 +36,11 @@ function App() {
         <Route path="/upload_bmd_keys" element={<UploadBMDKeys />} />
         <Route path="/vote" element={<VotePage />} />
         <Route path="/web_vote_results" element={<WebVoteResults />} />
+        <Route path="/org/login" element={<OrgLogin />} />
+        <Route path="/org/signup" element={<OrgSignup />} />
+        <Route path="/org" element={<RequireOrg><OrgDashboard /></RequireOrg>} />
+        <Route path="/org/dashboard" element={<RequireOrg><OrgDashboard /></RequireOrg>} />
+        <Route path="/org/elections/:election_id" element={<RequireOrg><OrgElectionDetail /></RequireOrg>} />
       </Routes>
     </Router>
   );
