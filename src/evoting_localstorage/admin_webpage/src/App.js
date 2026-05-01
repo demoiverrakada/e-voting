@@ -18,6 +18,7 @@ import OrgSignup from './org/OrgSignup';
 import RequireOrg from './org/RequireOrg';
 import OrgDashboard from './org/OrgDashboard';
 import OrgElectionDetail from './org/OrgElectionDetail';
+import BillingPage from './org/BillingPage';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
         <Route path="/org" element={<RequireOrg><OrgDashboard /></RequireOrg>} />
         <Route path="/org/dashboard" element={<RequireOrg><OrgDashboard /></RequireOrg>} />
         <Route path="/org/elections/:election_id" element={<RequireOrg><OrgElectionDetail /></RequireOrg>} />
+        <Route path="/org/billing" element={<RequireOrg><BillingPage /></RequireOrg>} />
       </Routes>
     </Router>
   );

@@ -37,6 +37,7 @@ const orgRoutes = require('./routes/orgRoutes')
 const voterAuthRoutes = require('./routes/voterAuthRoutes')
 const webVoteRoutes = require('./routes/webVoteRoutes')
 const electionRoutes = require('./routes/electionRoutes')
+const billingRoutes = require('./routes/billingRoutes');
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 app.use(authRoutes)
@@ -44,6 +45,7 @@ app.use(orgRoutes)
 app.use(voterAuthRoutes)
 app.use(webVoteRoutes)
 app.use(electionRoutes)
+app.use('/billing', billingRoutes);
 
 
 /*app.get('/',(req,res)=>

@@ -41,8 +41,18 @@ const createTestOrg = async () => {
   return { org, plainPassword };
 };
 
+/**
+ * Helper to get a signed JWT for a test organization.
+ */
+const getTestOrgToken = (org) => {
+  const jwt = require('jsonwebtoken');
+  const { jwtkey } = require('../keys');
+  return jwt.sign({ orgId: org._id }, jwtkey, { expiresIn: '1h' });
+};
+
 module.exports = {
   beforeAllHook,
   afterAllHook,
   createTestOrg,
+  getTestOrgToken,
 };

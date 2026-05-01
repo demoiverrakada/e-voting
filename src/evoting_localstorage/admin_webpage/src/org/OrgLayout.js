@@ -50,6 +50,7 @@ export default function OrgLayout({ children, orgName }) {
           🗳 E-Vote
         </div>
         <div style={styles.right}>
+          <a href="/org/billing" style={{ marginLeft: 16, color: '#007bff', textDecoration: 'none' }}>Billing</a>
           <span>{orgName}</span>
           <button style={styles.logout} onClick={handleLogout}>Log out</button>
         </div>

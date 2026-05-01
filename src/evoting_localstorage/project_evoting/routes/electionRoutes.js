@@ -1,7 +1,8 @@
 const express = require('express');
 const crypto = require('crypto');
-const { Election, Candidate, Voter, WebVote } = require('../models');
+const { Election, Candidate, Voter, WebVote, Organization } = require('../models');
 const requireOrgToken = require('../middleware/requireOrgToken');
+const requirePaidPlan = require('../middleware/requirePaidPlan');
 const { generateElectionId } = require('../lib/electionIdGenerator');
 const { sendVoterInvite } = require('../lib/mailer');
 const logger = require('../lib/logger');
@@ -11,7 +12,7 @@ const router = express.Router();
 router.use(requireOrgToken);
 
 // POST /api/elections - Create a new election
-router.post('/api/elections', async (req, res) => {
+router.post('/api/elections', requirePaidPlan, async (req, res) => {
   const { election_name, election_type, number_of_preferences } = req.body;
 
   if (!election_name || !election_type) {
@@ -34,6 +35,7 @@ router.post('/api/elections', async (req, res) => {
     });
 
     await election.save();
+    await Organization.findByIdAndUpdate(req.org._id, { $inc: { elections_created: 1 } });
     res.status(201).send(election);
   } catch (err) {
     res.status(422).send({ error: err.message });

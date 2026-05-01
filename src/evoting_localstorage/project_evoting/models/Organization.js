@@ -30,6 +30,18 @@ const OrganizationSchema = new mongoose.Schema({
     enum: ['free', 'paid'],
     default: 'free',
   },
+  elections_created: {
+    type: Number,
+    default: 0,
+  },
+  razorpay_payment_id: {
+    type: String,
+    default: null,
+  },
+  plan_activated_at: {
+    type: Date,
+    default: null,
+  },
   isVerified: {
     type: Boolean,
     default: false,
