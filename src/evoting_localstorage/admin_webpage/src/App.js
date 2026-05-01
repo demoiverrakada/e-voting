@@ -19,12 +19,18 @@ import RequireOrg from './org/RequireOrg';
 import OrgDashboard from './org/OrgDashboard';
 import OrgElectionDetail from './org/OrgElectionDetail';
 import BillingPage from './org/BillingPage';
+import LandingPage from './marketing/LandingPage';
+import PricingPage from './marketing/PricingPage';
+import AboutPage from './marketing/AboutPage';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/options" element={<OptionsPage />} />
         <Route path="/setup" element={<Setup />} />
         <Route path="/generate_ballots" element={<GenerateBallot />} />
