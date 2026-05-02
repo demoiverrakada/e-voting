@@ -14,6 +14,7 @@ const VoterSchema = new mongoose.Schema({
     vote:       { type: Boolean, default: false, required: true },
     election_id:{ type: Number, required: true },
     token_id:   { type: String, default: "" },
+    verified_at: { type: Date, default: null },
     time_stamp: { type: Date, index: true }
 });
 

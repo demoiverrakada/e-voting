@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const express = require('express');
-const { Candidate, Keys, Voter, WebVote } = require('../models');
+const { Candidate, Keys, Voter, WebVote, PollingBooth, Election } = require('../models');
 const requireOrgToken = require('../middleware/requireOrgToken');
 const logger = require('../lib/logger');
 
@@ -132,6 +132,21 @@ router.post('/api/vote/submit', async (req, res) => {
     const voter = await getActiveVoterByToken(token);
     if (!voter) {
       return res.status(401).send({ error: 'Invalid, expired, or already used token' });
+    }
+
+    // Enforce booth session for booth elections
+    const election = await Election.findOne({ org_id: voter.org_id._id || voter.org_id, election_id: voter.election_id });
+    if (election && election.mode === 'booth') {
+      const sessionToken = req.headers['x-booth-session'];
+      if (!sessionToken) {
+        return res.status(403).json({ error: 'Booth elections require an active booth session' });
+      }
+      const booth = await PollingBooth.findOne({ session_token: sessionToken, is_active: true });
+      if (!booth) {
+        return res.status(403).json({ error: 'Invalid or inactive booth session' });
+      }
+      // Increment booth vote counter
+      await PollingBooth.findByIdAndUpdate(booth._id, { $inc: { votes_cast: 1 } });
     }
 
     const electionPayload = await getElectionPayload(voter);

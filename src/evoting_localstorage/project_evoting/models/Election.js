@@ -23,6 +23,11 @@ const ElectionSchema = new mongoose.Schema({
     enum: ['fptp', 'preferential', 'block'],
     required: true,
   },
+  mode: {
+    type: String,
+    enum: ['online', 'booth'],
+    default: 'online',
+  },
   number_of_preferences: {
     type: Number,
     default: 1,
