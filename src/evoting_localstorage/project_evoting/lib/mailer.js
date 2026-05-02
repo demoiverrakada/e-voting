@@ -68,4 +68,28 @@ const sendVoterInvite = async (toEmail, voterName, electionName, voteUrl) => {
   return info;
 };
 
-module.exports = { sendVoterInvite };
+const sendOtpEmail = async (toEmail, orgName, otp) => {
+  if (!transporter) await initTransporter();
+  const info = await transporter.sendMail({
+    from: '"OpenVoting" <noreply@openvoting.in>',
+    to: toEmail,
+    subject: 'Your OpenVoting verification code',
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px;">
+        <h2 style="color:#007bff;">OpenVoting</h2>
+        <p>Hi ${orgName},</p>
+        <p>Use the code below to verify your email address. It expires in <strong>10 minutes</strong>.</p>
+        <div style="font-size:40px;font-weight:bold;letter-spacing:12px;text-align:center;
+                    padding:24px;background:#f8f9fa;border-radius:8px;margin:24px 0;">
+          ${otp}
+        </div>
+        <p style="color:#6c757d;font-size:13px;">If you did not request this, ignore this email.</p>
+      </div>
+    `,
+  });
+  if (process.env.NODE_ENV !== 'production') {
+    logger.info('OTP email preview: ' + nodemailer.getTestMessageUrl(info));
+  }
+};
+
+module.exports = { sendVoterInvite, sendOtpEmail };

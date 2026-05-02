@@ -54,6 +54,7 @@ const OrganizationSchema = new mongoose.Schema({
 
 OrganizationSchema.pre('save', function (next) {
   const org = this;
+  if (org.$locals.skipHash) return next();
   if (!org.isModified('passwordHash')) return next();
   bcrypt.genSalt(10, (err, salt) => {
     if (err) return next(err);

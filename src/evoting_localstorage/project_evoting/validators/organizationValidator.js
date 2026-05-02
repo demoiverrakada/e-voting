@@ -16,7 +16,16 @@ const loginSchema = Joi.object({
   password: Joi.string().min(8).required(),
 });
 
+const verifyOtpSchema = Joi.object({
+  email: Joi.string().email().required(),
+  otp: Joi.string().length(6).pattern(/^\d+$/).required().messages({
+    'string.length': 'OTP must be 6 digits',
+    'string.pattern.base': 'OTP must be numeric',
+  }),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
+  verifyOtpSchema,
 };

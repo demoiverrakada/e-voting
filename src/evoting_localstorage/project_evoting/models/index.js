@@ -1,6 +1,7 @@
 const Votes = require('./Vote');
 const Admin = require('./Admin');
 const Organization = require('./Organization');
+const OtpVerification = require('./OtpVerification');
 const Election = require('./Election');
 const Candidate = require('./Candidate');
 const Voter = require('./Voter');
@@ -15,6 +16,7 @@ module.exports = {
     Votes,
     Admin,
     Organization,
+    OtpVerification,
     Election,
     Candidate,
     Voter,
