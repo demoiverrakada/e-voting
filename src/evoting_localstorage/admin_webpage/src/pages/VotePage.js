@@ -155,9 +155,15 @@ function VotePage() {
       const encrypted = await encryptSelection(selection);
       const client_receipt_nonce = window.crypto.randomUUID();
 
+      const boothSession = sessionStorage.getItem('booth_session_token');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(boothSession ? { 'X-Booth-Session': boothSession } : {}),
+      };
+
       const res = await fetch(`${API_BASE_URL}/api/vote/submit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           token,
           ballot_type: electionType,

@@ -22,6 +22,9 @@ import BillingPage from './org/BillingPage';
 import LandingPage from './marketing/LandingPage';
 import PricingPage from './marketing/PricingPage';
 import AboutPage from './marketing/AboutPage';
+import OfficerLogin from './officer/OfficerLogin';
+import OfficerBooth from './officer/OfficerBooth';
+import RequireOfficer from './officer/RequireOfficer';
 
 function App() {
   return (
@@ -49,6 +52,8 @@ function App() {
         <Route path="/org/dashboard" element={<RequireOrg><OrgDashboard /></RequireOrg>} />
         <Route path="/org/elections/:election_id" element={<RequireOrg><OrgElectionDetail /></RequireOrg>} />
         <Route path="/org/billing" element={<RequireOrg><BillingPage /></RequireOrg>} />
+        <Route path="/officer/login" element={<OfficerLogin />} />
+        <Route path="/officer/booth" element={<RequireOfficer><OfficerBooth /></RequireOfficer>} />
       </Routes>
     </Router>
   );

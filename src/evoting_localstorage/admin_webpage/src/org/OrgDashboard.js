@@ -26,7 +26,7 @@ export default function OrgDashboard() {
   const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [createForm, setCreateForm] = useState({ election_name: '', election_type: 'fptp', number_of_preferences: 1 });
+  const [createForm, setCreateForm] = useState({ election_name: '', election_type: 'fptp', mode: 'online', number_of_preferences: 1 });
   const [createError, setCreateError] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -55,7 +55,7 @@ export default function OrgDashboard() {
     } else {
       setElections([data, ...elections]);
       setShowCreateForm(false);
-      setCreateForm({ election_name: '', election_type: 'fptp', number_of_preferences: 1 });
+      setCreateForm({ election_name: '', election_type: 'fptp', mode: 'online', number_of_preferences: 1 });
     }
   };
 
@@ -93,6 +93,16 @@ export default function OrgDashboard() {
               <option value="fptp">First Past The Post (FPTP)</option>
               <option value="preferential">Preferential Voting (STV/Ranked)</option>
               <option value="block">Block Voting</option>
+            </select>
+
+            <label style={styles.label}>Election Mode</label>
+            <select
+              style={styles.input}
+              value={createForm.mode}
+              onChange={(e) => setCreateForm({ ...createForm, mode: e.target.value })}
+            >
+              <option value="online">Online (voters receive email tokens)</option>
+              <option value="booth">Booth (supervised in-person voting)</option>
             </select>
 
             {createForm.election_type === 'preferential' && (

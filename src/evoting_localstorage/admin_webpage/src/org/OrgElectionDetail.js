@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { orgFetch } from './api';
 import OrgLayout from './OrgLayout';
 
@@ -20,7 +20,7 @@ const styles = {
   btnDanger: { padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' },
   table: { width: '100%', borderCollapse: 'collapse', marginTop: '20px' },
   th: { textAlign: 'left', padding: '12px', borderBottom: '2px solid #dee2e6' },
-  td: { padding: '12px', borderBottom: '1px solid #dee2e6' },
+  td: { padding: '12px', borderBottom: '1px solid #f0f0f0' },
   actionBar: {
     position: 'fixed',
     bottom: 0,
@@ -50,12 +50,18 @@ export default function OrgElectionDetail() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('candidates');
   
+  // Booths & Officers
+  const [booths, setBooths] = useState([]);
+  const [newBoothName, setNewBoothName] = useState('');
+  const [officers, setOfficers] = useState([]);
+  const [newOfficer, setNewOfficer] = useState({ name: '', email: '', password: '' });
+
   // Forms
   const [candForm, setCandForm] = useState({ name: '', entry_number: '', cand_id: '' });
   const [voterCsv, setVoterCsv] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     const [orgRes, summaryRes] = await Promise.all([
       orgFetch('/org/me'),
       orgFetch(`/api/elections/${election_id}/summary`)
@@ -63,9 +69,25 @@ export default function OrgElectionDetail() {
     if (orgRes.data) setOrg(orgRes.data);
     if (summaryRes.data) setData(summaryRes.data);
     setLoading(false);
-  };
+  }, [election_id]);
 
-  useEffect(() => { loadData(); }, [election_id]);
+  const loadBooths = useCallback(async () => {
+    const { data: bData } = await orgFetch(`/api/elections/${election_id}/booths`);
+    if (bData) setBooths(bData.booths);
+  }, [election_id]);
+
+  const loadOfficers = useCallback(async () => {
+    const { data: oData } = await orgFetch('/api/officers');
+    if (oData) setOfficers(oData.officers);
+  }, []);
+
+  useEffect(() => { 
+    loadData();
+    if (activeTab === 'booths') {
+      loadBooths();
+      loadOfficers();
+    }
+  }, [loadData, activeTab, loadBooths, loadOfficers]);
 
   const addCandidate = async (e) => {
     e.preventDefault();
@@ -104,8 +126,46 @@ export default function OrgElectionDetail() {
     } else { alert(error); }
   };
 
+  const createBooth = async (e) => {
+    e.preventDefault();
+    const { error } = await orgFetch(`/api/elections/${election_id}/booths`, {
+      method: 'POST',
+      body: JSON.stringify({ name: newBoothName })
+    });
+    if (!error) {
+      setNewBoothName('');
+      loadBooths();
+    } else alert(error);
+  };
+
+  const deactivateBooth = async (booth_id) => {
+    if (!window.confirm('Force deactivate booth?')) return;
+    const { error } = await orgFetch(`/api/elections/${election_id}/booths/${booth_id}/deactivate`, {
+      method: 'POST'
+    });
+    if (!error) loadBooths(); else alert(error);
+  };
+
+  const addOfficer = async (e) => {
+    e.preventDefault();
+    const { error } = await orgFetch('/api/officers', {
+      method: 'POST',
+      body: JSON.stringify(newOfficer)
+    });
+    if (!error) {
+      setNewOfficer({ name: '', email: '', password: '' });
+      loadOfficers();
+    } else alert(error);
+  };
+
+  const deleteOfficer = async (id) => {
+    if (!window.confirm('Delete officer?')) return;
+    const { error } = await orgFetch(`/api/officers/${id}`, { method: 'DELETE' });
+    if (!error) loadOfficers(); else alert(error);
+  };
+
   const openElection = async () => {
-    if (!window.confirm('Open election? This will send invitation emails to all voters.')) return;
+    if (!window.confirm('Open election? This will enable voting.')) return;
     setActionLoading(true);
     const { error } = await orgFetch(`/api/elections/${election_id}/open`, { method: 'POST' });
     setActionLoading(false);
@@ -134,7 +194,9 @@ export default function OrgElectionDetail() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <div>
           <h1 style={{ margin: 0 }}>{election.election_name}</h1>
-          <p style={{ color: '#666', margin: '5px 0 0 0' }}>{election.election_type.toUpperCase()} Election #{election.election_id}</p>
+          <p style={{ color: '#666', margin: '5px 0 0 0' }}>
+            {election.mode.toUpperCase()} · {election.election_type.toUpperCase()} Election #{election.election_id}
+          </p>
         </div>
         <div style={styles.statusBadge(election.status)}>{election.status}</div>
       </div>
@@ -142,6 +204,9 @@ export default function OrgElectionDetail() {
       <div style={styles.tabBar}>
         <button style={styles.tab(activeTab === 'candidates')} onClick={() => setActiveTab('candidates')}>Candidates</button>
         <button style={styles.tab(activeTab === 'voters')} onClick={() => setActiveTab('voters')}>Voters</button>
+        {election.mode === 'booth' && (
+          <button style={styles.tab(activeTab === 'booths')} onClick={() => setActiveTab('booths')}>🗳️ Booths</button>
+        )}
         <button style={styles.tab(activeTab === 'results')} onClick={() => setActiveTab('results')}>Results</button>
       </div>
 
@@ -202,9 +267,73 @@ export default function OrgElectionDetail() {
             <div style={{ padding: '10px', backgroundColor: '#e9ecef', borderRadius: '4px', marginBottom: '10px' }}>
               <strong>Total Voters:</strong> {election.total_voters}
             </div>
-            {/* Note: We would need a GET /api/elections/:id/voters to show the list, 
-                for now we just show the count from the summary */}
-            <p style={{ color: '#666', fontSize: '14px' }}>Voter details and invitation status can be viewed once the election is open.</p>
+            <p style={{ color: '#666', fontSize: '14px' }}>Voter details can be managed by polling officers during the election.</p>
+          </div>
+        )}
+
+        {activeTab === 'booths' && (
+          <div>
+            <div style={{ marginBottom: '40px' }}>
+              <h3>Polling Booths</h3>
+              <form onSubmit={createBooth} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <input style={styles.input} placeholder="Booth Name (e.g. Block 1)" value={newBoothName} onChange={e => setNewBoothName(e.target.value)} required />
+                <button style={styles.btnPrimary} type="submit">Create Booth</button>
+              </form>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>Name</th>
+                    <th style={styles.th}>Activation Code</th>
+                    <th style={styles.th}>Status</th>
+                    <th style={styles.th}>Votes</th>
+                    <th style={styles.th}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {booths.map(b => (
+                    <tr key={b.id}>
+                      <td style={styles.td}>{b.name}</td>
+                      <td style={styles.td}><code style={{ backgroundColor: '#eee', padding: '2px 6px' }}>{b.activation_code}</code></td>
+                      <td style={styles.td}>{b.is_active ? <span style={{ color: 'green', fontWeight: 'bold' }}>ACTIVE</span> : 'Inactive'}</td>
+                      <td style={styles.td}>{b.votes_cast}</td>
+                      <td style={styles.td}>
+                        {b.is_active && <button style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }} onClick={() => deactivateBooth(b.id)}>Force Deactivate</button>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div>
+              <h3>Polling Officers</h3>
+              <form onSubmit={addOfficer} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <input style={styles.input} placeholder="Name" value={newOfficer.name} onChange={e => setNewOfficer({...newOfficer, name: e.target.value})} required />
+                <input style={styles.input} placeholder="Email" type="email" value={newOfficer.email} onChange={e => setNewOfficer({...newOfficer, email: e.target.value})} required />
+                <input style={styles.input} placeholder="Password" type="password" value={newOfficer.password} onChange={e => setNewOfficer({...newOfficer, password: e.target.value})} required />
+                <button style={styles.btnPrimary} type="submit">Add Officer</button>
+              </form>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>Name</th>
+                    <th style={styles.th}>Email</th>
+                    <th style={styles.th}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {officers.map(o => (
+                    <tr key={o._id}>
+                      <td style={styles.td}>{o.name}</td>
+                      <td style={styles.td}>{o.email}</td>
+                      <td style={styles.td}>
+                        <button style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }} onClick={() => deleteOfficer(o._id)}>Remove</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -238,7 +367,7 @@ export default function OrgElectionDetail() {
         <div>
           {election.status === 'draft' && (
             <button style={styles.btnPrimary} onClick={openElection} disabled={actionLoading}>
-              {actionLoading ? 'Opening...' : 'Open Election & Send Invites'}
+              {actionLoading ? 'Opening...' : 'Open Election'}
             </button>
           )}
           {election.status === 'open' && (
