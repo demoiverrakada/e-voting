@@ -15,8 +15,9 @@ describe('Election Management API', () => {
   let token;
   let testOrg;
 
+  jest.setTimeout(20000);
+
   beforeAll(async () => {
-    jest.setTimeout(20000);
     await beforeAllHook();
     const { org } = await createTestOrg();
     testOrg = org;

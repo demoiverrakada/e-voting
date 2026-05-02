@@ -12,6 +12,8 @@ describe('Organization Routes', () => {
   let seededOrg;
   let seededPassword;
 
+  jest.setTimeout(20000);
+
   beforeAll(async () => {
     await beforeAllHook();
     // Seed an org for login and /me tests

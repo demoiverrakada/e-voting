@@ -68,11 +68,7 @@
       "!middleware/requireToken.js",
       "!models/Admin.js",
       "!models/connection.js",
-      "!**/node_modules/**",
-      "!routes/officerRoutes.js",
-      "!routes/boothAdminRoutes.js",
-      "!middleware/requireOfficerToken.js",
-      "!middleware/requireBoothSession.js"
+      "!**/node_modules/**"
     ],
     "coverageThreshold": {
       "global": {
