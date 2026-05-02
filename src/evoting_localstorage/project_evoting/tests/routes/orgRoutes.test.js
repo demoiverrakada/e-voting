@@ -2,15 +2,22 @@ const request = require('supertest');
 const express = require('express');
 const bodyParser = require('body-parser');
 const orgRoutes = require('../../routes/orgRoutes');
-const { beforeAllHook, afterAllHook } = require('../setup');
+const { beforeAllHook, afterAllHook, createTestOrg, getTestOrgToken } = require('../setup');
 
 const testApp = express();
 testApp.use(bodyParser.json());
 testApp.use(orgRoutes);
 
 describe('Organization Routes', () => {
+  let seededOrg;
+  let seededPassword;
+
   beforeAll(async () => {
     await beforeAllHook();
+    // Seed an org for login and /me tests
+    const { org, plainPassword } = await createTestOrg();
+    seededOrg = org;
+    seededPassword = plainPassword;
   });
 
   afterAll(async () => {
@@ -24,24 +31,23 @@ describe('Organization Routes', () => {
     password: 'password123'
   };
 
-  it('POST /org/register — creates org and returns token', async () => {
+  it('POST /org/register — sends OTP and returns message', async () => {
     const res = await request(testApp)
       .post('/org/register')
       .send(testOrgData);
     
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('token');
-    expect(res.body.org).toHaveProperty('id');
-    expect(res.body.org.email).toBe(testOrgData.email);
+    expect(res.body).toHaveProperty('message');
+    expect(res.body.message).toMatch(/OTP sent/i);
   });
 
-  it('POST /org/register — returns 409 for duplicate email', async () => {
+  it('POST /org/verify-otp — returns 400 for invalid OTP', async () => {
     const res = await request(testApp)
-      .post('/org/register')
-      .send(testOrgData);
+      .post('/org/verify-otp')
+      .send({ email: testOrgData.email, otp: '000000' });
     
-    expect(res.status).toBe(409);
-    expect(res.body.error).toBeDefined();
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/invalid otp/i);
   });
 
   it('POST /org/register — returns 400 for missing password', async () => {
@@ -58,8 +64,8 @@ describe('Organization Routes', () => {
     const res = await request(testApp)
       .post('/org/login')
       .send({
-        email: testOrgData.email,
-        password: testOrgData.password
+        email: seededOrg.email,
+        password: seededPassword
       });
     
     expect(res.status).toBe(200);
@@ -70,7 +76,7 @@ describe('Organization Routes', () => {
     const res = await request(testApp)
       .post('/org/login')
       .send({
-        email: testOrgData.email,
+        email: seededOrg.email,
         password: 'wrongpassword'
       });
     
@@ -78,21 +84,15 @@ describe('Organization Routes', () => {
   });
 
   it('GET /org/me — returns org for valid token', async () => {
-    const loginRes = await request(testApp)
-      .post('/org/login')
-      .send({
-        email: testOrgData.email,
-        password: testOrgData.password
-      });
-    
-    const token = loginRes.body.token;
+    const token = getTestOrgToken(seededOrg);
 
     const res = await request(testApp)
       .get('/org/me')
       .set('Authorization', `Bearer ${token}`);
     
     expect(res.status).toBe(200);
-    expect(res.body.email).toBe(testOrgData.email);
+    expect(res.body.email).toBe(seededOrg.email);
+    expect(res.body).toHaveProperty('name');
   });
 
   it('GET /org/me — returns 401 with no token', async () => {
