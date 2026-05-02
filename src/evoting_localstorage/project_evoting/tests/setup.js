@@ -3,9 +3,6 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let mongoServer;
 
-/**
- * Before all tests: start an in-memory MongoDB server and connect mongoose to it.
- */
 const beforeAllHook = async () => {
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
@@ -16,45 +13,34 @@ const beforeAllHook = async () => {
   await mongoose.connect(uri);
 };
 
-/**
- * After all tests: disconnect and stop the in-memory server.
- */
 const afterAllHook = async () => {
   await mongoose.disconnect();
-  if (mongoServer) {
-    await mongoServer.stop();
-  }
+  if (mongoServer) await mongoServer.stop();
 };
 
 /**
- * Helper to create a test organization.
+ * Create a test org. Pass overrides to avoid slug/email collisions
+ * when calling multiple times in the same test file.
+ * Defaults are kept for backward compatibility with existing tests.
  */
-const createTestOrg = async () => {
+const createTestOrg = async (overrides = {}) => {
   const { Organization } = require('../models');
-  const plainPassword = 'password123';
-  const orgData = {
-    name: 'Test Org',
-    slug: 'test-org',
-    email: 'test@example.com',
-    passwordHash: plainPassword,
-  };
-  const org = new Organization(orgData);
+  const plainPassword = overrides.password || 'testpassword123';
+  const name  = overrides.name  || 'Test Org';
+  const email = overrides.email || 'test@example.com';
+  const slug  = overrides.slug  || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const org = new Organization({ name, slug, email, passwordHash: plainPassword });
   await org.save();
-  return { org, plainPassword };
+  const jwt = require('jsonwebtoken');
+  const { jwtkey } = require('../keys');
+  const token = jwt.sign({ orgId: org._id }, jwtkey, { expiresIn: '1h' });
+  return { org, token, plainPassword };
 };
 
-/**
- * Helper to get a signed JWT for a test organization.
- */
 const getTestOrgToken = (org) => {
   const jwt = require('jsonwebtoken');
   const { jwtkey } = require('../keys');
   return jwt.sign({ orgId: org._id }, jwtkey, { expiresIn: '1h' });
 };
 
-module.exports = {
-  beforeAllHook,
-  afterAllHook,
-  createTestOrg,
-  getTestOrgToken,
-};
+module.exports = { beforeAllHook, afterAllHook, createTestOrg, getTestOrgToken };
