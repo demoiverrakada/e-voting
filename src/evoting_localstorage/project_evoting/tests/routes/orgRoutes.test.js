@@ -50,6 +50,30 @@ describe('Organization Routes', () => {
     expect(res.body.error).toMatch(/invalid otp/i);
   });
 
+  it('POST /org/verify-otp — creates org and returns token for valid OTP', async () => {
+    const crypto = require('crypto');
+    const { OtpVerification } = require('../../models');
+    const email = 'otp-happy@test.com';
+    const knownOtp = '123456';
+    const knownHash = crypto.createHash('sha256').update(knownOtp).digest('hex');
+
+    // Trigger OTP creation
+    await request(testApp)
+      .post('/org/register')
+      .send({ ...testOrgData, email });
+
+    // Manually set known OTP
+    await OtpVerification.findOneAndUpdate({ email }, { otpHash: knownHash });
+
+    const res = await request(testApp)
+      .post('/org/verify-otp')
+      .send({ email, otp: knownOtp });
+    
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('token');
+    expect(res.body.org.name).toBe(testOrgData.name);
+  });
+
   it('POST /org/register — returns 400 for missing password', async () => {
     const { password, ...incompleteData } = testOrgData;
     const res = await request(testApp)
